@@ -30,7 +30,7 @@ export const EntryLoader: React.FC<Props> = ({ onComplete }) => {
   }, [onComplete]);
 
   // Tightened transition durations
-  const insigniaTransition = { duration: 0.8, ease: [0.16, 1, 0.3, 1] };
+  const insigniaTransition = { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const };
 
   return (
     <motion.div 
