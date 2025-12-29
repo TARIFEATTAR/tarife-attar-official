@@ -1,0 +1,8 @@
+{
+  "name": "Tarife Attär - Modern Apothecary",
+  "description": "A high-end modern apothecary e-commerce experience featuring a sensory split-screen entry system and interactive atmospheric tuners.",
+  "requestFramePermissions": [
+    "microphone",
+    "geolocation"
+  ]
+}
