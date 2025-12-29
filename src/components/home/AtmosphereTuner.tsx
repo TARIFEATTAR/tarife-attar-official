@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { FieldReport } from '@/types';
 
@@ -66,11 +67,12 @@ export const AtmosphereTuner: React.FC<Props> = ({ onBack, onNavigate }) => {
             className="group relative flex flex-col h-full cursor-pointer pointer-events-auto z-40"
           >
             <div className="relative aspect-[3/4] overflow-hidden mb-6 bg-theme-charcoal/5 border border-transparent group-hover:border-theme-charcoal/20 transition-colors">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img 
+              <Image 
                 src={report.imageUrl} 
                 alt={report.name}
-                className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:scale-105 group-hover:opacity-100 transition-all duration-1000 ease-out"
+                fill
+                sizes="(max-width: 768px) 100vw, 33vw"
+                className="object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:scale-105 group-hover:opacity-100 transition-all duration-1000 ease-out"
               />
               <div className="absolute top-4 left-4 p-2 bg-white/10 backdrop-blur-sm">
                 <span className="font-mono text-[9px] tracking-tighter text-white uppercase">{report.coordinates}</span>

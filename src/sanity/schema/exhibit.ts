@@ -1,6 +1,12 @@
 // Exhibit schema type definition
 // This defines the structure for curated exhibits / editorial content
 
+type SanityRule = {
+  required: () => SanityRule;
+  min: (n: number) => SanityRule;
+  max: (n: number) => SanityRule;
+};
+
 export const exhibitSchema = {
   name: "exhibit",
   title: "Exhibit",
@@ -10,7 +16,7 @@ export const exhibitSchema = {
       name: "title",
       title: "Title",
       type: "string",
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: "slug",
@@ -20,7 +26,7 @@ export const exhibitSchema = {
         source: "title",
         maxLength: 96,
       },
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: "subtitle",

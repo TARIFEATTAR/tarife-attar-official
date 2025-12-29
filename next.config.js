@@ -7,7 +7,16 @@ const nextConfig = {
         hostname: "cdn.sanity.io",
         pathname: "/images/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
     ],
+  },
+  // Improve build performance
+  experimental: {
+    optimizePackageImports: ["lucide-react", "framer-motion"],
   },
 };
 

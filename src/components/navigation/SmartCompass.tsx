@@ -11,7 +11,7 @@ interface Props {
   onOpenAssistant: () => void;
 }
 
-export const SmartCompass: React.FC<Props> = ({ view, theme, gpsCoordinates, onNavigate, onOpenAssistant }) => {
+export const SmartCompass: React.FC<Props> = ({ view: _view, theme, gpsCoordinates, onNavigate, onOpenAssistant }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const isLight = theme === 'light';
@@ -51,7 +51,7 @@ export const SmartCompass: React.FC<Props> = ({ view, theme, gpsCoordinates, onN
                 >
                   <div className="absolute inset-0 bg-[radial-gradient(#000_1px,transparent_1px)] bg-[size:24px_24px] opacity-[0.03]" />
                   <div className="relative z-10 space-y-3 md:space-y-6">
-                    <span className="font-mono text-[8px] md:text-[9px] uppercase tracking-[0.6em] text-[#c5a66a]">PROTOCOL_01</span>
+                    <span className="font-mono text-[8px] md:text-[9px] uppercase tracking-[0.6em] text-theme-gold">PROTOCOL_01</span>
                     <h2 className="text-2xl sm:text-3xl md:text-5xl font-serif italic leading-none group-hover:tracking-tighter transition-all duration-[1s]">Sensory Curator</h2>
                     <p className="font-serif italic text-xs sm:text-sm md:text-lg opacity-60 max-w-[200px] md:max-w-xs mx-auto">Calibrate for your molecular match.</p>
                   </div>
@@ -104,7 +104,7 @@ export const SmartCompass: React.FC<Props> = ({ view, theme, gpsCoordinates, onN
           <div className="relative w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 flex items-center justify-center">
             {/* Outer Ring */}
             <div className="absolute inset-0 rounded-full bg-[#f4f2ec] border border-theme-charcoal/5 shadow-2xl overflow-hidden">
-               <div className="absolute inset-0 border-[3px] sm:border-[4px] md:border-[6px] border-[#c5a66a]/10 rounded-full" />
+               <div className="absolute inset-0 border-[3px] sm:border-[4px] md:border-[6px] border-theme-gold/10 rounded-full" />
                <svg viewBox="0 0 128 128" className="absolute inset-0 w-full h-full p-2 sm:p-3 md:p-4 overflow-visible pointer-events-none">
                 {[{ deg: 0, l: 'N' }, { deg: 90, l: 'E' }, { deg: 180, l: 'S' }, { deg: 270, l: 'W' }].map(m => (
                   <g key={m.deg} transform={`rotate(${m.deg}, 64, 64)`}>
@@ -129,7 +129,7 @@ export const SmartCompass: React.FC<Props> = ({ view, theme, gpsCoordinates, onN
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
               <motion.div 
                 animate={{ scale: isHovered || isOpen ? 1.2 : 1 }}
-                className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 rounded-full bg-[#c5a66a] border border-white/40 shadow-xl" 
+                className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 rounded-full bg-theme-gold border border-white/40 shadow-xl" 
               />
             </div>
           </div>

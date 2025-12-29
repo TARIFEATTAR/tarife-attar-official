@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
 
 /**
  * HybridCompass Navigation Component
@@ -19,7 +18,7 @@ interface HybridCompassProps {
   currentSection?: "atlas" | "relic";
 }
 
-export function HybridCompass({ onNavigate, currentSection = "atlas" }: HybridCompassProps) {
+export function HybridCompass({ onNavigate: _onNavigate, currentSection = "atlas" }: HybridCompassProps) {
   return (
     <motion.div
       className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50"

@@ -1,6 +1,14 @@
 // Product schema type definition
 // This defines the structure for fragrance products in the archive
 
+// Note: Using defineField/defineType from sanity for proper typing in Studio,
+// but this simplified version works for schema registration
+type SanityRule = {
+  required: () => SanityRule;
+  min: (n: number) => SanityRule;
+  max: (n: number) => SanityRule;
+};
+
 export const productSchema = {
   name: "product",
   title: "Product",
@@ -10,7 +18,7 @@ export const productSchema = {
       name: "title",
       title: "Title",
       type: "string",
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: "slug",
@@ -20,7 +28,7 @@ export const productSchema = {
         source: "title",
         maxLength: 96,
       },
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: SanityRule) => Rule.required(),
     },
     {
       name: "brand",
@@ -96,7 +104,7 @@ export const productSchema = {
       brand: "brand",
       media: "mainImage",
     },
-    prepare(selection: { title: string; brand: string; media: any }) {
+    prepare(selection: { title: string; brand: string; media: unknown }) {
       const { title, brand, media } = selection;
       return {
         title,

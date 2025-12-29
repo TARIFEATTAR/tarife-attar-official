@@ -15,6 +15,7 @@ export default {
           charcoal: "#1A1A1A",     // The Relic background/text - deep ink
           obsidian: "#121212",     // The Relic dark mode - absolute depth
           industrial: "#B3B3B3",   // Metadata - understated technical
+          gold: "#c5a66a",         // Accent gold - protocol markers
         },
       },
       fontFamily: {
