@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { SplitEntry } from "@/components/home";
-import { SmartCompass } from "@/components/navigation";
+import { SmartCompass, GlobalFooter } from "@/components/navigation";
 import { EntryLoader } from "@/components/intro";
 import { Product } from "@/types";
 
@@ -181,6 +181,9 @@ export default function Home() {
                 </div>
               </div>
             </section>
+
+            {/* Global Footer */}
+            <GlobalFooter theme="dark" />
 
             {/* Smart Compass Navigation */}
             <SmartCompass 
