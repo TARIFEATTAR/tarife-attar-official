@@ -33,20 +33,42 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse webhook payload
+    // Sanity webhooks send an array of mutations
     const body = await request.json();
-    const { _type, slug } = body;
+    const mutations = Array.isArray(body) ? body : body.mutations || [body];
 
-    // Revalidate based on document type
-    if (_type === 'product') {
+    // Track what needs revalidation
+    let hasProducts = false;
+    let hasExhibits = false;
+    const productSlugs: string[] = [];
+    const exhibitSlugs: string[] = [];
+
+    // Process each mutation
+    for (const mutation of mutations) {
+      const doc = mutation.result || mutation.after || mutation;
+      const _type = doc._type;
+      const slug = doc.slug?.current;
+
+      if (_type === 'product') {
+        hasProducts = true;
+        if (slug) productSlugs.push(slug);
+      } else if (_type === 'exhibit') {
+        hasExhibits = true;
+        if (slug) exhibitSlugs.push(slug);
+      }
+    }
+
+    // Revalidate based on document types found
+    if (hasProducts) {
       // Revalidate product tags
       revalidateTag('atlas-products');
       revalidateTag('relic-products');
       revalidateTag('atlas-counts');
       revalidateTag('featured-products');
 
-      // Revalidate product pages
-      if (slug?.current) {
-        revalidatePath(`/product/${slug.current}`);
+      // Revalidate specific product pages
+      for (const slug of productSlugs) {
+        revalidatePath(`/product/${slug}`);
       }
 
       // Revalidate collection pages
@@ -56,21 +78,21 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         revalidated: true,
-        message: `Product ${slug?.current || 'updated'} revalidated`,
+        message: `Products revalidated: ${productSlugs.length > 0 ? productSlugs.join(', ') : 'all products'}`,
         timestamp: new Date().toISOString(),
       });
     }
 
-    if (_type === 'exhibit') {
+    if (hasExhibits) {
       revalidateTag('exhibits');
-      if (slug?.current) {
-        revalidatePath(`/journal/${slug.current}`);
+      for (const slug of exhibitSlugs) {
+        revalidatePath(`/journal/${slug}`);
       }
       revalidatePath('/journal');
 
       return NextResponse.json({
         revalidated: true,
-        message: `Exhibit ${slug?.current || 'updated'} revalidated`,
+        message: `Exhibits revalidated: ${exhibitSlugs.length > 0 ? exhibitSlugs.join(', ') : 'all exhibits'}`,
         timestamp: new Date().toISOString(),
       });
     }

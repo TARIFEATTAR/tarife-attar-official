@@ -21,8 +21,9 @@ export async function sanityFetch<QueryResponse>({
 }): Promise<QueryResponse> {
   return client.fetch<QueryResponse>(query, params, {
     next: {
-      revalidate: tags.length ? false : revalidate, // Disable time-based revalidation if using tags
-      tags,
+      // Use tags for on-demand revalidation, but still allow time-based revalidation as fallback
+      revalidate: revalidate,
+      tags: tags.length > 0 ? tags : undefined,
     },
   });
 }
