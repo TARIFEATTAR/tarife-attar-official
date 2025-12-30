@@ -104,7 +104,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, onGuidedEntry }) => {
                 <motion.h2 className="text-2xl sm:text-3xl md:text-6xl italic font-light mb-2 md:mb-6 tracking-tighter">Atlas</motion.h2>
               </div>
               <motion.p className="max-w-[160px] sm:max-w-[200px] md:max-w-xs mx-auto text-xs sm:text-sm md:text-lg opacity-80 leading-relaxed font-serif italic">
-                {hovered === 'atlas' ? "Begin Protocol" : "Slow-release molecular oils stabilized via the Tarife Attär system."}
+                {hovered === 'atlas' ? "Explore Territories" : "Clean perfume oils. Four sensory territories. Twenty-four destinations."}
               </motion.p>
             </motion.div>
           )}
@@ -141,7 +141,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, onGuidedEntry }) => {
                 <motion.h2 className="text-2xl sm:text-3xl md:text-6xl font-light mb-2 md:mb-6 tracking-tighter">Relic</motion.h2>
               </div>
               <motion.p className="max-w-[160px] sm:max-w-[200px] md:max-w-xs mx-auto text-xs sm:text-sm md:text-lg leading-relaxed font-serif italic">
-                {hovered === 'relic' ? "Access Vault" : "Weighty study of fossilized resins."}
+                {hovered === 'relic' ? "Enter Vault" : "Pure resins. Rare materials. For the devoted collector."}
               </motion.p>
             </motion.div>
           )}

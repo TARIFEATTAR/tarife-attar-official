@@ -70,7 +70,10 @@ export type ProductFormat =
   | 'Perfume Oil' 
   | 'Atmosphere Mist' 
   | 'Traditional Attar' 
-  | 'Pure Distillate';
+  | 'Pure Distillate'
+  | 'Pure Oud'
+  | 'Aged Resin'
+  | 'Rare Attar';
 
 export type HardwareType = 
   | 'Roller' 
