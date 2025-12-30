@@ -29,6 +29,7 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredDirection, setHoveredDirection] = useState<'N' | 'E' | 'S' | 'W' | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Scroll-based needle rotation
   const { scrollYProgress } = useScroll();
@@ -43,20 +44,39 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
 
   useEffect(() => {
     setIsMounted(true);
+    
+    // Check if mobile on mount and resize
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Responsive size config - smaller on mobile
   const sizeConfig = {
-    sm: 80,
-    md: 100,
-    lg: 140,
+    sm: isMobile ? 64 : 80,
+    md: isMobile ? 72 : 100,
+    lg: isMobile ? 100 : 140,
   };
 
   const compassSize = sizeConfig[size];
+  
+  // Expanded compass size - responsive
+  const expandedSize = isMobile ? 180 : 256;
+  
   const needleBaseOffset = 45; // The needle image is at 45° by default
 
   const handleNavClick = (item: NavItem) => {
     onNavigate(item.path);
     setIsOpen(false);
+  };
+
+  // Handle touch for mobile - treat tap as both hover and click
+  const handleTouchStart = (direction: 'N' | 'E' | 'S' | 'W') => {
+    setHoveredDirection(direction);
   };
 
   if (!isMounted) {
@@ -94,31 +114,31 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
         className={`fixed z-[3000] ${
           isOpen 
             ? 'inset-0 flex items-center justify-center pointer-events-none' 
-            : 'bottom-6 right-6 pointer-events-auto'
+            : 'bottom-4 right-4 md:bottom-6 md:right-6 pointer-events-auto'
         }`}
         transition={springTransition}
       >
         <motion.button
-          className="cursor-pointer relative pointer-events-auto"
+          className="cursor-pointer relative pointer-events-auto touch-manipulation"
           layout
           animate={{
-            width: isOpen ? 256 : compassSize,
-            height: isOpen ? 256 : compassSize,
+            width: isOpen ? expandedSize : compassSize,
+            height: isOpen ? expandedSize : compassSize,
           }}
           transition={springTransition}
           onClick={(e) => {
             e.stopPropagation();
             setIsOpen(!isOpen);
           }}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          whileHover={{ scale: isOpen ? 1 : 1.05 }}
+          onMouseEnter={() => !isMobile && setIsHovered(true)}
+          onMouseLeave={() => !isMobile && setIsHovered(false)}
+          whileHover={isMobile ? {} : { scale: isOpen ? 1 : 1.05 }}
           whileTap={{ scale: isOpen ? 0.98 : 0.95 }}
         >
           {/* Compass Body */}
           <motion.div
             animate={{ 
-              rotate: isHovered && !isOpen ? [0, 5, -5, 0] : 0,
+              rotate: isHovered && !isOpen && !isMobile ? [0, 5, -5, 0] : 0,
             }}
             transition={{ duration: 0.4 }}
             className="absolute inset-0"
@@ -149,10 +169,10 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
               className="relative w-full h-full"
               style={{ transform: `rotate(-${needleBaseOffset}deg)` }}
               animate={{
-                rotate: isHovered && !isOpen ? [0, 15, -15, 0] : 0,
+                rotate: isHovered && !isOpen && !isMobile ? [0, 15, -15, 0] : 0,
               }}
               transition={
-                isHovered && !isOpen 
+                isHovered && !isOpen && !isMobile
                   ? { duration: 0.6, repeat: Infinity, repeatType: 'reverse' as const }
                   : { type: 'spring', stiffness: 80, damping: 20 }
               }
@@ -167,11 +187,11 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
             </motion.div>
           </motion.div>
 
-          {/* Hover glow effect */}
+          {/* Hover/Active glow effect */}
           <motion.div
             className="absolute inset-0 rounded-full pointer-events-none"
             animate={{
-              boxShadow: isHovered 
+              boxShadow: isHovered || isOpen
                 ? '0 0 30px rgba(197, 166, 106, 0.4)' 
                 : '0 4px 20px rgba(0, 0, 0, 0.2)',
             }}
@@ -196,17 +216,19 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                 exit={{ opacity: 0, y: 20 }}
                 transition={{ delay: 0.1, ...springTransition }}
                 onClick={() => handleNavClick(NAV_ITEMS[0])}
-                onMouseEnter={() => setHoveredDirection('N')}
-                onMouseLeave={() => setHoveredDirection(null)}
-                className="absolute top-[12%] left-1/2 -translate-x-1/2 text-center group py-4 px-6"
+                onMouseEnter={() => !isMobile && setHoveredDirection('N')}
+                onMouseLeave={() => !isMobile && setHoveredDirection(null)}
+                onTouchStart={() => handleTouchStart('N')}
+                onTouchEnd={() => setHoveredDirection(null)}
+                className="absolute top-[8%] md:top-[12%] left-1/2 -translate-x-1/2 text-center group py-3 px-4 md:py-4 md:px-6 min-w-[100px] touch-manipulation"
               >
-                <span className={`block font-mono text-xs md:text-sm uppercase tracking-[0.3em] transition-all duration-300 ${
-                  hoveredDirection === 'N' ? 'text-theme-gold scale-110' : 'text-white/80'
+                <span className={`block font-mono text-sm md:text-base uppercase tracking-[0.2em] md:tracking-[0.3em] transition-all duration-300 ${
+                  hoveredDirection === 'N' ? 'text-theme-gold scale-110' : 'text-white/90'
                 }`}>
                   {NAV_ITEMS[0].label}
                 </span>
-                <span className={`block font-serif italic text-[10px] mt-1 transition-opacity ${
-                  hoveredDirection === 'N' ? 'text-white/60' : 'text-white/40'
+                <span className={`block font-serif italic text-xs md:text-[10px] mt-1 transition-opacity ${
+                  hoveredDirection === 'N' ? 'text-white/70' : 'text-white/50'
                 }`}>
                   {NAV_ITEMS[0].description}
                 </span>
@@ -219,17 +241,19 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ delay: 0.15, ...springTransition }}
                 onClick={() => handleNavClick(NAV_ITEMS[1])}
-                onMouseEnter={() => setHoveredDirection('E')}
-                onMouseLeave={() => setHoveredDirection(null)}
-                className="absolute right-[12%] top-1/2 -translate-y-1/2 text-center group py-4 px-6"
+                onMouseEnter={() => !isMobile && setHoveredDirection('E')}
+                onMouseLeave={() => !isMobile && setHoveredDirection(null)}
+                onTouchStart={() => handleTouchStart('E')}
+                onTouchEnd={() => setHoveredDirection(null)}
+                className="absolute right-[4%] md:right-[12%] top-1/2 -translate-y-1/2 text-center group py-3 px-4 md:py-4 md:px-6 min-w-[90px] touch-manipulation"
               >
-                <span className={`block font-mono text-xs md:text-sm uppercase tracking-[0.3em] transition-all duration-300 ${
-                  hoveredDirection === 'E' ? 'text-theme-gold scale-110' : 'text-white/80'
+                <span className={`block font-mono text-sm md:text-base uppercase tracking-[0.2em] md:tracking-[0.3em] transition-all duration-300 ${
+                  hoveredDirection === 'E' ? 'text-theme-gold scale-110' : 'text-white/90'
                 }`}>
                   {NAV_ITEMS[1].label}
                 </span>
-                <span className={`block font-serif italic text-[10px] mt-1 transition-opacity ${
-                  hoveredDirection === 'E' ? 'text-white/60' : 'text-white/40'
+                <span className={`block font-serif italic text-xs md:text-[10px] mt-1 transition-opacity ${
+                  hoveredDirection === 'E' ? 'text-white/70' : 'text-white/50'
                 }`}>
                   {NAV_ITEMS[1].description}
                 </span>
@@ -242,17 +266,19 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ delay: 0.2, ...springTransition }}
                 onClick={() => handleNavClick(NAV_ITEMS[2])}
-                onMouseEnter={() => setHoveredDirection('S')}
-                onMouseLeave={() => setHoveredDirection(null)}
-                className="absolute bottom-[12%] left-1/2 -translate-x-1/2 text-center group py-4 px-6"
+                onMouseEnter={() => !isMobile && setHoveredDirection('S')}
+                onMouseLeave={() => !isMobile && setHoveredDirection(null)}
+                onTouchStart={() => handleTouchStart('S')}
+                onTouchEnd={() => setHoveredDirection(null)}
+                className="absolute bottom-[8%] md:bottom-[12%] left-1/2 -translate-x-1/2 text-center group py-3 px-4 md:py-4 md:px-6 min-w-[100px] touch-manipulation"
               >
-                <span className={`block font-mono text-xs md:text-sm uppercase tracking-[0.3em] transition-all duration-300 ${
-                  hoveredDirection === 'S' ? 'text-theme-gold scale-110' : 'text-white/80'
+                <span className={`block font-mono text-sm md:text-base uppercase tracking-[0.2em] md:tracking-[0.3em] transition-all duration-300 ${
+                  hoveredDirection === 'S' ? 'text-theme-gold scale-110' : 'text-white/90'
                 }`}>
                   {NAV_ITEMS[2].label}
                 </span>
-                <span className={`block font-serif italic text-[10px] mt-1 transition-opacity ${
-                  hoveredDirection === 'S' ? 'text-white/60' : 'text-white/40'
+                <span className={`block font-serif italic text-xs md:text-[10px] mt-1 transition-opacity ${
+                  hoveredDirection === 'S' ? 'text-white/70' : 'text-white/50'
                 }`}>
                   {NAV_ITEMS[2].description}
                 </span>
@@ -265,17 +291,19 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ delay: 0.25, ...springTransition }}
                 onClick={() => handleNavClick(NAV_ITEMS[3])}
-                onMouseEnter={() => setHoveredDirection('W')}
-                onMouseLeave={() => setHoveredDirection(null)}
-                className="absolute left-[12%] top-1/2 -translate-y-1/2 text-center group py-4 px-6"
+                onMouseEnter={() => !isMobile && setHoveredDirection('W')}
+                onMouseLeave={() => !isMobile && setHoveredDirection(null)}
+                onTouchStart={() => handleTouchStart('W')}
+                onTouchEnd={() => setHoveredDirection(null)}
+                className="absolute left-[4%] md:left-[12%] top-1/2 -translate-y-1/2 text-center group py-3 px-4 md:py-4 md:px-6 min-w-[90px] touch-manipulation"
               >
-                <span className={`block font-mono text-xs md:text-sm uppercase tracking-[0.3em] transition-all duration-300 ${
-                  hoveredDirection === 'W' ? 'text-theme-gold scale-110' : 'text-white/80'
+                <span className={`block font-mono text-sm md:text-base uppercase tracking-[0.2em] md:tracking-[0.3em] transition-all duration-300 ${
+                  hoveredDirection === 'W' ? 'text-theme-gold scale-110' : 'text-white/90'
                 }`}>
                   {NAV_ITEMS[3].label}
                 </span>
-                <span className={`block font-serif italic text-[10px] mt-1 transition-opacity ${
-                  hoveredDirection === 'W' ? 'text-white/60' : 'text-white/40'
+                <span className={`block font-serif italic text-xs md:text-[10px] mt-1 transition-opacity ${
+                  hoveredDirection === 'W' ? 'text-white/70' : 'text-white/50'
                 }`}>
                   {NAV_ITEMS[3].description}
                 </span>
@@ -287,18 +315,18 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ delay: 0.3 }}
-                className="absolute bottom-6 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-widest text-white/30"
+                className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-white/30 whitespace-nowrap"
               >
-                Click compass or anywhere to close
+                {isMobile ? 'Tap anywhere to close' : 'Click anywhere to close'}
               </motion.span>
             </motion.div>
           )}
         </AnimatePresence>
       </motion.div>
 
-      {/* Tooltip on hover - only when closed */}
+      {/* Tooltip on hover - desktop only */}
       <AnimatePresence>
-        {isHovered && !isOpen && (
+        {isHovered && !isOpen && !isMobile && (
           <motion.div
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
