@@ -64,7 +64,7 @@ export default async function AtlasPage() {
   const products = (await sanityFetch<AtlasProduct[]>({
     query: atlasProductsByTerritoryQuery,
     tags: ["atlas-products"],
-    revalidate: 10, // Revalidate every 10 seconds in development
+    revalidate: process.env.NODE_ENV === 'production' ? 60 : 10, // 60s in production, 10s in development
   })) || [];
 
   // Fetch territory counts

@@ -4,14 +4,14 @@ export const client = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
   apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || "2024-01-01",
-  useCdn: true, // Set to false if statically generating pages, using ISR or tag-based revalidation
+  useCdn: process.env.NODE_ENV === 'production', // Use CDN in production, direct API in development
 });
 
 // Optimized fetch function with caching strategies
 export async function sanityFetch<QueryResponse>({
   query,
   params = {},
-  revalidate = 60, // Default revalidation time in seconds
+  revalidate = process.env.NODE_ENV === 'production' ? 60 : 10, // 60s in production, 10s in development
   tags = [],
 }: {
   query: string;
