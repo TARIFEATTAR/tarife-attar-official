@@ -83,13 +83,11 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Main Content - Always rendered, fades in when loader completes */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: showLoader ? 0 : 1 }}
-        transition={{ duration: 0.6, delay: showLoader ? 0 : 0.2 }}
-        className="w-full bg-theme-alabaster selection:bg-theme-industrial/30 overflow-x-hidden"
-        style={{ pointerEvents: showLoader ? 'none' : 'auto' }}
+      {/* Main Content */}
+      <div
+        className={`w-full bg-theme-alabaster selection:bg-theme-industrial/30 overflow-x-hidden transition-opacity duration-700 ${
+          showLoader ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        }`}
       >
             {/* Hero Entry Section */}
             <div className="h-screen w-full relative">
@@ -191,7 +189,7 @@ export default function Home() {
               onNavigate={handleNavigate}
               size="md"
             />
-      </motion.div>
+      </div>
     </>
   );
 }
