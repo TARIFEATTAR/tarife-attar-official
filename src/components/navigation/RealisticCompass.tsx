@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, LayoutGroup } from 'framer-motion';
 
 interface NavItem {
   label: string;
@@ -63,67 +63,142 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
     return null;
   }
 
+  // Spring transition config for liquid feel
+  const springTransition = {
+    type: "spring" as const,
+    stiffness: 120,
+    damping: 24,
+    mass: 0.8
+  };
+
   return (
-    <>
-      {/* Navigation Overlay */}
+    <LayoutGroup>
+      {/* Navigation Overlay Background */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[2998] bg-black/90 backdrop-blur-xl flex items-center justify-center"
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[2998] bg-black/90 backdrop-blur-xl"
             onClick={() => setIsOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Single Animated Compass - moves from bottom-right to center */}
+      <motion.div
+        layout
+        layoutId="navigation-compass"
+        className={`fixed z-[3000] ${
+          isOpen 
+            ? 'inset-0 flex items-center justify-center pointer-events-none' 
+            : 'bottom-6 right-6 pointer-events-auto'
+        }`}
+        transition={springTransition}
+      >
+        <motion.button
+          className="cursor-pointer relative pointer-events-auto"
+          layout
+          animate={{
+            width: isOpen ? 256 : compassSize,
+            height: isOpen ? 256 : compassSize,
+          }}
+          transition={springTransition}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen(!isOpen);
+          }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          whileHover={{ scale: isOpen ? 1 : 1.05 }}
+          whileTap={{ scale: isOpen ? 0.98 : 0.95 }}
+        >
+          {/* Compass Body */}
+          <motion.div
+            animate={{ 
+              rotate: isHovered && !isOpen ? [0, 5, -5, 0] : 0,
+            }}
+            transition={{ duration: 0.4 }}
+            className="absolute inset-0"
           >
-            {/* Navigation Grid */}
+            <Image
+              src="/assets/compass-body.png"
+              alt="Navigation Compass"
+              fill
+              className="object-contain drop-shadow-lg"
+              priority
+            />
+          </motion.div>
+
+          {/* Animated Needle */}
+          <motion.div
+            className="absolute inset-0"
+            animate={{ 
+              rotate: isOpen 
+                ? (hoveredDirection 
+                    ? NAV_ITEMS.find(i => i.direction === hoveredDirection)!.angle - needleBaseOffset 
+                    : -needleBaseOffset)
+                : needleRotation.get()
+            }}
+            style={{ rotate: isOpen ? undefined : needleRotation }}
+            transition={springTransition}
+          >
+            <motion.div 
+              className="relative w-full h-full"
+              style={{ transform: `rotate(-${needleBaseOffset}deg)` }}
+              animate={{
+                rotate: isHovered && !isOpen ? [0, 15, -15, 0] : 0,
+              }}
+              transition={
+                isHovered && !isOpen 
+                  ? { duration: 0.6, repeat: Infinity, repeatType: 'reverse' as const }
+                  : { type: 'spring', stiffness: 80, damping: 20 }
+              }
+            >
+              <Image
+                src="/assets/compass-needle.png"
+                alt="Compass Needle"
+                fill
+                className="object-contain"
+                priority
+              />
+            </motion.div>
+          </motion.div>
+
+          {/* Hover glow effect */}
+          <motion.div
+            className="absolute inset-0 rounded-full pointer-events-none"
+            animate={{
+              boxShadow: isHovered 
+                ? '0 0 30px rgba(197, 166, 106, 0.4)' 
+                : '0 4px 20px rgba(0, 0, 0, 0.2)',
+            }}
+          />
+        </motion.button>
+
+        {/* Navigation buttons - only visible when open */}
+        <AnimatePresence>
+          {isOpen && (
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="relative w-[90vw] max-w-lg aspect-square flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ delay: 0.15, duration: 0.3 }}
+              className="absolute inset-0 pointer-events-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Compass in Center */}
-              <div className="relative w-48 h-48 md:w-64 md:h-64">
-                <Image
-                  src="/assets/compass-body.png"
-                  alt="Compass"
-                  fill
-                  className="object-contain"
-                  priority
-                />
-                <motion.div
-                  className="absolute inset-0"
-                  animate={{ 
-                    rotate: hoveredDirection 
-                      ? NAV_ITEMS.find(i => i.direction === hoveredDirection)!.angle - needleBaseOffset
-                      : -needleBaseOffset
-                  }}
-                  transition={{ 
-                    type: 'spring', 
-                    stiffness: 120, 
-                    damping: 24,
-                    mass: 0.8
-                  }}
-                >
-                  <div className="relative w-full h-full">
-                    <Image
-                      src="/assets/compass-needle.png"
-                      alt="Needle"
-                      fill
-                      className="object-contain"
-                      priority
-                    />
-                  </div>
-                </motion.div>
-              </div>
-
               {/* North - Threshold */}
-              <button
+              <motion.button
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ delay: 0.1, ...springTransition }}
                 onClick={() => handleNavClick(NAV_ITEMS[0])}
                 onMouseEnter={() => setHoveredDirection('N')}
                 onMouseLeave={() => setHoveredDirection(null)}
-                className="absolute top-0 left-1/2 -translate-x-1/2 text-center group py-4 px-6"
+                className="absolute top-[12%] left-1/2 -translate-x-1/2 text-center group py-4 px-6"
               >
                 <span className={`block font-mono text-xs md:text-sm uppercase tracking-[0.3em] transition-all duration-300 ${
                   hoveredDirection === 'N' ? 'text-theme-gold scale-110' : 'text-white/80'
@@ -135,14 +210,18 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                 }`}>
                   {NAV_ITEMS[0].description}
                 </span>
-              </button>
+              </motion.button>
 
               {/* East - Relic */}
-              <button
+              <motion.button
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ delay: 0.15, ...springTransition }}
                 onClick={() => handleNavClick(NAV_ITEMS[1])}
                 onMouseEnter={() => setHoveredDirection('E')}
                 onMouseLeave={() => setHoveredDirection(null)}
-                className="absolute right-0 top-1/2 -translate-y-1/2 text-center group py-4 px-6"
+                className="absolute right-[12%] top-1/2 -translate-y-1/2 text-center group py-4 px-6"
               >
                 <span className={`block font-mono text-xs md:text-sm uppercase tracking-[0.3em] transition-all duration-300 ${
                   hoveredDirection === 'E' ? 'text-theme-gold scale-110' : 'text-white/80'
@@ -154,14 +233,18 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                 }`}>
                   {NAV_ITEMS[1].description}
                 </span>
-              </button>
+              </motion.button>
 
               {/* South - Satchel */}
-              <button
+              <motion.button
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ delay: 0.2, ...springTransition }}
                 onClick={() => handleNavClick(NAV_ITEMS[2])}
                 onMouseEnter={() => setHoveredDirection('S')}
                 onMouseLeave={() => setHoveredDirection(null)}
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center group py-4 px-6"
+                className="absolute bottom-[12%] left-1/2 -translate-x-1/2 text-center group py-4 px-6"
               >
                 <span className={`block font-mono text-xs md:text-sm uppercase tracking-[0.3em] transition-all duration-300 ${
                   hoveredDirection === 'S' ? 'text-theme-gold scale-110' : 'text-white/80'
@@ -173,14 +256,18 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                 }`}>
                   {NAV_ITEMS[2].description}
                 </span>
-              </button>
+              </motion.button>
 
               {/* West - Atlas */}
-              <button
+              <motion.button
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ delay: 0.25, ...springTransition }}
                 onClick={() => handleNavClick(NAV_ITEMS[3])}
                 onMouseEnter={() => setHoveredDirection('W')}
                 onMouseLeave={() => setHoveredDirection(null)}
-                className="absolute left-0 top-1/2 -translate-y-1/2 text-center group py-4 px-6"
+                className="absolute left-[12%] top-1/2 -translate-y-1/2 text-center group py-4 px-6"
               >
                 <span className={`block font-mono text-xs md:text-sm uppercase tracking-[0.3em] transition-all duration-300 ${
                   hoveredDirection === 'W' ? 'text-theme-gold scale-110' : 'text-white/80'
@@ -192,85 +279,24 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                 }`}>
                   {NAV_ITEMS[3].description}
                 </span>
-              </button>
+              </motion.button>
 
               {/* Close hint */}
-              <span className="absolute -bottom-16 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-widest text-white/30">
-                Click anywhere to close
-              </span>
+              <motion.span 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: 0.3 }}
+                className="absolute bottom-6 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-widest text-white/30"
+              >
+                Click compass or anywhere to close
+              </motion.span>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      </motion.div>
 
-      {/* Floating Compass Button */}
-      <motion.button
-        className="fixed bottom-6 right-6 z-[3000] cursor-pointer"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onClick={() => setIsOpen(!isOpen)}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        style={{ width: compassSize, height: compassSize }}
-      >
-        {/* Compass Body */}
-        <motion.div
-          animate={{ 
-            rotate: isHovered && !isOpen ? [0, 5, -5, 0] : 0,
-          }}
-          transition={{ duration: 0.4 }}
-          className="absolute inset-0"
-        >
-          <Image
-            src="/assets/compass-body.png"
-            alt="Navigation Compass"
-            fill
-            className="object-contain drop-shadow-lg"
-            priority
-          />
-        </motion.div>
-
-        {/* Animated Needle */}
-        <motion.div
-          className="absolute inset-0"
-          style={{ rotate: needleRotation }}
-        >
-          <motion.div 
-            className="relative w-full h-full"
-            style={{ transform: `rotate(-${needleBaseOffset}deg)` }}
-            animate={{
-              rotate: isHovered && !isOpen 
-                ? [0, 15, -15, 0] 
-                : 0,
-            }}
-            transition={
-              isHovered && !isOpen 
-                ? { duration: 0.6, repeat: Infinity, repeatType: 'reverse' }
-                : { type: 'spring', stiffness: 80, damping: 20 }
-            }
-          >
-            <Image
-              src="/assets/compass-needle.png"
-              alt="Compass Needle"
-              fill
-              className="object-contain"
-              priority
-            />
-          </motion.div>
-        </motion.div>
-
-        {/* Hover glow effect */}
-        <motion.div
-          className="absolute inset-0 rounded-full pointer-events-none"
-          animate={{
-            boxShadow: isHovered 
-              ? '0 0 30px rgba(197, 166, 106, 0.4)' 
-              : '0 4px 20px rgba(0, 0, 0, 0.2)',
-          }}
-        />
-      </motion.button>
-
-      {/* Tooltip on hover */}
+      {/* Tooltip on hover - only when closed */}
       <AnimatePresence>
         {isHovered && !isOpen && (
           <motion.div
@@ -286,6 +312,6 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </LayoutGroup>
   );
 };

@@ -315,12 +315,11 @@ To elevate fragrance from commodity to art form. To create a world where scent i
 ### Current Messaging Themes
 - "Scent as Destination"
 - "Travel by instinct, not itinerary"
-- "Stabilize atmospheric memories into liquid specimens"
 - "Modern Apothecary"
 - "Navigate by territory. Discover by instinct."
 
 ### Social Handles
-- [To be provided - not found in codebase]
+- Instagram: @tarifeattar
 
 ---
 
