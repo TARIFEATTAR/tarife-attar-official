@@ -34,11 +34,11 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
   const { scrollYProgress } = useScroll();
   const rawRotation = useTransform(scrollYProgress, [0, 1], [0, 360]);
   
-  // Physics-based spring for smooth needle movement
+  // Physics-based spring for smooth needle movement (optimized for liquid feel)
   const needleRotation = useSpring(rawRotation, {
-    stiffness: 80,
-    damping: 20,
-    mass: 1.2,
+    stiffness: 120,  // Higher = more responsive
+    damping: 24,     // Lower = more oscillation (organic feel)
+    mass: 0.8,       // Lower = lighter feel
   });
 
   useEffect(() => {
@@ -102,7 +102,7 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                   transition={{ 
                     type: 'spring', 
                     stiffness: 120, 
-                    damping: 14,
+                    damping: 24,
                     mass: 0.8
                   }}
                 >

@@ -28,7 +28,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, onGuidedEntry }) => {
   return (
     <div className="relative w-full h-screen flex flex-col md:flex-row overflow-hidden">
       {/* Choice Modal Overlay */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {showChoice !== 'idle' && (
           <motion.div 
             initial={{ opacity: 0 }}
@@ -85,7 +85,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, onGuidedEntry }) => {
         className={`relative flex flex-col items-center justify-center overflow-hidden cursor-pointer
           ${hovered === 'atlas' ? 'w-full h-2/3 md:w-[75%] md:h-full' : 
             hovered === 'relic' ? 'w-full h-1/3 md:w-[25%] md:h-full' : 'w-full h-1/2 md:w-1/2 md:h-full'}
-          bg-theme-alabaster text-theme-charcoal transition-all duration-1000 ease-out`}
+          bg-theme-alabaster text-theme-charcoal transition-all duration-1000`}
       >
         <motion.div
           initial={{ opacity: 0 }}
@@ -93,7 +93,13 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, onGuidedEntry }) => {
           className="text-center px-6 md:px-10 relative z-10"
         >
           <div className="flex flex-col items-center">
-            <motion.span className="text-5xl sm:text-6xl md:text-[12rem] font-serif font-bold mb-2 leading-none text-theme-gold">A</motion.span>
+            {/* A insignia - matches EntryLoader layoutId for morphing */}
+            <motion.span 
+              layoutId="atlas-insignia"
+              className="text-5xl sm:text-6xl md:text-[12rem] font-serif font-bold mb-2 leading-none text-theme-gold"
+            >
+              A
+            </motion.span>
             <motion.h2 className="text-2xl sm:text-3xl md:text-6xl italic font-light mb-2 md:mb-6 tracking-tighter">Atlas</motion.h2>
           </div>
           <motion.p className="max-w-[160px] sm:max-w-[200px] md:max-w-xs mx-auto text-xs sm:text-sm md:text-lg opacity-80 leading-relaxed font-serif italic">
@@ -110,7 +116,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, onGuidedEntry }) => {
         className={`relative flex flex-col items-center justify-center overflow-hidden cursor-pointer
           ${hovered === 'relic' ? 'w-full h-2/3 md:w-[75%] md:h-full' : 
             hovered === 'atlas' ? 'w-full h-1/3 md:w-[25%] md:h-full' : 'w-full h-1/2 md:w-1/2 md:h-full'}
-          bg-theme-obsidian text-theme-alabaster transition-all duration-1000 ease-out`}
+          bg-theme-obsidian text-theme-alabaster transition-all duration-1000`}
       >
         <motion.div
           initial={{ opacity: 0 }}
@@ -118,7 +124,13 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, onGuidedEntry }) => {
           className="text-center px-6 md:px-10 relative z-10"
         >
           <div className="flex flex-col items-center">
-            <motion.span className="text-5xl sm:text-6xl md:text-[12rem] font-serif font-bold mb-2 leading-none text-theme-gold">R</motion.span>
+            {/* R insignia - matches EntryLoader layoutId for morphing */}
+            <motion.span 
+              layoutId="relic-insignia"
+              className="text-5xl sm:text-6xl md:text-[12rem] font-serif font-bold mb-2 leading-none text-theme-gold"
+            >
+              R
+            </motion.span>
             <motion.h2 className="text-2xl sm:text-3xl md:text-6xl font-light mb-2 md:mb-6 tracking-tighter">Relic</motion.h2>
           </div>
           <motion.p className="max-w-[160px] sm:max-w-[200px] md:max-w-xs mx-auto text-xs sm:text-sm md:text-lg leading-relaxed font-serif italic">

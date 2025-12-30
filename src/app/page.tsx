@@ -45,7 +45,7 @@ const NOTABLE_FORMULATIONS: Partial<Product>[] = [
 
 export default function Home() {
   const router = useRouter();
-  const [showLoader, setShowLoader] = useState(false); // Disabled intro loader
+  const [showLoader, setShowLoader] = useState(true); // Enable intro loader with animations
 
   const handleNavigate = (path: string) => {
     if (path === 'home') {
@@ -77,7 +77,7 @@ export default function Home() {
   return (
     <>
       {/* Cinematic Entry Loader */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {showLoader && (
           <EntryLoader onComplete={handleLoaderComplete} />
         )}

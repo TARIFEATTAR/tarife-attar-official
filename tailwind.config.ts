@@ -22,6 +22,9 @@ export default {
         serif: ["var(--font-eb-garamond)", "Georgia", "serif"],
         mono: ["var(--font-jetbrains-mono)", "monospace"],
       },
+      transitionTimingFunction: {
+        'liquid': 'cubic-bezier(0.85, 0, 0.15, 1)', // Thick oil movement - heavy, deliberate, smooth
+      },
       animation: {
         "fade-in": "fadeIn 0.5s ease-out",
         "slide-up": "slideUp 0.6s ease-out",

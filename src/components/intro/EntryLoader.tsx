@@ -32,8 +32,19 @@ export const EntryLoader: React.FC<Props> = ({ onComplete }) => {
       transition={{ duration: 0.5 }}
       className="fixed inset-0 z-[500] bg-theme-alabaster flex items-center justify-center overflow-hidden"
     >
-      <div className="relative flex items-center justify-center gap-[0.4em] text-4xl md:text-8xl tracking-[0.2em] font-serif font-light text-theme-charcoal">
-        
+      {/* Text container with scaling during fission */}
+      <motion.div 
+        className="relative flex items-center justify-center gap-[0.4em] text-4xl md:text-8xl tracking-[0.2em] font-serif font-light text-theme-charcoal"
+        animate={{
+          scale: stage >= 3 ? 0.8 : 1,
+          filter: stage >= 3 ? 'blur(12px)' : 'blur(0px)',
+          opacity: stage >= 3 ? 0.1 : 1
+        }}
+        transition={{ 
+          duration: 0.8,
+          ease: [0.85, 0, 0.15, 1] // Liquid easing
+        }}
+      >
         {/* TARIFE text */}
         <motion.span
           initial={{ opacity: 0, y: 20 }}
@@ -42,22 +53,29 @@ export const EntryLoader: React.FC<Props> = ({ onComplete }) => {
             y: stage >= 1 ? 0 : 20,
             filter: stage >= 3 ? 'blur(8px)' : 'blur(0px)'
           }}
-          transition={{ duration: 0.6 }}
+          transition={{ 
+            duration: 0.6,
+            ease: [0.85, 0, 0.15, 1] // Liquid easing
+          }}
           className="whitespace-nowrap"
         >
           TARIFE
         </motion.span>
 
         <div className="flex items-center">
-          {/* A insignia */}
+          {/* A insignia - with layoutId for morphing */}
           <motion.span
+            layoutId="atlas-insignia"
             initial={{ opacity: 0 }}
             animate={{ 
               opacity: stage >= 1 ? 1 : 0,
               scale: stage === 2 ? 1.15 : 1,
               color: stage === 2 ? '#c5a66a' : '#1A1A1A',
             }}
-            transition={{ duration: 0.5 }}
+            transition={{ 
+              duration: 0.5,
+              ease: [0.85, 0, 0.15, 1] // Liquid easing
+            }}
             className="inline-block"
           >
             A
@@ -70,40 +88,67 @@ export const EntryLoader: React.FC<Props> = ({ onComplete }) => {
               opacity: stage >= 1 ? (stage >= 3 ? 0.1 : 1) : 0,
               filter: stage >= 3 ? 'blur(12px)' : 'blur(0px)',
             }}
-            transition={{ duration: 0.6 }}
+            transition={{ 
+              duration: 0.6,
+              ease: [0.85, 0, 0.15, 1] // Liquid easing
+            }}
             className="inline-block"
           >
             TTÄ
           </motion.span>
 
-          {/* R insignia */}
+          {/* R insignia - with layoutId for morphing */}
           <motion.span
+            layoutId="relic-insignia"
             initial={{ opacity: 0 }}
             animate={{ 
               opacity: stage >= 1 ? 1 : 0,
               scale: stage === 2 ? 1.15 : 1,
               color: stage === 2 ? '#c5a66a' : '#1A1A1A',
             }}
-            transition={{ duration: 0.5 }}
+            transition={{ 
+              duration: 0.5,
+              ease: [0.85, 0, 0.15, 1] // Liquid easing
+            }}
             className="inline-block"
           >
             R
           </motion.span>
         </div>
-      </div>
+      </motion.div>
       
-      {/* Split reveal background */}
+      {/* Enhanced Fission: Split reveal background with blur + scale */}
       {stage >= 3 && (
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="absolute inset-0 z-[-1] flex pointer-events-none"
         >
-          <div className="w-1/2 h-full bg-theme-alabaster" />
+          {/* Left Panel - Fixed with slight scale */}
           <motion.div 
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            transition={{ duration: 0.6, ease: [0.85, 0, 0.15, 1] }}
+            className="w-1/2 h-full bg-theme-alabaster"
+            initial={{ scale: 1.1, filter: 'blur(4px)' }}
+            animate={{ 
+              scale: 1,
+              filter: 'blur(0px)'
+            }}
+            transition={{ 
+              duration: 0.8,
+              ease: [0.85, 0, 0.15, 1] // Liquid easing
+            }}
+          />
+          {/* Right Panel - Slides in with blur + scale */}
+          <motion.div 
+            initial={{ x: '100%', scale: 1.1, filter: 'blur(4px)' }}
+            animate={{ 
+              x: 0,
+              scale: 1,
+              filter: 'blur(0px)'
+            }}
+            transition={{ 
+              duration: 0.8,
+              ease: [0.85, 0, 0.15, 1] // Liquid easing
+            }}
             className="w-1/2 h-full bg-theme-obsidian" 
           />
         </motion.div>
