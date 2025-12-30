@@ -45,7 +45,7 @@ const NOTABLE_FORMULATIONS: Partial<Product>[] = [
 
 export default function Home() {
   const router = useRouter();
-  const [showLoader, setShowLoader] = useState(true);
+  const [showLoader, setShowLoader] = useState(false); // Disabled intro loader
 
   const handleNavigate = (path: string) => {
     if (path === 'home') {
