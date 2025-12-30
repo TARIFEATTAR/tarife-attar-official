@@ -8,14 +8,15 @@ interface NavItem {
   label: string;
   path: string;
   direction: 'N' | 'E' | 'S' | 'W';
+  angle: number; // Needle angle for this direction
   description: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Threshold', path: 'home', direction: 'N', description: 'Return to origin' },
-  { label: 'The Relic', path: 'relic', direction: 'E', description: 'Pure resins & rare materials' },
-  { label: 'Satchel', path: 'cart', direction: 'S', description: 'Your collection' },
-  { label: 'The Atlas', path: 'atlas', direction: 'W', description: 'Perfume oil territories' },
+  { label: 'Threshold', path: 'home', direction: 'N', angle: 0, description: 'Return to origin' },
+  { label: 'The Relic', path: 'relic', direction: 'E', angle: 90, description: 'Pure resins & rare materials' },
+  { label: 'Satchel', path: 'cart', direction: 'S', angle: 180, description: 'Your collection' },
+  { label: 'The Atlas', path: 'atlas', direction: 'W', angle: 270, description: 'Perfume oil territories' },
 ];
 
 interface Props {
@@ -26,6 +27,7 @@ interface Props {
 export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [hoveredDirection, setHoveredDirection] = useState<'N' | 'E' | 'S' | 'W' | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
   // Scroll-based needle rotation
@@ -92,12 +94,19 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                 />
                 <motion.div
                   className="absolute inset-0"
-                  style={{ rotate: needleRotation }}
+                  animate={{ 
+                    rotate: hoveredDirection 
+                      ? NAV_ITEMS.find(i => i.direction === hoveredDirection)!.angle - needleBaseOffset
+                      : -needleBaseOffset
+                  }}
+                  transition={{ 
+                    type: 'spring', 
+                    stiffness: 120, 
+                    damping: 14,
+                    mass: 0.8
+                  }}
                 >
-                  <div 
-                    className="relative w-full h-full"
-                    style={{ transform: `rotate(-${needleBaseOffset}deg)` }}
-                  >
+                  <div className="relative w-full h-full">
                     <Image
                       src="/assets/compass-needle.png"
                       alt="Needle"
@@ -112,12 +121,18 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
               {/* North - Threshold */}
               <button
                 onClick={() => handleNavClick(NAV_ITEMS[0])}
-                className="absolute top-0 left-1/2 -translate-x-1/2 text-center group"
+                onMouseEnter={() => setHoveredDirection('N')}
+                onMouseLeave={() => setHoveredDirection(null)}
+                className="absolute top-0 left-1/2 -translate-x-1/2 text-center group py-4 px-6"
               >
-                <span className="block font-mono text-xs md:text-sm uppercase tracking-[0.3em] text-white/80 group-hover:text-theme-gold transition-colors">
+                <span className={`block font-mono text-xs md:text-sm uppercase tracking-[0.3em] transition-all duration-300 ${
+                  hoveredDirection === 'N' ? 'text-theme-gold scale-110' : 'text-white/80'
+                }`}>
                   {NAV_ITEMS[0].label}
                 </span>
-                <span className="block font-serif italic text-[10px] text-white/40 mt-1">
+                <span className={`block font-serif italic text-[10px] mt-1 transition-opacity ${
+                  hoveredDirection === 'N' ? 'text-white/60' : 'text-white/40'
+                }`}>
                   {NAV_ITEMS[0].description}
                 </span>
               </button>
@@ -125,12 +140,18 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
               {/* East - Relic */}
               <button
                 onClick={() => handleNavClick(NAV_ITEMS[1])}
-                className="absolute right-0 top-1/2 -translate-y-1/2 text-center group"
+                onMouseEnter={() => setHoveredDirection('E')}
+                onMouseLeave={() => setHoveredDirection(null)}
+                className="absolute right-0 top-1/2 -translate-y-1/2 text-center group py-4 px-6"
               >
-                <span className="block font-mono text-xs md:text-sm uppercase tracking-[0.3em] text-white/80 group-hover:text-theme-gold transition-colors">
+                <span className={`block font-mono text-xs md:text-sm uppercase tracking-[0.3em] transition-all duration-300 ${
+                  hoveredDirection === 'E' ? 'text-theme-gold scale-110' : 'text-white/80'
+                }`}>
                   {NAV_ITEMS[1].label}
                 </span>
-                <span className="block font-serif italic text-[10px] text-white/40 mt-1">
+                <span className={`block font-serif italic text-[10px] mt-1 transition-opacity ${
+                  hoveredDirection === 'E' ? 'text-white/60' : 'text-white/40'
+                }`}>
                   {NAV_ITEMS[1].description}
                 </span>
               </button>
@@ -138,12 +159,18 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
               {/* South - Satchel */}
               <button
                 onClick={() => handleNavClick(NAV_ITEMS[2])}
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center group"
+                onMouseEnter={() => setHoveredDirection('S')}
+                onMouseLeave={() => setHoveredDirection(null)}
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center group py-4 px-6"
               >
-                <span className="block font-mono text-xs md:text-sm uppercase tracking-[0.3em] text-white/80 group-hover:text-theme-gold transition-colors">
+                <span className={`block font-mono text-xs md:text-sm uppercase tracking-[0.3em] transition-all duration-300 ${
+                  hoveredDirection === 'S' ? 'text-theme-gold scale-110' : 'text-white/80'
+                }`}>
                   {NAV_ITEMS[2].label}
                 </span>
-                <span className="block font-serif italic text-[10px] text-white/40 mt-1">
+                <span className={`block font-serif italic text-[10px] mt-1 transition-opacity ${
+                  hoveredDirection === 'S' ? 'text-white/60' : 'text-white/40'
+                }`}>
                   {NAV_ITEMS[2].description}
                 </span>
               </button>
@@ -151,12 +178,18 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
               {/* West - Atlas */}
               <button
                 onClick={() => handleNavClick(NAV_ITEMS[3])}
-                className="absolute left-0 top-1/2 -translate-y-1/2 text-center group"
+                onMouseEnter={() => setHoveredDirection('W')}
+                onMouseLeave={() => setHoveredDirection(null)}
+                className="absolute left-0 top-1/2 -translate-y-1/2 text-center group py-4 px-6"
               >
-                <span className="block font-mono text-xs md:text-sm uppercase tracking-[0.3em] text-white/80 group-hover:text-theme-gold transition-colors">
+                <span className={`block font-mono text-xs md:text-sm uppercase tracking-[0.3em] transition-all duration-300 ${
+                  hoveredDirection === 'W' ? 'text-theme-gold scale-110' : 'text-white/80'
+                }`}>
                   {NAV_ITEMS[3].label}
                 </span>
-                <span className="block font-serif italic text-[10px] text-white/40 mt-1">
+                <span className={`block font-serif italic text-[10px] mt-1 transition-opacity ${
+                  hoveredDirection === 'W' ? 'text-white/60' : 'text-white/40'
+                }`}>
                   {NAV_ITEMS[3].description}
                 </span>
               </button>
