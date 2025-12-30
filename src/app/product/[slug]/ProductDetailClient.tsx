@@ -115,12 +115,12 @@ export function ProductDetailClient({ product }: Props) {
         <div className="max-w-[1800px] mx-auto px-6 md:px-24 py-6 flex items-center justify-between">
           <Link
             href={isAtlas ? "/atlas" : "/relic"}
-            className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity"
+            className="flex items-center gap-3 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 hover:opacity-100 transition-opacity"
           >
             <ArrowLeft className="w-4 h-4" />
             Return to {isAtlas ? "Atlas" : "Relic"}
           </Link>
-          <span className="font-mono text-[10px] uppercase tracking-[0.6em] text-theme-gold">
+          <span className="font-mono text-xs md:text-sm uppercase tracking-[0.6em] text-theme-gold">
             {isAtlas ? "The Atlas" : "The Relic"}
           </span>
         </div>
@@ -188,11 +188,11 @@ export function ProductDetailClient({ product }: Props) {
           <div className="flex flex-col justify-center space-y-8">
             {/* Collection Badge */}
             <div className="flex items-center gap-4">
-              <span className="font-mono text-[9px] uppercase tracking-[0.4em] opacity-40">
+              <span className="font-mono text-xs md:text-sm uppercase tracking-[0.4em] opacity-80">
                 {isAtlas ? "ATLAS COLLECTION" : "RELIC VAULT"}
               </span>
               {isAtlas && product.atlasData?.atmosphere && (
-                <span className="font-mono text-[9px] uppercase tracking-widest text-theme-gold">
+                <span className="font-mono text-xs md:text-sm uppercase tracking-widest text-theme-gold">
                   {TERRITORY_NAMES[product.atlasData.atmosphere] || product.atlasData.atmosphere}
                 </span>
               )}
@@ -205,7 +205,7 @@ export function ProductDetailClient({ product }: Props) {
 
             {/* Product Essence/Notes Preview */}
             {product.notes && (
-              <div className="flex flex-wrap gap-2 font-mono text-[10px] uppercase tracking-widest opacity-60">
+              <div className="flex flex-wrap gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
                 {product.notes.top && product.notes.top.length > 0 && (
                   <span>TOP: {product.notes.top.slice(0, 2).join(", ")}</span>
                 )}
@@ -228,12 +228,12 @@ export function ProductDetailClient({ product }: Props) {
             {/* Volume & Format */}
             <div className="flex items-center gap-6">
               {product.volume && (
-                <div className="px-6 py-3 border border-theme-charcoal/20 font-mono text-[10px] uppercase tracking-widest">
+                <div className="px-6 py-3 border border-theme-charcoal/20 font-mono text-xs md:text-sm uppercase tracking-widest">
                   {product.volume}
                 </div>
               )}
               {product.productFormat && (
-                <span className="font-mono text-[10px] uppercase tracking-widest opacity-60">
+                <span className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
                   {product.productFormat}
                 </span>
               )}
@@ -243,8 +243,8 @@ export function ProductDetailClient({ product }: Props) {
             {isAtlas && product.atlasData && (
               <div className="space-y-3 pt-4 border-t border-theme-charcoal/10">
                 {product.atlasData.gpsCoordinates && (
-                  <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest opacity-60">
-                    <MapPin className="w-3 h-3" />
+                  <div className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
+                    <MapPin className="w-4 h-4" />
                     {product.atlasData.gpsCoordinates}
                   </div>
                 )}
@@ -255,20 +255,20 @@ export function ProductDetailClient({ product }: Props) {
             {isRelic && product.relicData && (
               <div className="space-y-3 pt-4 border-t border-theme-charcoal/10">
                 {product.relicData.originRegion && (
-                  <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest opacity-60">
-                    <MapPin className="w-3 h-3" />
+                  <div className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
+                    <MapPin className="w-4 h-4" />
                     {product.relicData.originRegion}
                   </div>
                 )}
                 {product.relicData.distillationYear && (
-                  <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest opacity-60">
-                    <Calendar className="w-3 h-3" />
+                  <div className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
+                    <Calendar className="w-4 h-4" />
                     Distilled {product.relicData.distillationYear}
                   </div>
                 )}
                 {product.relicData.viscosity !== undefined && (
-                  <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest opacity-60">
-                    <Droplets className="w-3 h-3" />
+                  <div className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
+                    <Droplets className="w-4 h-4" />
                     Viscosity: {product.relicData.viscosity}/100
                   </div>
                 )}
@@ -277,7 +277,7 @@ export function ProductDetailClient({ product }: Props) {
 
             {/* Quantity Selector */}
             <div className="flex items-center gap-4">
-              <span className="font-mono text-[10px] uppercase tracking-widest opacity-60">
+              <span className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
                 Quantity
               </span>
               <div className="flex items-center border border-theme-charcoal/20">
@@ -304,7 +304,7 @@ export function ProductDetailClient({ product }: Props) {
             <button
               onClick={handleAddToSatchel}
               disabled={!product.inStock}
-              className={`hidden md:block w-full py-5 font-mono text-[10px] uppercase tracking-[0.4em] transition-all ${
+              className={`hidden md:block w-full py-5 font-mono text-sm md:text-base uppercase tracking-[0.4em] transition-all ${
                 product.inStock
                   ? "bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90"
                   : "bg-theme-charcoal/20 text-theme-charcoal/40 cursor-not-allowed"
@@ -314,7 +314,7 @@ export function ProductDetailClient({ product }: Props) {
             </button>
 
             {/* Gift Option */}
-            <button className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">
+            <button className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 hover:opacity-100 transition-opacity">
               <Gift className="w-4 h-4" />
               Make it a gift
             </button>
@@ -324,7 +324,7 @@ export function ProductDetailClient({ product }: Props) {
               {/* Product Description */}
               <button
                 onClick={() => toggleSection("description")}
-                className="w-full flex items-center justify-between py-4 font-mono text-[10px] uppercase tracking-widest hover:opacity-60 transition-opacity"
+                className="w-full flex items-center justify-between py-4 font-mono text-xs md:text-sm uppercase tracking-widest opacity-90 hover:opacity-100 transition-opacity"
               >
                 <span>Product Description</span>
                 <Plus
@@ -341,7 +341,7 @@ export function ProductDetailClient({ product }: Props) {
                     exit={{ height: 0, opacity: 0 }}
                     className="overflow-hidden"
                   >
-                    <div className="pb-4 font-serif italic text-sm leading-relaxed opacity-80">
+                    <div className="pb-4 font-serif italic text-base md:text-lg leading-relaxed opacity-90">
                       {isAtlas && product.atlasData?.travelLog ? (
                         <PortableText value={product.atlasData.travelLog} />
                       ) : isRelic && product.relicData?.museumDescription ? (
@@ -357,7 +357,7 @@ export function ProductDetailClient({ product }: Props) {
               {/* Notes & Ingredients */}
               <button
                 onClick={() => toggleSection("notes")}
-                className="w-full flex items-center justify-between py-4 font-mono text-[10px] uppercase tracking-widest hover:opacity-60 transition-opacity"
+                className="w-full flex items-center justify-between py-4 font-mono text-xs md:text-sm uppercase tracking-widest opacity-90 hover:opacity-100 transition-opacity"
               >
                 <span>Notes & Ingredients</span>
                 <Plus
@@ -377,30 +377,30 @@ export function ProductDetailClient({ product }: Props) {
                     <div className="pb-4 space-y-4">
                       {product.notes?.top && product.notes.top.length > 0 && (
                         <div>
-                          <span className="font-mono text-[9px] uppercase tracking-widest opacity-40 block mb-2">
+                          <span className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 block mb-2">
                             Top Notes
                           </span>
-                          <div className="font-serif italic text-sm">
+                          <div className="font-serif italic text-base md:text-lg">
                             {product.notes.top.join(", ")}
                           </div>
                         </div>
                       )}
                       {product.notes?.heart && product.notes.heart.length > 0 && (
                         <div>
-                          <span className="font-mono text-[9px] uppercase tracking-widest opacity-40 block mb-2">
+                          <span className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 block mb-2">
                             Heart Notes
                           </span>
-                          <div className="font-serif italic text-sm">
+                          <div className="font-serif italic text-base md:text-lg">
                             {product.notes.heart.join(", ")}
                           </div>
                         </div>
                       )}
                       {product.notes?.base && product.notes.base.length > 0 && (
                         <div>
-                          <span className="font-mono text-[9px] uppercase tracking-widest opacity-40 block mb-2">
+                          <span className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 block mb-2">
                             Base Notes
                           </span>
-                          <div className="font-serif italic text-sm">
+                          <div className="font-serif italic text-base md:text-lg">
                             {product.notes.base.join(", ")}
                           </div>
                         </div>
@@ -437,7 +437,7 @@ export function ProductDetailClient({ product }: Props) {
                   ${product.price}
                 </div>
                 {product.volume && (
-                  <div className="font-mono text-[8px] uppercase tracking-widest opacity-40">
+                  <div className="font-mono text-[11px] uppercase tracking-widest opacity-80">
                     {product.volume}
                   </div>
                 )}
@@ -470,7 +470,7 @@ export function ProductDetailClient({ product }: Props) {
               <button
                 onClick={handleAddToSatchel}
                 disabled={!product.inStock}
-                className={`flex-1 py-4 font-mono text-[10px] uppercase tracking-[0.4em] transition-all ${
+                className={`flex-1 py-4 font-mono text-sm uppercase tracking-[0.4em] transition-all ${
                   product.inStock
                     ? "bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90 active:bg-theme-charcoal/80"
                     : "bg-theme-charcoal/20 text-theme-charcoal/40 cursor-not-allowed"

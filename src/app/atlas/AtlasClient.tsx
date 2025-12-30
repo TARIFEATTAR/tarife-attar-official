@@ -49,12 +49,12 @@ export function AtlasClient({ territories, totalCount }: Props) {
         <div className="max-w-[1800px] mx-auto px-6 md:px-24 py-6 flex items-center justify-between">
           <button
             onClick={() => router.push("/")}
-            className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity"
+            className="flex items-center gap-3 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 hover:opacity-100 transition-opacity"
           >
             <ArrowLeft className="w-4 h-4" />
             Return to Threshold
           </button>
-          <span className="font-mono text-[10px] uppercase tracking-[0.6em] text-theme-gold">
+          <span className="font-mono text-xs md:text-sm uppercase tracking-[0.6em] text-theme-gold">
             The Atlas
           </span>
         </div>
@@ -69,17 +69,17 @@ export function AtlasClient({ territories, totalCount }: Props) {
             transition={{ duration: 0.8 }}
             className="max-w-3xl"
           >
-            <span className="font-mono text-[10px] uppercase tracking-[0.8em] text-theme-gold mb-6 block">
+            <span className="font-mono text-xs md:text-sm uppercase tracking-[0.8em] text-theme-gold mb-6 block">
               {totalCount} Perfume Oils · 4 Territories
             </span>
             <h1 className="text-5xl md:text-8xl font-serif italic tracking-tighter leading-[0.9] mb-8">
               The Atlas
             </h1>
-            <p className="font-serif italic text-xl md:text-2xl opacity-60 leading-relaxed max-w-xl mb-6">
+            <p className="font-serif italic text-xl md:text-2xl opacity-80 leading-relaxed max-w-xl mb-6">
               Clean, skin-safe perfume oils. Phthalate-free formulations 
               crafted for those who travel by scent.
             </p>
-            <p className="font-mono text-[10px] uppercase tracking-widest opacity-30">
+            <p className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-70">
               Navigate by territory. Discover by instinct.
             </p>
           </motion.div>
@@ -97,10 +97,10 @@ export function AtlasClient({ territories, totalCount }: Props) {
           >
             <button
               onClick={() => setActiveTerritory(null)}
-              className={`px-6 py-3 font-mono text-[10px] uppercase tracking-widest transition-all ${
+              className={`px-6 py-3 font-mono text-xs md:text-sm uppercase tracking-widest transition-all ${
                 activeTerritory === null
                   ? "bg-theme-charcoal text-theme-alabaster"
-                  : "bg-theme-charcoal/5 opacity-60 hover:opacity-100"
+                  : "bg-theme-charcoal/5 opacity-80 hover:opacity-100"
               }`}
             >
               All Territories
@@ -109,10 +109,10 @@ export function AtlasClient({ territories, totalCount }: Props) {
               <button
                 key={territory.id}
                 onClick={() => setActiveTerritory(territory.id)}
-                className={`px-6 py-3 font-mono text-[10px] uppercase tracking-widest transition-all ${
+                className={`px-6 py-3 font-mono text-xs md:text-sm uppercase tracking-widest transition-all ${
                   activeTerritory === territory.id
                     ? "bg-theme-charcoal text-theme-alabaster"
-                    : "bg-theme-charcoal/5 opacity-60 hover:opacity-100"
+                    : "bg-theme-charcoal/5 opacity-80 hover:opacity-100"
                 }`}
               >
                 {territory.name}
@@ -141,11 +141,11 @@ export function AtlasClient({ territories, totalCount }: Props) {
                     <h2 className="text-4xl md:text-6xl font-serif italic tracking-tighter mb-2">
                       {territory.name}
                     </h2>
-                    <p className="font-serif italic text-lg opacity-60">
+                    <p className="font-serif italic text-lg md:text-xl opacity-80">
                       {territory.tagline}
                     </p>
                   </div>
-                  <p className="font-mono text-[9px] uppercase tracking-widest opacity-30">
+                  <p className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-70">
                     {territory.count} Specimen{territory.count !== 1 ? "s" : ""}
                   </p>
                 </div>
@@ -187,11 +187,11 @@ export function AtlasClient({ territories, totalCount }: Props) {
                         )}
                         <div className="p-4 flex-1 flex flex-col justify-between">
                           <div>
-                            <h3 className="font-serif italic text-sm mb-1 group-hover:tracking-tighter transition-all line-clamp-2">
+                            <h3 className="font-serif italic text-base md:text-lg mb-1 group-hover:tracking-tighter transition-all line-clamp-2">
                               {product.title}
                             </h3>
                             {product.price && (
-                              <p className="font-mono text-[9px] uppercase tracking-widest opacity-40 tabular-nums">
+                              <p className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 tabular-nums">
                                 ${product.price}
                               </p>
                             )}
