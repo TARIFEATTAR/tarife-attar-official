@@ -259,26 +259,45 @@ export const allProductsQuery = groq`
   }
 `;
 
-// Exhibit queries (unchanged)
+// Exhibit queries
 export const allExhibitsQuery = groq`
-  *[_type == "exhibit"] | order(_createdAt desc) {
+  *[_type == "exhibit" && !(_id in path("drafts.**"))] | order(_createdAt desc) {
     _id,
     title,
     slug,
     subtitle,
+    internalSku,
     coverImage,
-    "excerpt": body[0].children[0].text
+    "excerpt": body[0].children[0].text,
+    specimenData {
+      binomial,
+      origin,
+      coordinates,
+      harvestStratum,
+      viscosity,
+      profile
+    }
   }
 `;
 
 export const exhibitBySlugQuery = groq`
-  *[_type == "exhibit" && slug.current == $slug][0] {
+  *[_type == "exhibit" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
     _id,
     title,
     slug,
     subtitle,
+    internalSku,
     body,
     coverImage,
+    specimenData {
+      binomial,
+      origin,
+      coordinates,
+      harvestStratum,
+      viscosity,
+      profile
+    },
+    curatorsLog,
     featuredProducts[]-> {
       _id,
       title,
