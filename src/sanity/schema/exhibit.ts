@@ -11,6 +11,13 @@ export const exhibitSchema = {
   name: "exhibit",
   title: "Exhibit",
   type: "document",
+  // Disable releases for exhibits - allow direct publishing
+  __experimental_actions: [
+    'create',
+    'update',
+    'publish',
+    'delete',
+  ],
   fields: [
     {
       name: "title",
