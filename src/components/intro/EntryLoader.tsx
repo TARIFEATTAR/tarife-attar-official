@@ -1,136 +1,122 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface Props {
   onComplete: () => void;
 }
 
-type Stage = 'void' | 'inscription' | 'manifest' | 'fission' | 'handoff';
-
 export const EntryLoader: React.FC<Props> = ({ onComplete }) => {
-  const [stage, setStage] = useState<Stage>('void');
+  const [stage, setStage] = useState(0);
 
   useEffect(() => {
-    const sequence = async () => {
-      // Total sequence ~2.5 seconds
-      await new Promise(r => setTimeout(r, 200));
-      setStage('inscription');
-      await new Promise(r => setTimeout(r, 600));
-      setStage('manifest');
-      await new Promise(r => setTimeout(r, 700));
-      setStage('fission');
-      await new Promise(r => setTimeout(r, 400));
-      setStage('handoff');
-      await new Promise(r => setTimeout(r, 600));
-      onComplete();
-    };
-    sequence();
-  }, [onComplete]);
+    // Simple sequential animation
+    const timer1 = setTimeout(() => setStage(1), 300);
+    const timer2 = setTimeout(() => setStage(2), 1000);
+    const timer3 = setTimeout(() => setStage(3), 1800);
+    const timer4 = setTimeout(() => onComplete(), 2400);
 
-  // Tightened transition durations
-  const insigniaTransition = { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const };
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+      clearTimeout(timer4);
+    };
+  }, [onComplete]);
 
   return (
     <motion.div 
       initial={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.6 } }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
       className="fixed inset-0 z-[500] bg-theme-alabaster flex items-center justify-center overflow-hidden"
     >
       <div className="relative flex items-center justify-center gap-[0.4em] text-4xl md:text-8xl tracking-[0.2em] font-serif font-light text-theme-charcoal">
         
-        {/* The Brand Name Inscription */}
+        {/* TARIFE text */}
         <motion.span
+          initial={{ opacity: 0, y: 20 }}
           animate={{ 
-            opacity: stage === 'void' ? 0 : (stage === 'fission' || stage === 'handoff' ? 0.2 : 1),
-            filter: stage === 'fission' || stage === 'handoff' ? 'blur(10px)' : 'blur(0px)',
-            y: stage === 'void' ? 15 : 0,
-            scale: stage === 'void' ? 0.98 : 1
+            opacity: stage >= 1 ? (stage >= 3 ? 0.2 : 1) : 0,
+            y: stage >= 1 ? 0 : 20,
+            filter: stage >= 3 ? 'blur(8px)' : 'blur(0px)'
           }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.6 }}
           className="whitespace-nowrap"
         >
           TARIFE
         </motion.span>
 
         <div className="flex items-center">
-          {/* Insignia: Atlas */}
+          {/* A insignia */}
           <motion.span
-            layoutId="insignia-atlas"
+            initial={{ opacity: 0 }}
             animate={{ 
-              scale: stage === 'manifest' ? 1.2 : 1,
-              // Bronze only flashes during manifest stage, otherwise settles to ink black
-              color: stage === 'manifest' ? '#c5a66a' : '#1A1A1A',
-              fontWeight: stage === 'manifest' ? 700 : 400,
-              opacity: stage === 'void' ? 0 : 1
+              opacity: stage >= 1 ? 1 : 0,
+              scale: stage === 2 ? 1.15 : 1,
+              color: stage === 2 ? '#c5a66a' : '#1A1A1A',
             }}
-            transition={insigniaTransition}
-            className="inline-block relative z-10"
+            transition={{ duration: 0.5 }}
+            className="inline-block"
           >
             A
           </motion.span>
 
-          {/* Dissolving Characters */}
+          {/* TTÄ text */}
           <motion.span
+            initial={{ opacity: 0 }}
             animate={{ 
-              opacity: stage === 'void' ? 0 : (stage === 'fission' || stage === 'handoff' ? 0.05 : 1),
-              filter: stage === 'fission' || stage === 'handoff' ? 'blur(15px)' : 'blur(0px)',
-              scale: stage === 'fission' || stage === 'handoff' ? 0.8 : 1
+              opacity: stage >= 1 ? (stage >= 3 ? 0.1 : 1) : 0,
+              filter: stage >= 3 ? 'blur(12px)' : 'blur(0px)',
             }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.6 }}
             className="inline-block"
           >
             TTÄ
           </motion.span>
 
-          {/* Insignia: Relic */}
+          {/* R insignia */}
           <motion.span
-            layoutId="insignia-relic"
+            initial={{ opacity: 0 }}
             animate={{ 
-              scale: stage === 'manifest' ? 1.2 : 1,
-              color: stage === 'manifest' ? '#c5a66a' : '#1A1A1A',
-              fontWeight: stage === 'manifest' ? 700 : 400,
-              opacity: stage === 'void' ? 0 : 1
+              opacity: stage >= 1 ? 1 : 0,
+              scale: stage === 2 ? 1.15 : 1,
+              color: stage === 2 ? '#c5a66a' : '#1A1A1A',
             }}
-            transition={insigniaTransition}
-            className="inline-block relative z-10"
+            transition={{ duration: 0.5 }}
+            className="inline-block"
           >
             R
           </motion.span>
         </div>
       </div>
       
-      {/* Cinematic World Fission */}
-      <AnimatePresence>
-        {(stage === 'fission' || stage === 'handoff') && (
+      {/* Split reveal background */}
+      {stage >= 3 && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="absolute inset-0 z-[-1] flex pointer-events-none"
+        >
+          <div className="w-1/2 h-full bg-theme-alabaster" />
           <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="absolute inset-0 z-[-1] flex pointer-events-none"
-          >
-            <div className="w-1/2 h-full bg-theme-alabaster" />
-            <motion.div 
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              transition={{ duration: 0.8, ease: [0.85, 0, 0.15, 1] }}
-              className="w-1/2 h-full bg-theme-obsidian" 
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Manifestation Atmosphere */}
-      <AnimatePresence>
-        {stage === 'manifest' && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#B3B3B3_0%,_transparent_70%)]"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            transition={{ duration: 0.6, ease: [0.85, 0, 0.15, 1] }}
+            className="w-1/2 h-full bg-theme-obsidian" 
           />
-        )}
-      </AnimatePresence>
+        </motion.div>
+      )}
+
+      {/* Flash effect during stage 2 */}
+      {stage === 2 && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.08 }}
+          className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#c5a66a_0%,_transparent_60%)]"
+        />
+      )}
     </motion.div>
   );
 };

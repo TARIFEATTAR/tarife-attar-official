@@ -77,21 +77,20 @@ export default function Home() {
   return (
     <>
       {/* Cinematic Entry Loader */}
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {showLoader && (
           <EntryLoader onComplete={handleLoaderComplete} />
         )}
       </AnimatePresence>
 
-      {/* Main Content */}
-      <AnimatePresence>
-        {!showLoader && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            className="w-full bg-theme-alabaster selection:bg-theme-industrial/30 overflow-x-hidden"
-          >
+      {/* Main Content - Always rendered, fades in when loader completes */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: showLoader ? 0 : 1 }}
+        transition={{ duration: 0.6, delay: showLoader ? 0 : 0.2 }}
+        className="w-full bg-theme-alabaster selection:bg-theme-industrial/30 overflow-x-hidden"
+        style={{ pointerEvents: showLoader ? 'none' : 'auto' }}
+      >
             {/* Hero Entry Section */}
             <div className="h-screen w-full relative">
               <SplitEntry 
@@ -192,9 +191,7 @@ export default function Home() {
               onNavigate={handleNavigate}
               size="md"
             />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </motion.div>
     </>
   );
 }
