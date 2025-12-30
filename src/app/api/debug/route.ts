@@ -24,17 +24,6 @@ export async function GET() {
   let sanityTest: { success: boolean; error?: string; productCount?: number } = { success: false };
   
   try {
-    const products = await client.fetch(
-      `*[_type == "product" && !(_id in path("drafts.**"))] | order(_createdAt desc) [0...5] {
-        _id,
-        title,
-        slug,
-        collectionType,
-        "atmosphere": atlasData.atmosphere,
-        "isPublished": !(_id in path("drafts.**"))
-      }`
-    );
-    
     const allProducts = await client.fetch(
       `count(*[_type == "product" && !(_id in path("drafts.**"))])`
     );

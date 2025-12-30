@@ -8,7 +8,6 @@
 
 import React from 'react';
 import { set, unset, PatchEvent } from 'sanity';
-import { Stack, Card, Text } from '@sanity/ui';
 
 interface ViscosityInputProps {
   value?: number;
@@ -63,15 +62,35 @@ export const ViscosityInput: React.FC<ViscosityInputProps> = ({
   const previewColor = interpolateColor('#F2F0E9', '#3D1C02', normalizedValue);
 
   return (
-    <Stack space={4}>
-      <Card padding={4} style={{ backgroundColor: previewColor }} radius={2}>
-        <Text size={1} weight="semibold" style={{ color: normalizedValue > 0.5 ? '#F2F0E9' : '#1A1A1A' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div
+        style={{
+          padding: '16px',
+          backgroundColor: previewColor,
+          borderRadius: '4px',
+          transition: 'background-color 0.3s ease-in-out',
+        }}
+      >
+        <div
+          style={{
+            fontSize: '14px',
+            fontWeight: '600',
+            color: normalizedValue > 0.5 ? '#F2F0E9' : '#1A1A1A',
+            marginBottom: '8px',
+          }}
+        >
           Viscosity Preview
-        </Text>
-        <Text size={0} muted style={{ color: normalizedValue > 0.5 ? '#F2F0E9' : '#1A1A1A', marginTop: 8 }}>
+        </div>
+        <div
+          style={{
+            fontSize: '12px',
+            color: normalizedValue > 0.5 ? '#F2F0E9' : '#1A1A1A',
+            opacity: 0.8,
+          }}
+        >
           {value} / {max}
-        </Text>
-      </Card>
+        </div>
+      </div>
       
       <input
         type="range"
@@ -80,12 +99,18 @@ export const ViscosityInput: React.FC<ViscosityInputProps> = ({
         max={max}
         step={step}
         onChange={(e) => handleChange(Number(e.target.value))}
-        style={{ width: '100%' }}
+        style={{ width: '100%', cursor: 'pointer' }}
       />
       
-      <Text size={0} muted>
+      <div
+        style={{
+          fontSize: '12px',
+          color: '#666',
+          opacity: 0.7,
+        }}
+      >
         Adjust viscosity: {value < 25 ? 'Ethereal / Mist' : value < 50 ? 'Fluid / Serum' : value < 75 ? 'Dense / Balm' : 'Concrete / Ointment'}
-      </Text>
-    </Stack>
+      </div>
+    </div>
   );
 };
