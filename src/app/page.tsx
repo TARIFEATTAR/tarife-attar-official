@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { SplitEntry } from "@/components/home";
-import { SmartCompass, GlobalFooter } from "@/components/navigation";
+import { RealisticCompass, GlobalFooter } from "@/components/navigation";
 import { EntryLoader } from "@/components/intro";
 import { Product } from "@/types";
 
@@ -191,13 +191,10 @@ export default function Home() {
             {/* Global Footer */}
             <GlobalFooter theme="dark" />
 
-            {/* Smart Compass Navigation */}
-            <SmartCompass 
-              view="home"
-              theme="light"
-              gpsCoordinates="41.4025° N, 2.1743° E"
+            {/* Realistic Compass Navigation */}
+            <RealisticCompass 
               onNavigate={handleNavigate}
-              onOpenAssistant={handleOpenAssistant}
+              size="md"
             />
           </motion.div>
         )}

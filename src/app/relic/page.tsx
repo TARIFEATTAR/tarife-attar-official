@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { SmartCompass, GlobalFooter } from "@/components/navigation";
+import { RealisticCompass, GlobalFooter } from "@/components/navigation";
 import { ArrowLeft, Lock } from "lucide-react";
 
 // Relic categories
@@ -162,11 +162,9 @@ export default function RelicPage() {
 
       <GlobalFooter theme="dark" />
 
-      <SmartCompass
-        view="relic"
-        theme="dark"
+      <RealisticCompass
         onNavigate={handleNavigate}
-        onOpenAssistant={() => {}}
+        size="md"
       />
     </div>
   );

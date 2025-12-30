@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { SmartCompass, GlobalFooter } from "@/components/navigation";
+import { RealisticCompass, GlobalFooter } from "@/components/navigation";
 import { ArrowLeft } from "lucide-react";
 
 // Territory definitions
@@ -212,11 +212,9 @@ export default function AtlasPage() {
 
       <GlobalFooter theme="dark" />
 
-      <SmartCompass
-        view="atlas"
-        theme="light"
+      <RealisticCompass
         onNavigate={handleNavigate}
-        onOpenAssistant={() => {}}
+        size="md"
       />
     </div>
   );
