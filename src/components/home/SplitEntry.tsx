@@ -3,8 +3,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EntryState } from '@/types';
-import { AtmosphereTuner } from './AtmosphereTuner';
-import { ViscosityTuner } from './ViscosityTuner';
 
 interface Props {
   onNavigate?: (path: string) => void;
@@ -12,18 +10,17 @@ interface Props {
 }
 
 export const SplitEntry: React.FC<Props> = ({ onNavigate, onGuidedEntry }) => {
-  const [selection, setSelection] = useState<EntryState>('idle');
   const [hovered, setHovered] = useState<EntryState>('idle');
   const [showChoice, setShowChoice] = useState<EntryState>('idle');
 
-  const isAnySelected = selection !== 'idle';
-
   const handleChoice = (isGuided: boolean) => {
     const target = showChoice as 'atlas' | 'relic';
+    // Both options now navigate to the proper page
     if (isGuided) {
       onGuidedEntry?.(target);
     } else {
-      setSelection(target);
+      // Direct entry also navigates to the page
+      onNavigate?.(target);
     }
     setShowChoice('idle');
   };
@@ -82,76 +79,52 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, onGuidedEntry }) => {
 
       {/* Atlas Side */}
       <motion.section
-        onMouseEnter={() => !isAnySelected && setHovered('atlas')}
-        onMouseLeave={() => !isAnySelected && setHovered('idle')}
+        onMouseEnter={() => setHovered('atlas')}
+        onMouseLeave={() => setHovered('idle')}
         onClick={() => setShowChoice('atlas')}
         className={`relative flex flex-col items-center justify-center overflow-hidden cursor-pointer
-          ${selection === 'atlas' ? 'w-full h-full z-40' : selection === 'relic' ? 'w-0 h-0 md:w-0 md:h-full pointer-events-none' : 
-            hovered === 'atlas' ? 'w-full h-2/3 md:w-[75%] md:h-full' : 
+          ${hovered === 'atlas' ? 'w-full h-2/3 md:w-[75%] md:h-full' : 
             hovered === 'relic' ? 'w-full h-1/3 md:w-[25%] md:h-full' : 'w-full h-1/2 md:w-1/2 md:h-full'}
           bg-theme-alabaster text-theme-charcoal transition-all duration-1000 ease-out`}
       >
-        <AnimatePresence mode="wait">
-          {selection === 'idle' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="text-center px-6 md:px-10 relative z-10"
-            >
-              <div className="flex flex-col items-center">
-                <motion.span className="text-5xl sm:text-6xl md:text-[12rem] font-serif font-bold mb-2 leading-none text-theme-gold">A</motion.span>
-                <motion.h2 className="text-2xl sm:text-3xl md:text-6xl italic font-light mb-2 md:mb-6 tracking-tighter">Atlas</motion.h2>
-              </div>
-              <motion.p className="max-w-[160px] sm:max-w-[200px] md:max-w-xs mx-auto text-xs sm:text-sm md:text-lg opacity-80 leading-relaxed font-serif italic">
-                {hovered === 'atlas' ? "Explore Territories" : "Clean perfume oils. Four sensory territories. Twenty-four destinations."}
-              </motion.p>
-            </motion.div>
-          )}
-
-          {selection === 'atlas' && (
-            <motion.div key="atlas-active" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full h-full p-6 sm:p-8 md:p-20 flex flex-col">
-              <AtmosphereTuner onBack={() => setSelection('idle')} onNavigate={onNavigate} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center px-6 md:px-10 relative z-10"
+        >
+          <div className="flex flex-col items-center">
+            <motion.span className="text-5xl sm:text-6xl md:text-[12rem] font-serif font-bold mb-2 leading-none text-theme-gold">A</motion.span>
+            <motion.h2 className="text-2xl sm:text-3xl md:text-6xl italic font-light mb-2 md:mb-6 tracking-tighter">Atlas</motion.h2>
+          </div>
+          <motion.p className="max-w-[160px] sm:max-w-[200px] md:max-w-xs mx-auto text-xs sm:text-sm md:text-lg opacity-80 leading-relaxed font-serif italic">
+            {hovered === 'atlas' ? "Explore Territories" : "Clean perfume oils. Four sensory territories. Twenty-four destinations."}
+          </motion.p>
+        </motion.div>
       </motion.section>
 
       {/* Relic Side */}
       <motion.section
-        onMouseEnter={() => !isAnySelected && setHovered('relic')}
-        onMouseLeave={() => !isAnySelected && setHovered('idle')}
+        onMouseEnter={() => setHovered('relic')}
+        onMouseLeave={() => setHovered('idle')}
         onClick={() => setShowChoice('relic')}
         className={`relative flex flex-col items-center justify-center overflow-hidden cursor-pointer
-          ${selection === 'relic' ? 'w-full h-full z-40' : selection === 'atlas' ? 'w-0 h-0 md:w-0 md:h-full pointer-events-none' : 
-            hovered === 'relic' ? 'w-full h-2/3 md:w-[75%] md:h-full' : 
+          ${hovered === 'relic' ? 'w-full h-2/3 md:w-[75%] md:h-full' : 
             hovered === 'atlas' ? 'w-full h-1/3 md:w-[25%] md:h-full' : 'w-full h-1/2 md:w-1/2 md:h-full'}
           bg-theme-obsidian text-theme-alabaster transition-all duration-1000 ease-out`}
       >
-        <AnimatePresence mode="wait">
-          {selection === 'idle' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="text-center px-6 md:px-10 relative z-10"
-            >
-              <div className="flex flex-col items-center">
-                <motion.span className="text-5xl sm:text-6xl md:text-[12rem] font-serif font-bold mb-2 leading-none text-theme-gold">R</motion.span>
-                <motion.h2 className="text-2xl sm:text-3xl md:text-6xl font-light mb-2 md:mb-6 tracking-tighter">Relic</motion.h2>
-              </div>
-              <motion.p className="max-w-[160px] sm:max-w-[200px] md:max-w-xs mx-auto text-xs sm:text-sm md:text-lg leading-relaxed font-serif italic">
-                {hovered === 'relic' ? "Enter Vault" : "Pure resins. Rare materials. For the devoted collector."}
-              </motion.p>
-            </motion.div>
-          )}
-
-          {selection === 'relic' && (
-            <motion.div key="relic-active" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full h-full p-6 sm:p-8 md:p-20 flex flex-col">
-              <ViscosityTuner onBack={() => setSelection('idle')} onNavigate={onNavigate} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center px-6 md:px-10 relative z-10"
+        >
+          <div className="flex flex-col items-center">
+            <motion.span className="text-5xl sm:text-6xl md:text-[12rem] font-serif font-bold mb-2 leading-none text-theme-gold">R</motion.span>
+            <motion.h2 className="text-2xl sm:text-3xl md:text-6xl font-light mb-2 md:mb-6 tracking-tighter">Relic</motion.h2>
+          </div>
+          <motion.p className="max-w-[160px] sm:max-w-[200px] md:max-w-xs mx-auto text-xs sm:text-sm md:text-lg leading-relaxed font-serif italic">
+            {hovered === 'relic' ? "Enter Vault" : "Pure resins. Rare materials. For the devoted collector."}
+          </motion.p>
+        </motion.div>
       </motion.section>
     </div>
   );
