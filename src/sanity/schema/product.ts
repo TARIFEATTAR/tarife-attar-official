@@ -212,6 +212,12 @@ export const productSchema = {
           description: 'Geographic origin of the material (e.g., "Trat, Thailand", "Assam, India")',
         },
         {
+          name: 'gpsCoordinates',
+          title: 'GPS Coordinates',
+          type: 'string',
+          description: 'Optional geographic coordinates for the origin (e.g., "12.5657° N, 102.5065° E" for Trat, Thailand)',
+        },
+        {
           name: 'viscosity',
           title: 'Viscosity',
           type: 'number',
@@ -234,6 +240,12 @@ export const productSchema = {
           description: 'Curatorial description for the collector',
           validation: (Rule: SanityRule) =>
             sensoryLexiconValidation(Rule, 'Museum Description'),
+        },
+        {
+          name: 'fieldReport',
+          title: 'Field Report',
+          type: 'fieldReport',
+          description: 'Shoppable lifestyle image showcasing the material origin, distillation process, or collector context',
         },
       ],
     },

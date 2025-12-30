@@ -97,8 +97,22 @@ export const relicProductsQuery = groq`
     inStock,
     "distillationYear": relicData.distillationYear,
     "originRegion": relicData.originRegion,
+    "gpsCoordinates": relicData.gpsCoordinates,
     "viscosity": relicData.viscosity,
     "museumDescription": relicData.museumDescription,
+    "fieldReport": relicData.fieldReport {
+      image,
+      hotspots[] {
+        product-> {
+          _id,
+          title,
+          slug
+        },
+        x,
+        y,
+        note
+      }
+    },
     notes,
     perfumer,
     year
@@ -121,8 +135,22 @@ export const relicProductsByCategoryQuery = groq`
     inStock,
     "distillationYear": relicData.distillationYear,
     "originRegion": relicData.originRegion,
+    "gpsCoordinates": relicData.gpsCoordinates,
     "viscosity": relicData.viscosity,
     "museumDescription": relicData.museumDescription,
+    "fieldReport": relicData.fieldReport {
+      image,
+      hotspots[] {
+        product-> {
+          _id,
+          title,
+          slug
+        },
+        x,
+        y,
+        note
+      }
+    },
     notes,
     perfumer,
     year
@@ -174,8 +202,22 @@ export const productBySlugQuery = groq`
     relicData {
       distillationYear,
       originRegion,
+      gpsCoordinates,
       viscosity,
-      museumDescription
+      museumDescription,
+      fieldReport {
+        image,
+        hotspots[] {
+          product-> {
+            _id,
+            title,
+            slug
+          },
+          x,
+          y,
+          note
+        }
+      }
     }
   }
 `;

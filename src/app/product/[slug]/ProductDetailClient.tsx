@@ -36,12 +36,39 @@ interface Product {
     atmosphere?: string;
     gpsCoordinates?: string;
     travelLog?: PortableTextBlock[];
+    fieldReport?: {
+      image?: any;
+      hotspots?: Array<{
+        product?: {
+          _id: string;
+          title: string;
+          slug: { current: string };
+        };
+        x: number;
+        y: number;
+        note?: string;
+      }>;
+    };
   };
   relicData?: {
     distillationYear?: number;
     originRegion?: string;
+    gpsCoordinates?: string;
     viscosity?: number;
     museumDescription?: PortableTextBlock[];
+    fieldReport?: {
+      image?: any;
+      hotspots?: Array<{
+        product?: {
+          _id: string;
+          title: string;
+          slug: { current: string };
+        };
+        x: number;
+        y: number;
+        note?: string;
+      }>;
+    };
   };
 }
 
@@ -258,6 +285,12 @@ export function ProductDetailClient({ product }: Props) {
                   <div className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
                     <MapPin className="w-4 h-4" />
                     {product.relicData.originRegion}
+                  </div>
+                )}
+                {product.relicData.gpsCoordinates && (
+                  <div className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
+                    <MapPin className="w-4 h-4" />
+                    {product.relicData.gpsCoordinates}
                   </div>
                 )}
                 {product.relicData.distillationYear && (
