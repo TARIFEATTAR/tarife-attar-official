@@ -44,6 +44,14 @@ export default async function RelicPage() {
     revalidate: 0, // Always fetch fresh data, rely on webhook for revalidation
   })) || [];
 
+  // Debug: Log products to help troubleshoot
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[Relic Page] Total products fetched:', products.length);
+    products.forEach((p) => {
+      console.log(`[Relic Page] Product: ${p.title}, Format: ${p.productFormat || 'NONE'}, Published: ${p._id && !p._id.startsWith('drafts.')}`);
+    });
+  }
+
   // Group products by category (productFormat)
   const categories = RELIC_CATEGORIES.map((category) => ({
     ...category,
@@ -51,12 +59,13 @@ export default async function RelicPage() {
     products: products.filter((p) => p.productFormat === category.productFormat),
   }));
 
-  // Products without a matching category
+  // Products without a matching category (including those without productFormat)
   const productsWithoutCategory = products.filter(
-    (p) => !RELIC_CATEGORIES.some((c) => c.productFormat === p.productFormat)
+    (p) => !p.productFormat || !RELIC_CATEGORIES.some((c) => c.productFormat === p.productFormat)
   );
 
   // If there are products without a category, add an "Other" category
+  // This ensures ALL products are shown, even if they don't have a productFormat set
   if (productsWithoutCategory.length > 0) {
     categories.push({
       id: "other",

@@ -114,7 +114,12 @@ export function RelicClient({ categories, totalCount }: Props) {
               {/* Product Grid */}
               {category.products.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {category.products.map((product) => (
+                  {category.products.map((product) => {
+                    // Debug: Log product details
+                    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+                      console.log('[RelicClient] Rendering product:', product.title, product.slug?.current);
+                    }
+                    return (
                     <Link
                       key={product._id}
                       href={`/product/${product.slug.current}`}
@@ -164,7 +169,8 @@ export function RelicClient({ categories, totalCount }: Props) {
                         )}
                       </div>
                     </Link>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
