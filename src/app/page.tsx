@@ -65,10 +65,6 @@ export default function Home() {
     router.push(`/${path}`);
   };
 
-  const handleOpenAssistant = () => {
-    console.log('Opening Alchemist assistant...');
-  };
-
   const handleLoaderComplete = useCallback(() => {
     setShowLoader(false);
   }, []);
