@@ -180,6 +180,20 @@ export const productSchema = {
             sensoryLexiconValidation(Rule, 'Travel Log'),
         },
         {
+          name: 'badges',
+          title: 'Trust Badges',
+          type: 'array',
+          of: [{ type: 'string' }],
+          description: 'Distinguishing factors for this Atlas product',
+          options: {
+            list: [
+              { title: 'Skin-Safe', value: 'Skin-Safe' },
+              { title: 'Clean', value: 'Clean' },
+              { title: 'Cruelty-Free', value: 'Cruelty-Free' },
+            ],
+          },
+        },
+        {
           name: 'fieldReport',
           title: 'Field Report',
           type: 'fieldReport',
@@ -242,6 +256,19 @@ export const productSchema = {
             sensoryLexiconValidation(Rule, 'Museum Description'),
         },
         {
+          name: 'badges',
+          title: 'Trust Badges',
+          type: 'array',
+          of: [{ type: 'string' }],
+          description: 'Distinguishing factors for this Relic product',
+          options: {
+            list: [
+              { title: 'Pure Origin', value: 'Pure Origin' },
+              { title: 'Wild Harvested', value: 'Wild Harvested' },
+            ],
+          },
+        },
+        {
           name: 'fieldReport',
           title: 'Field Report',
           type: 'fieldReport',
@@ -298,6 +325,25 @@ export const productSchema = {
       title: 'In Stock',
       type: 'boolean',
       initialValue: true,
+    },
+
+    // Shared: Ethical Scarcity Note
+    {
+      name: 'scarcityNote',
+      title: 'Scarcity Note',
+      type: 'string',
+      description: 'Custom message for limited stock (e.g., "Limited Batch — 2024 Harvest")',
+      placeholder: 'Limited Batch Production — Small Volume Reserve',
+    },
+
+    // Shared: Related Products (Complete the Journey)
+    {
+      name: 'relatedProducts',
+      title: 'Related Products',
+      type: 'array',
+      description: 'Products to display in the "Complete the Journey" section',
+      of: [{ type: 'reference', to: [{ type: 'product' }] }],
+      validation: (Rule: SanityRule) => Rule.max(3),
     },
   ],
 
