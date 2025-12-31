@@ -92,8 +92,8 @@ To bridge the gap between mass-market fragrance and true artisanal perfumery. To
    - No hidden synthetics
 
 2. **Skin-Safe First**
-   - All Atlas oils are phthalate-free, skin-safe
-   - Vegan and cruelty-free options
+   - All Atlas oils are clean, skin-safe
+   - Cruelty-free
    - Transparent ingredient sourcing
 
 3. **Elevated Language**
@@ -130,7 +130,7 @@ To elevate fragrance from commodity to art form. To create a world where scent i
 **David Ogilvy (Specificity & Proof)**
 - **Best For:** Product descriptions, "About" pages, premium positioning
 - **Use When:** Describing Atlas territories, GPS coordinates, distillation years, viscosity measurements
-- **Key Input:** "Four territories. Twenty-four coordinates. Phthalate-free. Skin-safe. Vegan. Cruelty-free."
+- **Key Input:** "Four territories. Twenty-four coordinates. Clean. Skin-safe. Cruelty-free."
 
 **J. Peterman (Narrative Storyteller)**
 - **Best For:** Travel Logs, Field Reports, Museum Descriptions

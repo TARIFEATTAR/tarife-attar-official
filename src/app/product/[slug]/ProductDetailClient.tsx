@@ -150,10 +150,8 @@ const TrustBadges = ({ isAtlas, isRelic }: { isAtlas: boolean; isRelic: boolean 
         { label: "Skin Safe", icon: Check },
         { label: "Clean", icon: Check },
         { label: "Cruelty-Free", icon: Check },
-        { label: "Ethically Sourced", icon: Check },
       ]
     : [
-        { label: "Ethically Sourced", icon: Check },
         { label: "Pure Origin", icon: Check },
         { label: "Wild Harvested", icon: Check },
       ];
