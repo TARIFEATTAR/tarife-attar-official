@@ -31,6 +31,7 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
   const [isMounted, setIsMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isShortViewport, setIsShortViewport] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   const { scrollYProgress } = useScroll();
   const rawRotation = useTransform(scrollYProgress, [0, 1], [0, 360]);
@@ -48,6 +49,11 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
     };
     handleResize();
     window.addEventListener('resize', handleResize);
+
+    // Load interaction state from localStorage
+    const interacted = localStorage.getItem('compass-interacted');
+    if (interacted) setHasInteracted(true);
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
@@ -248,12 +254,39 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
           animate={{
             width: isOpen ? expandedSize : compassSize,
             height: isOpen ? expandedSize : compassSize,
+            scale: isOpen ? 1 : (hasInteracted ? 1 : [1, 1.08, 1]),
+            boxShadow: isOpen 
+              ? 'none' 
+              : (hasInteracted 
+                ? '0 4px 20px rgba(0,0,0,0.1)'
+                : [
+                    '0 4px 20px rgba(0,0,0,0.1)',
+                    '0 8px 40px rgba(197,166,106,0.3)', // Gold glow
+                    '0 4px 20px rgba(0,0,0,0.1)',
+                  ])
           }}
-          transition={springTransition}
+          transition={{
+            ...springTransition,
+            scale: {
+              duration: 2.5,
+              repeat: isOpen || hasInteracted ? 0 : Infinity,
+              ease: "easeInOut"
+            },
+            boxShadow: {
+              duration: 2.5,
+              repeat: isOpen || hasInteracted ? 0 : Infinity,
+              ease: "easeInOut"
+            }
+          }}
           onClick={(e) => {
             e.stopPropagation();
             setIsOpen(!isOpen);
             if (isOpen) setHoveredDirection(null);
+            
+            if (!hasInteracted) {
+              setHasInteracted(true);
+              localStorage.setItem('compass-interacted', 'true');
+            }
           }}
           onMouseEnter={() => !isMobile && setIsHovered(true)}
           onMouseLeave={() => !isMobile && setIsHovered(false)}
