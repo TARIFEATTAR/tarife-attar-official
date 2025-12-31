@@ -53,7 +53,7 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
   // Perfectly circular proportions
   const expandedSize = isMobile ? 180 : 240;
   const compassRadius = expandedSize / 2;
-  const labelGap = isMobile ? 40 : 60; // Exact gap from edge of compass to label
+  const labelGap = isMobile ? 30 : 50; // Tighter gap for better cardinal connection
   
   const needleBaseOffset = 45;
 
@@ -88,126 +88,136 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
               onClick={handleOverlayClick}
             />
 
-            {/* Labels Layer - Fixed Inset 0 to guarantee perfect centering */}
+            {/* Absolute Cardinal Labels Layer */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[2999] pointer-events-none flex items-center justify-center"
+              className="fixed inset-0 z-[2999] pointer-events-none"
             >
-              <div className="relative w-full h-full flex items-center justify-center">
-                
-                {/* NORTH - Threshold */}
+              {/* NORTH AXIS (Vertical Center, Top) */}
+              <div className="absolute top-0 left-0 right-0 bottom-1/2 flex items-end justify-center pb-[calc(120px+50px)] md:pb-[calc(120px+50px)]"
+                   style={{ 
+                     paddingBottom: `${compassRadius + labelGap}px`,
+                     height: '50vh',
+                     width: '100vw'
+                   }}>
                 <motion.button
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  transition={{ delay: 0.1, ...springTransition }}
+                  exit={{ opacity: 0, y: 10 }}
                   onClick={() => handleNavClick(NAV_ITEMS[0])}
                   onMouseEnter={() => !isMobile && setHoveredDirection('N')}
                   onMouseLeave={() => !isMobile && setHoveredDirection(null)}
-                  onTouchStart={() => handleTouchStart('N')}
-                  onTouchEnd={() => setHoveredDirection(null)}
-                  className="absolute pointer-events-auto touch-manipulation flex flex-col items-center group px-6 py-4"
-                  style={{ bottom: `calc(50% + ${compassRadius + labelGap}px)`, left: '50%', transform: 'translateX(-50%)' }}
+                  className="pointer-events-auto flex flex-col items-center group touch-manipulation"
                 >
-                  <span className={`font-mono text-sm md:text-lg uppercase tracking-[0.4em] transition-all duration-300 ${
+                  <span className={`font-mono text-sm md:text-lg uppercase tracking-[0.5em] transition-all duration-300 ${
                     hoveredDirection === 'N' ? 'text-theme-gold scale-105' : 'text-white/90'
                   }`}>
                     {NAV_ITEMS[0].label}
                   </span>
-                  <span className={`font-serif italic text-[10px] md:text-xs mt-2 transition-opacity ${
+                  <span className={`font-serif italic text-[10px] md:text-xs mt-2 tracking-widest transition-opacity ${
                     hoveredDirection === 'N' ? 'text-white/70' : 'text-white/40'
                   }`}>
                     {NAV_ITEMS[0].description}
                   </span>
                 </motion.button>
+              </div>
 
-                {/* SOUTH - Satchel */}
+              {/* SOUTH AXIS (Vertical Center, Bottom) */}
+              <div className="absolute top-1/2 left-0 right-0 bottom-0 flex items-start justify-center pt-[calc(120px+50px)] md:pt-[calc(120px+50px)]"
+                   style={{ 
+                     paddingTop: `${compassRadius + labelGap}px`,
+                     height: '50vh',
+                     width: '100vw'
+                   }}>
                 <motion.button
-                  initial={{ opacity: 0, y: -20 }}
+                  initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ delay: 0.15, ...springTransition }}
+                  exit={{ opacity: 0, y: -10 }}
                   onClick={() => handleNavClick(NAV_ITEMS[2])}
                   onMouseEnter={() => !isMobile && setHoveredDirection('S')}
                   onMouseLeave={() => !isMobile && setHoveredDirection(null)}
-                  onTouchStart={() => handleTouchStart('S')}
-                  onTouchEnd={() => setHoveredDirection(null)}
-                  className="absolute pointer-events-auto touch-manipulation flex flex-col items-center group px-6 py-4"
-                  style={{ top: `calc(50% + ${compassRadius + labelGap}px)`, left: '50%', transform: 'translateX(-50%)' }}
+                  className="pointer-events-auto flex flex-col items-center group touch-manipulation"
                 >
-                  <span className={`font-mono text-sm md:text-lg uppercase tracking-[0.4em] transition-all duration-300 ${
+                  <span className={`font-mono text-sm md:text-lg uppercase tracking-[0.5em] transition-all duration-300 ${
                     hoveredDirection === 'S' ? 'text-theme-gold scale-105' : 'text-white/90'
                   }`}>
                     {NAV_ITEMS[2].label}
                   </span>
-                  <span className={`font-serif italic text-[10px] md:text-xs mt-2 transition-opacity ${
+                  <span className={`font-serif italic text-[10px] md:text-xs mt-2 tracking-widest transition-opacity ${
                     hoveredDirection === 'S' ? 'text-white/70' : 'text-white/40'
                   }`}>
                     {NAV_ITEMS[2].description}
                   </span>
                 </motion.button>
+              </div>
 
-                {/* EAST - The Relic */}
+              {/* EAST AXIS (Horizontal Center, Right) */}
+              <div className="absolute top-0 right-0 bottom-0 left-1/2 flex items-center justify-start pl-[calc(120px+50px)] md:pl-[calc(120px+50px)]"
+                   style={{ 
+                     paddingLeft: `${compassRadius + labelGap}px`,
+                     width: '50vw',
+                     height: '100vh'
+                   }}>
                 <motion.button
-                  initial={{ opacity: 0, x: -20 }}
+                  initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ delay: 0.2, ...springTransition }}
+                  exit={{ opacity: 0, x: -10 }}
                   onClick={() => handleNavClick(NAV_ITEMS[1])}
                   onMouseEnter={() => !isMobile && setHoveredDirection('E')}
                   onMouseLeave={() => !isMobile && setHoveredDirection(null)}
-                  onTouchStart={() => handleTouchStart('E')}
-                  onTouchEnd={() => setHoveredDirection(null)}
-                  className="absolute pointer-events-auto touch-manipulation flex flex-col items-center group px-6 py-4"
-                  style={{ left: `calc(50% + ${compassRadius + labelGap}px)`, top: '50%', transform: 'translateY(-50%)' }}
+                  className="pointer-events-auto flex flex-col items-center group touch-manipulation"
                 >
-                  <span className={`font-mono text-sm md:text-lg uppercase tracking-[0.4em] transition-all duration-300 ${
+                  <span className={`font-mono text-sm md:text-lg uppercase tracking-[0.5em] transition-all duration-300 ${
                     hoveredDirection === 'E' ? 'text-theme-gold scale-105' : 'text-white/90'
                   }`}>
                     {NAV_ITEMS[1].label}
                   </span>
-                  <span className={`font-serif italic text-[10px] md:text-xs mt-2 transition-opacity ${
+                  <span className={`font-serif italic text-[10px] md:text-xs mt-2 tracking-widest transition-opacity ${
                     hoveredDirection === 'E' ? 'text-white/70' : 'text-white/40'
                   }`}>
                     {NAV_ITEMS[1].description}
                   </span>
                 </motion.button>
+              </div>
 
-                {/* WEST - The Atlas */}
+              {/* WEST AXIS (Horizontal Center, Left) */}
+              <div className="absolute top-0 left-0 bottom-0 right-1/2 flex items-center justify-end pr-[calc(120px+50px)] md:pr-[calc(120px+50px)]"
+                   style={{ 
+                     paddingRight: `${compassRadius + labelGap}px`,
+                     width: '50vw',
+                     height: '100vh'
+                   }}>
                 <motion.button
-                  initial={{ opacity: 0, x: 20 }}
+                  initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ delay: 0.25, ...springTransition }}
+                  exit={{ opacity: 0, x: 10 }}
                   onClick={() => handleNavClick(NAV_ITEMS[3])}
                   onMouseEnter={() => !isMobile && setHoveredDirection('W')}
                   onMouseLeave={() => !isMobile && setHoveredDirection(null)}
-                  onTouchStart={() => handleTouchStart('W')}
-                  onTouchEnd={() => setHoveredDirection(null)}
-                  className="absolute pointer-events-auto touch-manipulation flex flex-col items-center group px-6 py-4"
-                  style={{ right: `calc(50% + ${compassRadius + labelGap}px)`, top: '50%', transform: 'translateY(-50%)' }}
+                  className="pointer-events-auto flex flex-col items-center group touch-manipulation"
                 >
-                  <span className={`font-mono text-sm md:text-lg uppercase tracking-[0.4em] transition-all duration-300 ${
+                  <span className={`font-mono text-sm md:text-lg uppercase tracking-[0.5em] transition-all duration-300 ${
                     hoveredDirection === 'W' ? 'text-theme-gold scale-105' : 'text-white/90'
                   }`}>
                     {NAV_ITEMS[3].label}
                   </span>
-                  <span className={`font-serif italic text-[10px] md:text-xs mt-2 transition-opacity ${
+                  <span className={`font-serif italic text-[10px] md:text-xs mt-2 tracking-widest transition-opacity ${
                     hoveredDirection === 'W' ? 'text-white/70' : 'text-white/40'
                   }`}>
                     {NAV_ITEMS[3].description}
                   </span>
                 </motion.button>
+              </div>
 
-                {/* Close Hint */}
+              {/* Close Hint */}
+              <div className="absolute bottom-10 left-0 right-0 flex justify-center">
                 <motion.span 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="absolute bottom-10 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-[0.5em] text-white/30 whitespace-nowrap"
+                  className="font-mono text-[10px] uppercase tracking-[0.5em] text-white/20 whitespace-nowrap"
                 >
                   {isMobile ? 'Tap anywhere to close' : 'Click anywhere to close'}
                 </motion.span>
