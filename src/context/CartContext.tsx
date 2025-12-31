@@ -67,8 +67,13 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const cartTotal = items.reduce((sum, item) => {
-    const price = parseFloat(item.price.replace('$', ''));
-    return sum + (price * item.quantity);
+    // Safely handle price whether it's a string or number
+    const priceValue = typeof item.price === 'string' 
+      ? parseFloat(item.price.replace('$', '')) 
+      : typeof item.price === 'number'
+      ? item.price
+      : 0;
+    return sum + (priceValue * item.quantity);
   }, 0);
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
