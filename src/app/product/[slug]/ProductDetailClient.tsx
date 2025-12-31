@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Plus, Minus, Gift, MapPin, Calendar, Droplets } from "lucide-react";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { ArrowLeft, Plus, Minus, Gift, MapPin, Calendar, Droplets, Check, AlertCircle, Map as MapIcon, Info } from "lucide-react";
 import { urlForImage } from "@/sanity/lib/image";
 import { useSatchel } from "@/context/CartContext";
 import { RealisticCompass, GlobalFooter } from "@/components/navigation";
@@ -83,15 +83,110 @@ const TERRITORY_NAMES: Record<string, string> = {
   terra: "Terra",
 };
 
+// Scent Pyramid Component
+const ScentPyramid = ({ notes }: { notes: Product["notes"] }) => {
+  if (!notes) return null;
+
+  return (
+    <div className="relative w-full max-w-[300px] mx-auto py-8">
+      <svg viewBox="0 0 200 180" className="w-full h-auto drop-shadow-sm">
+        {/* Background Triangle */}
+        <motion.path
+          d="M100 20 L20 160 L180 160 Z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="0.5"
+          className="text-theme-charcoal/10"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ duration: 1.5, ease: "easeInOut" }}
+        />
+        
+        {/* Horizontal Dividers */}
+        <line x1="60" y1="70" x2="140" y2="70" stroke="currentColor" strokeWidth="0.5" className="text-theme-charcoal/10" />
+        <line x1="40" y1="120" x2="160" y2="120" stroke="currentColor" strokeWidth="0.5" className="text-theme-charcoal/10" />
+
+        {/* TOP notes (Apex) */}
+        <g className="group cursor-help">
+          <motion.circle 
+            cx="100" cy="45" r="5" 
+            className="fill-theme-gold"
+            whileHover={{ scale: 1.5 }}
+          />
+          <text x="110" y="48" className="font-mono text-[8px] uppercase tracking-widest fill-theme-charcoal/60">Top</text>
+        </g>
+        
+        {/* HEART notes (Center) */}
+        <g className="group cursor-help">
+          <motion.circle 
+            cx="85" cy="95" r="6" 
+            className="fill-theme-gold/70"
+            whileHover={{ scale: 1.5 }}
+          />
+          <motion.circle 
+            cx="115" cy="95" r="6" 
+            className="fill-theme-gold/70"
+            whileHover={{ scale: 1.5 }}
+          />
+          <text x="100" y="108" textAnchor="middle" className="font-mono text-[8px] uppercase tracking-widest fill-theme-charcoal/60">Heart</text>
+        </g>
+        
+        {/* BASE notes (Bottom) */}
+        <g className="group cursor-help">
+          <motion.circle cx="70" cy="145" r="7" className="fill-theme-gold/40" whileHover={{ scale: 1.5 }} />
+          <motion.circle cx="100" cy="145" r="7" className="fill-theme-gold/40" whileHover={{ scale: 1.5 }} />
+          <motion.circle cx="130" cy="145" r="7" className="fill-theme-gold/40" whileHover={{ scale: 1.5 }} />
+          <text x="100" y="158" textAnchor="middle" className="font-mono text-[8px] uppercase tracking-widest fill-theme-charcoal/60">Base</text>
+        </g>
+      </svg>
+    </div>
+  );
+};
+
+// Trust Badges Component - Conditionally rendered based on collection type
+const TrustBadges = ({ isAtlas, isRelic }: { isAtlas: boolean; isRelic: boolean }) => {
+  const badges = isAtlas 
+    ? [
+        { label: "Skin Safe", icon: Check },
+        { label: "Clean", icon: Check },
+        { label: "Cruelty-Free", icon: Check },
+        { label: "Ethically Sourced", icon: Check },
+      ]
+    : [
+        { label: "Ethically Sourced", icon: Check },
+        { label: "Pure Origin", icon: Check },
+        { label: "Wild Harvested", icon: Check },
+      ];
+
+  return (
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-6 border-t border-theme-charcoal/5">
+      {badges.map((badge, i) => (
+        <div key={i} className="flex items-center gap-2 opacity-60">
+          <badge.icon className="w-3 h-3 text-theme-gold" />
+          <span className="font-mono text-[9px] md:text-[10px] uppercase tracking-wider whitespace-nowrap">
+            {badge.label}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 export function ProductDetailClient({ product }: Props) {
   const router = useRouter();
   const { addToSatchel } = useSatchel();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [isAdding, setIsAdding] = useState(false);
+  const [showMap, setShowMap] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     description: false,
     notes: false,
   });
+
+  const scrollRef = useRef(null);
+  const { scrollY } = useScroll();
+  const imageY = useTransform(scrollY, [0, 1000], [0, -100]);
 
   const allImages = product.mainImage
     ? [product.mainImage, ...(product.gallery || [])]
@@ -101,10 +196,16 @@ export function ProductDetailClient({ product }: Props) {
   const isAtlas = product.collectionType === "atlas";
   const isRelic = product.collectionType === "relic";
 
-  const handleAddToSatchel = () => {
-    if (!product.inStock) return;
+  const handleAddToSatchel = async () => {
+    if (!product.inStock || isAdding) return;
 
-    // Convert Sanity product to CartItem format
+    setIsAdding(true);
+    
+    // Haptic feedback
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      navigator.vibrate(40);
+    }
+
     const cartProduct = {
       id: product._id,
       title: product.title,
@@ -119,8 +220,10 @@ export function ProductDetailClient({ product }: Props) {
       addToSatchel(cartProduct as any);
     }
 
-    // Optional: Show success message or open cart
-    // You can add a toast notification here
+    // Success state feedback
+    setTimeout(() => {
+      setIsAdding(false);
+    }, 1200);
   };
 
   const toggleSection = (section: string) => {
@@ -158,17 +261,24 @@ export function ProductDetailClient({ product }: Props) {
         <div className="max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 px-6 md:px-24">
           {/* Left: Product Images */}
           <div className="space-y-4">
-            {/* Main Image */}
-            <div className="relative aspect-[4/5] bg-theme-charcoal/5 overflow-hidden border border-theme-charcoal/10">
+            {/* Main Image with Parallax */}
+            <div className="relative aspect-[4/5] bg-theme-charcoal/5 overflow-hidden border border-theme-charcoal/10 group">
               {mainImageUrl ? (
-                <Image
-                  src={mainImageUrl.width(800).height(1000).url()}
-                  alt={product.title}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover"
-                  priority
-                />
+                <motion.div 
+                  className="w-full h-full relative"
+                  style={{ y: imageY }}
+                >
+                  <Image
+                    src={mainImageUrl.width(800).height(1000).url()}
+                    alt={product.title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover scale-110 group-hover:scale-[1.12] transition-transform duration-[2s] ease-out"
+                    priority
+                  />
+                  {/* Atmospheric Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-theme-charcoal/5 to-transparent pointer-events-none" />
+                </motion.div>
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <span className="font-mono text-xs uppercase tracking-widest opacity-20">
@@ -270,9 +380,37 @@ export function ProductDetailClient({ product }: Props) {
             {isAtlas && product.atlasData && (
               <div className="space-y-3 pt-4 border-t border-theme-charcoal/10">
                 {product.atlasData.gpsCoordinates && (
-                  <div className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
-                    <MapPin className="w-4 h-4" />
-                    {product.atlasData.gpsCoordinates}
+                  <div className="group flex flex-col gap-3">
+                    <button 
+                      onClick={() => setShowMap(!showMap)}
+                      className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 hover:opacity-100 hover:text-theme-gold transition-all"
+                    >
+                      <MapPin className={`w-4 h-4 transition-transform ${showMap ? 'scale-110 text-theme-gold' : ''}`} />
+                      <span className="border-b border-transparent group-hover:border-theme-gold/30">
+                        {product.atlasData.gpsCoordinates}
+                      </span>
+                      <Info className="w-3 h-3 opacity-30" />
+                    </button>
+                    
+                    <AnimatePresence>
+                      {showMap && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="aspect-video bg-theme-charcoal/5 border border-theme-charcoal/10 flex items-center justify-center relative group/map">
+                            <MapIcon className="w-8 h-8 opacity-10 group-hover/map:scale-110 transition-transform duration-700" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="font-mono text-[9px] uppercase tracking-[0.3em] opacity-40">
+                                [ Interactive Territory Map Integration Pending ]
+                              </span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 )}
               </div>
@@ -280,17 +418,43 @@ export function ProductDetailClient({ product }: Props) {
 
             {/* Relic-Specific Details */}
             {isRelic && product.relicData && (
-              <div className="space-y-3 pt-4 border-t border-theme-charcoal/10">
-                {product.relicData.originRegion && (
-                  <div className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
-                    <MapPin className="w-4 h-4" />
-                    {product.relicData.originRegion}
-                  </div>
-                )}
-                {product.relicData.gpsCoordinates && (
-                  <div className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
-                    <MapPin className="w-4 h-4" />
-                    {product.relicData.gpsCoordinates}
+              <div className="space-y-4 pt-4 border-t border-theme-charcoal/10">
+                {(product.relicData.originRegion || product.relicData.gpsCoordinates) && (
+                  <div className="group flex flex-col gap-3">
+                    <button 
+                      onClick={() => setShowMap(!showMap)}
+                      className="flex flex-col gap-1 items-start font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 hover:opacity-100 hover:text-theme-gold transition-all"
+                    >
+                      <div className="flex items-center gap-2">
+                        <MapPin className={`w-4 h-4 transition-transform ${showMap ? 'scale-110 text-theme-gold' : ''}`} />
+                        <span>{product.relicData.originRegion || "Rare Origin"}</span>
+                      </div>
+                      {product.relicData.gpsCoordinates && (
+                        <span className="pl-6 text-[10px] opacity-60 font-mono tracking-widest">
+                          {product.relicData.gpsCoordinates}
+                        </span>
+                      )}
+                    </button>
+                    
+                    <AnimatePresence>
+                      {showMap && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="aspect-video bg-theme-charcoal/5 border border-theme-charcoal/10 flex items-center justify-center relative group/map">
+                            <MapIcon className="w-8 h-8 opacity-10 group-hover/map:scale-110 transition-transform duration-700" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="font-mono text-[9px] uppercase tracking-[0.3em] opacity-40 text-center px-6">
+                                [ Curatorial Geographic Archive Data Pending ]
+                              </span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 )}
                 {product.relicData.distillationYear && (
@@ -300,9 +464,20 @@ export function ProductDetailClient({ product }: Props) {
                   </div>
                 )}
                 {product.relicData.viscosity !== undefined && (
-                  <div className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
-                    <Droplets className="w-4 h-4" />
-                    Viscosity: {product.relicData.viscosity}/100
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
+                      <Droplets className="w-4 h-4" />
+                      Viscosity: {product.relicData.viscosity}/100
+                    </div>
+                    {/* Visual Viscosity Meter */}
+                    <div className="w-full h-[2px] bg-theme-charcoal/5 relative overflow-hidden">
+                      <motion.div 
+                        initial={{ x: "-100%" }}
+                        animate={{ x: `${product.relicData.viscosity - 100}%` }}
+                        transition={{ duration: 1.5, ease: "circOut", delay: 0.5 }}
+                        className="absolute inset-0 bg-theme-gold/40"
+                      />
+                    </div>
                   </div>
                 )}
               </div>
@@ -314,43 +489,94 @@ export function ProductDetailClient({ product }: Props) {
                 Quantity
               </span>
               <div className="flex items-center border border-theme-charcoal/20">
-                <button
+                <motion.button
+                  whileHover={{ backgroundColor: "rgba(0,0,0,0.05)" }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-4 py-3 hover:bg-theme-charcoal/5 transition-colors"
+                  className="px-4 py-3 transition-colors"
                   disabled={quantity <= 1}
                 >
                   <Minus className="w-4 h-4" />
-                </button>
+                </motion.button>
                 <span className="px-6 py-3 font-mono text-sm tabular-nums min-w-[3rem] text-center">
                   {quantity}
                 </span>
-                <button
+                <motion.button
+                  whileHover={{ backgroundColor: "rgba(0,0,0,0.05)" }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => setQuantity(quantity + 1)}
-                  className="px-4 py-3 hover:bg-theme-charcoal/5 transition-colors"
+                  className="px-4 py-3 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
-                </button>
+                </motion.button>
               </div>
             </div>
 
-            {/* Add to Satchel Button - Hidden on mobile (shown in sticky bar) */}
-            <button
+            {/* Add to Satchel Button with Feedback */}
+            <motion.button
+              layout
               onClick={handleAddToSatchel}
-              disabled={!product.inStock}
-              className={`hidden md:block w-full py-5 font-mono text-sm md:text-base uppercase tracking-[0.4em] transition-all ${
+              disabled={!product.inStock || isAdding}
+              whileHover={product.inStock && !isAdding ? { scale: 1.01 } : {}}
+              whileTap={product.inStock && !isAdding ? { scale: 0.99 } : {}}
+              className={`hidden md:flex items-center justify-center gap-3 w-full py-5 font-mono text-sm md:text-base uppercase tracking-[0.4em] transition-all relative overflow-hidden ${
                 product.inStock
-                  ? "bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90"
+                  ? isAdding 
+                    ? "bg-theme-gold text-theme-alabaster"
+                    : "bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90"
                   : "bg-theme-charcoal/20 text-theme-charcoal/40 cursor-not-allowed"
               }`}
             >
-              {product.inStock ? "Add to Satchel" : "Out of Stock"}
-            </button>
+              <AnimatePresence mode="wait">
+                {isAdding ? (
+                  <motion.div
+                    key="adding"
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -20, opacity: 0 }}
+                    className="flex items-center gap-2"
+                  >
+                    <Check className="w-5 h-5" />
+                    <span>Added</span>
+                  </motion.div>
+                ) : (
+                  <motion.span
+                    key="add"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    {product.inStock ? "Add to Satchel" : "Out of Stock"}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.button>
+
+            {/* Ethical Scarcity Indicator */}
+            {product.inStock && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                className="flex items-center gap-2"
+              >
+                <AlertCircle className="w-3 h-3" />
+                <span className="font-mono text-[9px] uppercase tracking-widest">
+                  Limited Batch Production — Small Volume Reserve
+                </span>
+              </motion.div>
+            )}
+
+            {/* Trust Badges */}
+            <TrustBadges isAtlas={isAtlas} isRelic={isRelic} />
 
             {/* Gift Option */}
-            <button className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 hover:opacity-100 transition-opacity">
+            <motion.button 
+              whileHover={{ x: 5 }}
+              className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 hover:opacity-100 transition-all hover:text-theme-gold"
+            >
               <Gift className="w-4 h-4" />
               Make it a gift
-            </button>
+            </motion.button>
 
             {/* Collapsible Sections */}
             <div className="space-y-2 pt-8 border-t border-theme-charcoal/10">
@@ -392,7 +618,7 @@ export function ProductDetailClient({ product }: Props) {
                 onClick={() => toggleSection("notes")}
                 className="w-full flex items-center justify-between py-4 font-mono text-xs md:text-sm uppercase tracking-widest opacity-90 hover:opacity-100 transition-opacity"
               >
-                <span>Notes & Ingredients</span>
+                <span>Scent Architecture</span>
                 <Plus
                   className={`w-4 h-4 transition-transform ${
                     expandedSections.notes ? "rotate-45" : ""
@@ -407,39 +633,57 @@ export function ProductDetailClient({ product }: Props) {
                     exit={{ height: 0, opacity: 0 }}
                     className="overflow-hidden"
                   >
-                    <div className="pb-4 space-y-4">
-                      {product.notes?.top && product.notes.top.length > 0 && (
-                        <div>
-                          <span className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 block mb-2">
-                            Top Notes
-                          </span>
-                          <div className="font-serif italic text-base md:text-lg">
-                            {product.notes.top.join(", ")}
-                          </div>
-                        </div>
-                      )}
-                      {product.notes?.heart && product.notes.heart.length > 0 && (
-                        <div>
-                          <span className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 block mb-2">
-                            Heart Notes
-                          </span>
-                          <div className="font-serif italic text-base md:text-lg">
-                            {product.notes.heart.join(", ")}
-                          </div>
-                        </div>
-                      )}
-                      {product.notes?.base && product.notes.base.length > 0 && (
-                        <div>
-                          <span className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 block mb-2">
-                            Base Notes
-                          </span>
-                          <div className="font-serif italic text-base md:text-lg">
-                            {product.notes.base.join(", ")}
-                          </div>
-                        </div>
-                      )}
+                    <div className="pb-8 space-y-8">
+                      {/* Visual Scent Pyramid */}
+                      <ScentPyramid notes={product.notes} />
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {product.notes?.top && product.notes.top.length > 0 && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                          >
+                            <span className="font-mono text-[10px] uppercase tracking-widest opacity-40 block mb-2">
+                              Top Notes
+                            </span>
+                            <div className="font-serif italic text-base">
+                              {product.notes.top.join(", ")}
+                            </div>
+                          </motion.div>
+                        )}
+                        {product.notes?.heart && product.notes.heart.length > 0 && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                          >
+                            <span className="font-mono text-[10px] uppercase tracking-widest opacity-40 block mb-2">
+                              Heart Notes
+                            </span>
+                            <div className="font-serif italic text-base">
+                              {product.notes.heart.join(", ")}
+                            </div>
+                          </motion.div>
+                        )}
+                        {product.notes?.base && product.notes.base.length > 0 && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                          >
+                            <span className="font-mono text-[10px] uppercase tracking-widest opacity-40 block mb-2">
+                              Base Notes
+                            </span>
+                            <div className="font-serif italic text-base">
+                              {product.notes.base.join(", ")}
+                            </div>
+                          </motion.div>
+                        )}
+                      </div>
+                      
                       {product.perfumer && (
-                        <div className="pt-4 border-t border-theme-charcoal/10">
+                        <div className="pt-4 border-t border-theme-charcoal/5">
                           <span className="font-mono text-[9px] uppercase tracking-widest opacity-40 block mb-2">
                             Perfumer
                           </span>
@@ -450,6 +694,18 @@ export function ProductDetailClient({ product }: Props) {
                   </motion.div>
                 )}
               </AnimatePresence>
+            </div>
+          </div>
+        </div>
+
+        {/* Complete the Journey - Simple Upsell Placeholder */}
+        <div className="max-w-[1800px] mx-auto px-6 md:px-24 mt-32">
+          <div className="border-t border-theme-charcoal/10 pt-16">
+            <h2 className="font-mono text-xs md:text-sm uppercase tracking-[0.5em] mb-12 text-center opacity-60">
+              Complete the Journey
+            </h2>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-12 opacity-40 grayscale hover:grayscale-0 transition-all duration-700 cursor-not-allowed">
+              <span className="font-serif italic text-lg">[ AI-Curated Recommendations Integration Pending ]</span>
             </div>
           </div>
         </div>

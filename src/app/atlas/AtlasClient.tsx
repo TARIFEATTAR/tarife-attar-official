@@ -76,7 +76,7 @@ export function AtlasClient({ territories, totalCount }: Props) {
               The Atlas
             </h1>
             <p className="font-serif italic text-xl md:text-2xl opacity-80 leading-relaxed max-w-xl mb-6">
-              Clean, skin-safe perfume oils. Phthalate-free formulations 
+              Clean, skin-safe perfume oils. Intentional formulations 
               crafted for those who travel by scent.
             </p>
             <p className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-70">
@@ -232,15 +232,13 @@ export function AtlasClient({ territories, totalCount }: Props) {
               Clean. Safe. Intentional.
             </h3>
             <p className="font-serif italic opacity-60 leading-relaxed">
-              Every Atlas oil is phthalate-free, skin-safe, and crafted with 
+              Every Atlas oil is clean, skin-safe, and crafted with 
               transparent ingredient sourcing. No synthetics that don&apos;t serve the scent.
             </p>
             <div className="flex flex-wrap justify-center gap-8 pt-4 font-mono text-[9px] uppercase tracking-widest opacity-30">
-              <span>Phthalate-Free</span>
-              <span>·</span>
               <span>Skin-Safe</span>
               <span>·</span>
-              <span>Vegan</span>
+              <span>Clean</span>
               <span>·</span>
               <span>Cruelty-Free</span>
             </div>
