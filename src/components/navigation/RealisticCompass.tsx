@@ -323,11 +323,24 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
             <motion.div 
               className="relative w-full h-full"
               style={{ transform: `rotate(-${needleBaseOffset}deg)` }}
-              animate={{ rotate: isHovered && !isOpen && !isMobile ? [0, 15, -15, 0] : 0 }}
+              animate={{ 
+                rotate: isHovered && !isOpen && !isMobile 
+                  ? [0, 15, -15, 0] 
+                  : isOpen
+                  ? 0 
+                  : [0, 3, -2, 0] // Subtle idle twitch
+              }}
               transition={
-                isHovered && !isOpen && !isMobile
+                isOpen
+                  ? { type: 'spring', stiffness: 120, damping: 24 }
+                  : isHovered && !isMobile
                   ? { duration: 0.6, repeat: Infinity, repeatType: 'reverse' as const }
-                  : { type: 'spring', stiffness: 80, damping: 20 }
+                  : { 
+                      duration: 4, 
+                      repeat: Infinity, 
+                      repeatDelay: 8, // Twitch every 8 seconds
+                      ease: "easeInOut" 
+                    }
               }
             >
               <Image
