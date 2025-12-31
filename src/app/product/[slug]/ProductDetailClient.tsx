@@ -213,7 +213,22 @@ export function ProductDetailClient({ product }: Props) {
   const isRelic = product.collectionType === "relic";
 
   const handleAddToSatchel = async () => {
-    if (!product.inStock || isAdding || !product.shopifyVariantId) return;
+    // Check if product is purchasable
+    if (!product.inStock) {
+      console.warn('Product is out of stock');
+      return;
+    }
+
+    if (isAdding) {
+      console.warn('Already adding to cart');
+      return;
+    }
+
+    if (!product.shopifyVariantId) {
+      console.error('Product missing Shopify Variant ID. Please add shopifyVariantId in Sanity Studio.');
+      alert('This product is not yet connected to Shopify. Please contact support or check Sanity Studio.');
+      return;
+    }
 
     setIsAdding(true);
     
@@ -223,7 +238,9 @@ export function ProductDetailClient({ product }: Props) {
     }
 
     try {
+      console.log('Adding to cart:', { variantId: product.shopifyVariantId, quantity });
       await addItem(product.shopifyVariantId, quantity);
+      console.log('Successfully added to cart');
       
       // Success state feedback
       setTimeout(() => {
@@ -231,6 +248,7 @@ export function ProductDetailClient({ product }: Props) {
       }, 1200);
     } catch (error) {
       console.error('Error adding to cart:', error);
+      alert(`Failed to add to cart: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setIsAdding(false);
     }
   };
@@ -525,14 +543,16 @@ export function ProductDetailClient({ product }: Props) {
             <motion.button
               layout
               onClick={handleAddToSatchel}
-              disabled={!product.inStock || isAdding}
-              whileHover={product.inStock && !isAdding ? { scale: 1.01 } : {}}
-              whileTap={product.inStock && !isAdding ? { scale: 0.99 } : {}}
+              disabled={!product.inStock || isAdding || !product.shopifyVariantId}
+              whileHover={product.inStock && !isAdding && product.shopifyVariantId ? { scale: 1.01 } : {}}
+              whileTap={product.inStock && !isAdding && product.shopifyVariantId ? { scale: 0.99 } : {}}
               className={`hidden md:flex items-center justify-center gap-3 w-full py-5 font-mono text-sm md:text-base uppercase tracking-[0.4em] transition-all relative overflow-hidden ${
                 product.inStock
                   ? isAdding 
                     ? "bg-theme-gold text-theme-alabaster"
-                    : "bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90"
+                    : product.shopifyVariantId
+                    ? "bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90"
+                    : "bg-theme-charcoal/40 text-theme-alabaster/60 cursor-not-allowed"
                   : "bg-theme-charcoal/20 text-theme-charcoal/40 cursor-not-allowed"
               }`}
             >
@@ -555,11 +575,31 @@ export function ProductDetailClient({ product }: Props) {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    {product.inStock ? "Add to Satchel" : "Out of Stock"}
+                    {!product.inStock 
+                      ? "Out of Stock" 
+                      : !product.shopifyVariantId
+                      ? "Not Connected to Shopify"
+                      : "Add to Satchel"}
                   </motion.span>
                 )}
               </AnimatePresence>
             </motion.button>
+
+            {/* Shopify Connection Warning */}
+            {product.inStock && !product.shopifyVariantId && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-4 bg-amber-50 border border-amber-200 rounded"
+              >
+                <p className="font-mono text-[10px] uppercase tracking-widest text-amber-800 mb-1">
+                  ⚠️ Shopify Connection Required
+                </p>
+                <p className="font-serif text-xs text-amber-700">
+                  This product needs a Shopify Variant ID to be added to cart. Please add it in Sanity Studio under the "Shopify Sync" tab.
+                </p>
+              </motion.div>
+            )}
 
             {/* Ethical Scarcity Indicator */}
             {product.inStock && (
@@ -806,7 +846,9 @@ export function ProductDetailClient({ product }: Props) {
                   product.inStock
                     ? isAdding
                       ? "bg-theme-gold text-theme-alabaster"
-                      : "bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90 active:bg-theme-charcoal/80"
+                      : product.shopifyVariantId
+                      ? "bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90 active:bg-theme-charcoal/80"
+                      : "bg-theme-charcoal/40 text-theme-alabaster/60 cursor-not-allowed"
                     : "bg-theme-charcoal/20 text-theme-charcoal/40 cursor-not-allowed"
                 }`}
               >
@@ -829,7 +871,11 @@ export function ProductDetailClient({ product }: Props) {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                     >
-                      {product.inStock ? "Add to Satchel" : "Out of Stock"}
+                      {!product.inStock 
+                        ? "Out of Stock" 
+                        : !product.shopifyVariantId
+                        ? "Not Connected"
+                        : "Add to Satchel"}
                     </motion.span>
                   )}
                 </AnimatePresence>

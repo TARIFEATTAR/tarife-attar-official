@@ -94,23 +94,54 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
 
   const addItem = async (variantId: string, quantity: number) => {
     setIsLoading(true);
+    setError(null);
+    
+    let currentCart = cart;
+    if (!currentCart) {
+      console.log('No cart available. Creating new cart...');
+      await createNewCart();
+      currentCart = cart;
+      if (!currentCart) {
+        const errorMsg = 'Failed to create cart. Please check your Shopify configuration.';
+        setError(errorMsg);
+        setIsLoading(false);
+        throw new Error(errorMsg);
+      }
+    }
+
     try {
+      const formattedVariantId = formatVariantId(variantId);
+      console.log('Adding item to cart:', { variantId, formattedVariantId, quantity, cartId: currentCart.id });
+      
       const response = await shopifyFetch({
         query: ADD_LINES_MUTATION,
         variables: {
-          cartId: cart.id,
+          cartId: currentCart.id,
           lines: [{
-            merchandiseId: formatVariantId(variantId),
+            merchandiseId: formattedVariantId,
             quantity
           }]
         }
       });
       
+      console.log('Shopify response:', response);
+      
+      if (response.errors) {
+        console.error('Shopify GraphQL errors:', response.errors);
+        throw new Error(response.errors[0]?.message || 'Failed to add item to cart');
+      }
+      
       if (response.data?.cartLinesAdd?.cart) {
         setCart(response.data.cartLinesAdd.cart);
+        console.log('Successfully added item to cart');
+      } else {
+        throw new Error('Invalid response from Shopify');
       }
     } catch (err) {
-      setError('Failed to add item to cart');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to add item to cart';
+      console.error('Error adding item to cart:', err);
+      setError(errorMessage);
+      throw err; // Re-throw so the component can handle it
     } finally {
       setIsLoading(false);
     }
