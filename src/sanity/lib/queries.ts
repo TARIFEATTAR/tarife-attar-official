@@ -176,6 +176,17 @@ export const productBySlugQuery = groq`
     mainImage,
     gallery,
     inStock,
+    shopifyHandle,
+    shopifyVariantId,
+    shopifyProductId,
+    scarcityNote,
+    relatedProducts[]-> {
+      _id,
+      title,
+      slug,
+      price,
+      mainImage
+    },
     notes,
     perfumer,
     year,
@@ -184,6 +195,7 @@ export const productBySlugQuery = groq`
       atmosphere,
       gpsCoordinates,
       travelLog,
+      badges,
       fieldReport {
         image,
         hotspots[] {
@@ -205,6 +217,7 @@ export const productBySlugQuery = groq`
       gpsCoordinates,
       viscosity,
       museumDescription,
+      badges,
       fieldReport {
         image,
         hotspots[] {

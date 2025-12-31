@@ -7,7 +7,7 @@ import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { ArrowLeft, Plus, Minus, Gift, MapPin, Calendar, Droplets, Check, AlertCircle, Map as MapIcon, Info } from "lucide-react";
 import { urlForImage } from "@/sanity/lib/image";
-import { useSatchel } from "@/context/CartContext";
+import { useShopifyCart } from "@/context";
 import { RealisticCompass, GlobalFooter } from "@/components/navigation";
 import { PortableText } from "@portabletext/react";
 
@@ -25,6 +25,17 @@ interface Product {
   mainImage?: any;
   gallery?: Array<{ _key: string; asset: any }>;
   inStock?: boolean;
+  shopifyHandle?: string;
+  shopifyVariantId?: string;
+  shopifyProductId?: string;
+  scarcityNote?: string;
+  relatedProducts?: Array<{
+    _id: string;
+    title: string;
+    slug: { current: string };
+    price?: number;
+    mainImage?: any;
+  }>;
   notes?: {
     top?: string[];
     heart?: string[];
@@ -36,6 +47,7 @@ interface Product {
     atmosphere?: string;
     gpsCoordinates?: string;
     travelLog?: PortableTextBlock[];
+    badges?: string[];
     fieldReport?: {
       image?: any;
       hotspots?: Array<{
@@ -56,6 +68,7 @@ interface Product {
     gpsCoordinates?: string;
     viscosity?: number;
     museumDescription?: PortableTextBlock[];
+    badges?: string[];
     fieldReport?: {
       image?: any;
       hotspots?: Array<{
@@ -144,17 +157,22 @@ const ScentPyramid = ({ notes }: { notes: Product["notes"] }) => {
 };
 
 // Trust Badges Component - Conditionally rendered based on collection type
-const TrustBadges = ({ isAtlas, isRelic }: { isAtlas: boolean; isRelic: boolean }) => {
-  const badges = isAtlas 
-    ? [
-        { label: "Skin Safe", icon: Check },
-        { label: "Clean", icon: Check },
-        { label: "Cruelty-Free", icon: Check },
-      ]
-    : [
-        { label: "Pure Origin", icon: Check },
-        { label: "Wild Harvested", icon: Check },
-      ];
+const TrustBadges = ({ isAtlas, isRelic, product }: { isAtlas: boolean; isRelic: boolean; product: Product }) => {
+  // Use custom badges from Sanity if available, otherwise fall back to defaults
+  const customBadges = isAtlas ? product.atlasData?.badges : product.relicData?.badges;
+  
+  const badges = customBadges && customBadges.length > 0 
+    ? customBadges.map(label => ({ label, icon: Check }))
+    : isAtlas 
+      ? [
+          { label: "Skin Safe", icon: Check },
+          { label: "Clean", icon: Check },
+          { label: "Cruelty-Free", icon: Check },
+        ]
+      : [
+          { label: "Pure Origin", icon: Check },
+          { label: "Wild Harvested", icon: Check },
+        ];
 
   return (
     <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-6 border-t border-theme-charcoal/5">
@@ -172,7 +190,7 @@ const TrustBadges = ({ isAtlas, isRelic }: { isAtlas: boolean; isRelic: boolean 
 
 export function ProductDetailClient({ product }: Props) {
   const router = useRouter();
-  const { addToSatchel } = useSatchel();
+  const { addItem, isLoading: isCartLoading } = useShopifyCart();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
@@ -195,7 +213,7 @@ export function ProductDetailClient({ product }: Props) {
   const isRelic = product.collectionType === "relic";
 
   const handleAddToSatchel = async () => {
-    if (!product.inStock || isAdding) return;
+    if (!product.inStock || isAdding || !product.shopifyVariantId) return;
 
     setIsAdding(true);
     
@@ -204,24 +222,17 @@ export function ProductDetailClient({ product }: Props) {
       navigator.vibrate(40);
     }
 
-    const cartProduct = {
-      id: product._id,
-      title: product.title,
-      price: product.price || 0,
-      imageUrl: mainImageUrl?.width(400).url() || "",
-      collectionType: product.collectionType,
-      productFormat: product.productFormat,
-      volume: product.volume,
-    };
-
-    for (let i = 0; i < quantity; i++) {
-      addToSatchel(cartProduct as any);
-    }
-
-    // Success state feedback
-    setTimeout(() => {
+    try {
+      await addItem(product.shopifyVariantId, quantity);
+      
+      // Success state feedback
+      setTimeout(() => {
+        setIsAdding(false);
+      }, 1200);
+    } catch (error) {
+      console.error('Error adding to cart:', error);
       setIsAdding(false);
-    }, 1200);
+    }
   };
 
   const toggleSection = (section: string) => {
@@ -559,13 +570,13 @@ export function ProductDetailClient({ product }: Props) {
               >
                 <AlertCircle className="w-3 h-3" />
                 <span className="font-mono text-[9px] uppercase tracking-widest">
-                  Limited Batch Production — Small Volume Reserve
+                  {product.scarcityNote || "Limited Batch Production — Small Volume Reserve"}
                 </span>
               </motion.div>
             )}
 
             {/* Trust Badges */}
-            <TrustBadges isAtlas={isAtlas} isRelic={isRelic} />
+            <TrustBadges isAtlas={isAtlas} isRelic={isRelic} product={product} />
 
             {/* Gift Option */}
             <motion.button 
@@ -696,17 +707,51 @@ export function ProductDetailClient({ product }: Props) {
           </div>
         </div>
 
-        {/* Complete the Journey - Simple Upsell Placeholder */}
-        <div className="max-w-[1800px] mx-auto px-6 md:px-24 mt-32">
-          <div className="border-t border-theme-charcoal/10 pt-16">
-            <h2 className="font-mono text-xs md:text-sm uppercase tracking-[0.5em] mb-12 text-center opacity-60">
-              Complete the Journey
-            </h2>
-            <div className="flex flex-col md:flex-row items-center justify-center gap-12 opacity-40 grayscale hover:grayscale-0 transition-all duration-700 cursor-not-allowed">
-              <span className="font-serif italic text-lg">[ AI-Curated Recommendations Integration Pending ]</span>
+        {/* Complete the Journey - Related Products */}
+        {product.relatedProducts && product.relatedProducts.length > 0 && (
+          <div className="max-w-[1800px] mx-auto px-6 md:px-24 mt-32">
+            <div className="border-t border-theme-charcoal/10 pt-16">
+              <h2 className="font-mono text-xs md:text-sm uppercase tracking-[0.5em] mb-12 text-center opacity-60">
+                Complete the Journey
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                {product.relatedProducts.map((related) => {
+                  const relatedImageUrl = urlForImage(related.mainImage);
+                  return (
+                    <Link
+                      key={related._id}
+                      href={`/product/${related.slug.current}`}
+                      className="group flex flex-col items-center text-center space-y-6"
+                    >
+                      <div className="relative aspect-[4/5] w-full bg-theme-charcoal/5 overflow-hidden border border-theme-charcoal/5">
+                        {relatedImageUrl ? (
+                          <Image
+                            src={relatedImageUrl.width(600).height(750).url()}
+                            alt={related.title}
+                            fill
+                            className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center opacity-20 font-mono text-[8px] uppercase tracking-widest">
+                            No Image
+                          </div>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="font-serif italic text-xl group-hover:tracking-tighter transition-all">
+                          {related.title}
+                        </h3>
+                        <p className="font-mono text-xs opacity-40 uppercase tracking-widest">
+                          ${related.price}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       <GlobalFooter theme="light" />
@@ -756,14 +801,38 @@ export function ProductDetailClient({ product }: Props) {
               {/* Add to Satchel Button */}
               <button
                 onClick={handleAddToSatchel}
-                disabled={!product.inStock}
-                className={`flex-1 py-4 font-mono text-sm uppercase tracking-[0.4em] transition-all ${
+                disabled={!product.inStock || isAdding || !product.shopifyVariantId}
+                className={`flex-1 py-4 font-mono text-sm uppercase tracking-[0.4em] transition-all relative overflow-hidden ${
                   product.inStock
-                    ? "bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90 active:bg-theme-charcoal/80"
+                    ? isAdding
+                      ? "bg-theme-gold text-theme-alabaster"
+                      : "bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90 active:bg-theme-charcoal/80"
                     : "bg-theme-charcoal/20 text-theme-charcoal/40 cursor-not-allowed"
                 }`}
               >
-                {product.inStock ? "Add to Satchel" : "Out of Stock"}
+                <AnimatePresence mode="wait">
+                  {isAdding ? (
+                    <motion.div
+                      key="adding-mobile"
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: -20, opacity: 0 }}
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <Check className="w-4 h-4" />
+                      <span>Added</span>
+                    </motion.div>
+                  ) : (
+                    <motion.span
+                      key="add-mobile"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      {product.inStock ? "Add to Satchel" : "Out of Stock"}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </button>
             </div>
           </div>

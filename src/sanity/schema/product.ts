@@ -8,6 +8,8 @@
 import { sensoryLexiconValidation } from '../validation/sensoryLexicon';
 import { ViscosityInput } from '../components/ViscosityInput';
 
+import { shopifyFields } from './shopifyFields';
+
 type SanityRule = {
   required: () => SanityRule;
   min: (n: number) => SanityRule;
@@ -19,12 +21,20 @@ export const productSchema = {
   name: 'product',
   title: 'Product',
   type: 'document',
+  groups: [
+    { name: 'general', title: 'General Info' },
+    { name: 'media', title: 'Media' },
+    { name: 'data', title: 'Collection Data' },
+    { name: 'notes', title: 'Fragrance Architecture' },
+    { name: 'commerce', title: 'Shopify Sync' },
+  ],
   fields: [
     // Collection Type - The Bifurcation Point
     {
       name: 'collectionType',
       title: 'Collection Type',
       type: 'string',
+      group: 'general',
       description: 'The "Two Roads" strategy: Atlas (Voyage) or Relic (Purity)',
       options: {
         list: [
@@ -56,6 +66,7 @@ export const productSchema = {
       name: 'internalName',
       title: 'Internal Name',
       type: 'string',
+      group: 'general',
       description: 'For inventory tracking and internal reference',
       validation: (Rule: SanityRule) => Rule.required(),
     },
@@ -65,6 +76,7 @@ export const productSchema = {
       name: 'title',
       title: 'Title',
       type: 'string',
+      group: 'general',
       description: 'Public-facing product name',
       validation: (Rule: SanityRule) => sensoryLexiconValidation(Rule, 'title'),
     },
@@ -74,6 +86,7 @@ export const productSchema = {
       name: 'slug',
       title: 'Slug',
       type: 'slug',
+      group: 'general',
       options: {
         source: 'title',
         maxLength: 96,
@@ -86,6 +99,7 @@ export const productSchema = {
       name: 'mainImage',
       title: 'Main Image',
       type: 'image',
+      group: 'media',
       options: {
         hotspot: true,
       },
@@ -96,6 +110,7 @@ export const productSchema = {
       name: 'gallery',
       title: 'Gallery',
       type: 'array',
+      group: 'media',
       of: [
         {
           type: 'image',
@@ -111,6 +126,7 @@ export const productSchema = {
       name: 'price',
       title: 'Price',
       type: 'number',
+      group: 'commerce',
       description: 'Price in USD',
       validation: (Rule: SanityRule) => Rule.min(0),
     },
@@ -120,6 +136,7 @@ export const productSchema = {
       name: 'volume',
       title: 'Volume',
       type: 'string',
+      group: 'general',
       description: 'e.g., "9ml", "3ml", "15ml"',
     },
 
@@ -128,6 +145,7 @@ export const productSchema = {
       name: 'productFormat',
       title: 'Product Format',
       type: 'string',
+      group: 'general',
       options: {
         list: [
           { title: 'Perfume Oil', value: 'Perfume Oil' },
@@ -140,11 +158,15 @@ export const productSchema = {
       },
     },
 
+    // Shopify Specific Fields
+    ...shopifyFields,
+
     // ===== THE ATLAS DATA (Hidden if collectionType != 'atlas') =====
     {
       name: 'atlasData',
       title: 'Atlas Data',
       type: 'object',
+      group: 'data',
       description: 'Voyage-specific data for The Atlas collection',
       hidden: ({ parent }: { parent?: { collectionType?: string } }) =>
         parent?.collectionType !== 'atlas',
@@ -207,6 +229,7 @@ export const productSchema = {
       name: 'relicData',
       title: 'Relic Data',
       type: 'object',
+      group: 'data',
       description: 'Vault-specific data for The Relic collection',
       hidden: ({ parent }: { parent?: { collectionType?: string } }) =>
         parent?.collectionType !== 'relic',
@@ -282,6 +305,7 @@ export const productSchema = {
       name: 'notes',
       title: 'Fragrance Notes',
       type: 'object',
+      group: 'notes',
       fields: [
         {
           name: 'top',
@@ -309,6 +333,7 @@ export const productSchema = {
       name: 'perfumer',
       title: 'Perfumer / Nose',
       type: 'string',
+      group: 'general',
     },
 
     // Shared: Year
@@ -316,6 +341,7 @@ export const productSchema = {
       name: 'year',
       title: 'Year',
       type: 'number',
+      group: 'general',
       description: 'Year of release or creation',
     },
 
@@ -324,6 +350,7 @@ export const productSchema = {
       name: 'inStock',
       title: 'In Stock',
       type: 'boolean',
+      group: 'commerce',
       initialValue: true,
     },
 
@@ -332,6 +359,7 @@ export const productSchema = {
       name: 'scarcityNote',
       title: 'Scarcity Note',
       type: 'string',
+      group: 'commerce',
       description: 'Custom message for limited stock (e.g., "Limited Batch — 2024 Harvest")',
       placeholder: 'Limited Batch Production — Small Volume Reserve',
     },
@@ -341,6 +369,7 @@ export const productSchema = {
       name: 'relatedProducts',
       title: 'Related Products',
       type: 'array',
+      group: 'data',
       description: 'Products to display in the "Complete the Journey" section',
       of: [{ type: 'reference', to: [{ type: 'product' }] }],
       validation: (Rule: SanityRule) => Rule.max(3),

@@ -1,8 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { CartProvider } from "@/context/CartContext";
-import { WishlistProvider } from "@/context/WishlistContext";
+import { ShopifyCartProvider, WishlistProvider } from "@/context";
 
 interface ProvidersProps {
   children: ReactNode;
@@ -10,10 +9,10 @@ interface ProvidersProps {
 
 export function Providers({ children }: ProvidersProps) {
   return (
-    <CartProvider>
+    <ShopifyCartProvider>
       <WishlistProvider>
         {children}
       </WishlistProvider>
-    </CartProvider>
+    </ShopifyCartProvider>
   );
 }
