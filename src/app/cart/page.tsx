@@ -134,11 +134,14 @@ export default function CartPage() {
                         </div>
                         <div className="text-right">
                           <p className="font-mono text-lg">
-                            ${typeof item.price === 'string' 
-                              ? parseFloat(item.price).toFixed(2) 
-                              : typeof item.price === 'number'
-                              ? item.price.toFixed(2)
-                              : '0.00'}
+                            ${(() => {
+                              if (typeof item.price === 'string') {
+                                return parseFloat(item.price).toFixed(2);
+                              } else if (typeof item.price === 'number') {
+                                return item.price.toFixed(2);
+                              }
+                              return '0.00';
+                            })()}
                           </p>
                         </div>
                       </motion.div>
@@ -166,11 +169,14 @@ export default function CartPage() {
                       <div className="flex justify-between">
                         <span className="opacity-60 font-mono text-xs uppercase">Subtotal</span>
                         <span className="font-mono">
-                          ${typeof cartTotal === 'string' 
-                            ? parseFloat(cartTotal).toFixed(2) 
-                            : typeof cartTotal === 'number'
-                            ? cartTotal.toFixed(2)
-                            : '0.00'}
+                          ${(() => {
+                            if (typeof cartTotal === 'string') {
+                              return parseFloat(cartTotal).toFixed(2);
+                            } else if (typeof cartTotal === 'number') {
+                              return cartTotal.toFixed(2);
+                            }
+                            return '0.00';
+                          })()}
                         </span>
                       </div>
                       <div className="flex justify-between">
@@ -183,11 +189,14 @@ export default function CartPage() {
                         <span className="font-serif italic text-lg">Total</span>
                         <div className="text-right">
                           <span className="font-mono text-xl block">
-                            ${typeof cartTotal === 'string' 
-                              ? parseFloat(cartTotal).toFixed(2) 
-                              : typeof cartTotal === 'number'
-                              ? cartTotal.toFixed(2)
-                              : '0.00'}
+                            ${(() => {
+                              if (typeof cartTotal === 'string') {
+                                return parseFloat(cartTotal).toFixed(2);
+                              } else if (typeof cartTotal === 'number') {
+                                return cartTotal.toFixed(2);
+                              }
+                              return '0.00';
+                            })()}
                           </span>
                           <span className="font-mono text-[9px] uppercase opacity-40 tracking-widest">USD</span>
                         </div>
