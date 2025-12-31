@@ -50,10 +50,10 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
   const sizeConfig = { sm: isMobile ? 64 : 80, md: isMobile ? 72 : 100, lg: isMobile ? 100 : 140 };
   const compassSize = sizeConfig[size];
   
-  // Perfectly circular proportions
+  // Expanded state dimensions
   const expandedSize = isMobile ? 180 : 240;
   const compassRadius = expandedSize / 2;
-  const labelGap = isMobile ? 30 : 50; // Tighter gap for better cardinal connection
+  const labelGap = isMobile ? 30 : 50; // Distance from compass edge to label center
   
   const needleBaseOffset = 45;
 
@@ -95,12 +95,10 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
               exit={{ opacity: 0 }}
               className="fixed inset-0 z-[2999] pointer-events-none"
             >
-              {/* NORTH AXIS (Vertical Center, Top) */}
-              <div className="absolute top-0 left-0 right-0 bottom-1/2 flex items-end justify-center pb-[calc(120px+50px)] md:pb-[calc(120px+50px)]"
+              {/* NORTH - Threshold (Perfectly centered horizontally, above center) */}
+              <div className="absolute top-0 left-0 right-0 bottom-1/2 flex items-end justify-center"
                    style={{ 
-                     paddingBottom: `${compassRadius + labelGap}px`,
-                     height: '50vh',
-                     width: '100vw'
+                     paddingBottom: `${compassRadius + labelGap}px`
                    }}>
                 <motion.button
                   initial={{ opacity: 0, y: 10 }}
@@ -124,12 +122,10 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                 </motion.button>
               </div>
 
-              {/* SOUTH AXIS (Vertical Center, Bottom) */}
-              <div className="absolute top-1/2 left-0 right-0 bottom-0 flex items-start justify-center pt-[calc(120px+50px)] md:pt-[calc(120px+50px)]"
+              {/* SOUTH - Satchel (Perfectly centered horizontally, below center) */}
+              <div className="absolute top-1/2 left-0 right-0 bottom-0 flex items-start justify-center"
                    style={{ 
-                     paddingTop: `${compassRadius + labelGap}px`,
-                     height: '50vh',
-                     width: '100vw'
+                     paddingTop: `${compassRadius + labelGap}px`
                    }}>
                 <motion.button
                   initial={{ opacity: 0, y: -10 }}
@@ -153,12 +149,10 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                 </motion.button>
               </div>
 
-              {/* EAST AXIS (Horizontal Center, Right) */}
-              <div className="absolute top-0 right-0 bottom-0 left-1/2 flex items-center justify-start pl-[calc(120px+50px)] md:pl-[calc(120px+50px)]"
+              {/* EAST - The Relic (Perfectly centered vertically, right of center) */}
+              <div className="absolute top-0 right-0 bottom-0 left-1/2 flex items-center justify-start"
                    style={{ 
-                     paddingLeft: `${compassRadius + labelGap}px`,
-                     width: '50vw',
-                     height: '100vh'
+                     paddingLeft: `${compassRadius + labelGap}px`
                    }}>
                 <motion.button
                   initial={{ opacity: 0, x: -10 }}
@@ -182,12 +176,10 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                 </motion.button>
               </div>
 
-              {/* WEST AXIS (Horizontal Center, Left) */}
-              <div className="absolute top-0 left-0 bottom-0 right-1/2 flex items-center justify-end pr-[calc(120px+50px)] md:pr-[calc(120px+50px)]"
+              {/* WEST - The Atlas (Perfectly centered vertically, left of center) */}
+              <div className="absolute top-0 left-0 bottom-0 right-1/2 flex items-center justify-end"
                    style={{ 
-                     paddingRight: `${compassRadius + labelGap}px`,
-                     width: '50vw',
-                     height: '100vh'
+                     paddingRight: `${compassRadius + labelGap}px`
                    }}>
                 <motion.button
                   initial={{ opacity: 0, x: 10 }}
