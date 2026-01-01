@@ -45,22 +45,23 @@ export function RelicClient({ categories, totalCount }: Props) {
     <div className="min-h-screen bg-theme-obsidian text-theme-alabaster">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-theme-obsidian/80 backdrop-blur-md border-b border-white/5">
-        <div className="max-w-[1800px] mx-auto px-6 md:px-24 py-6 flex items-center justify-between">
+        <div className="max-w-[1800px] mx-auto px-4 md:px-24 py-4 md:py-6 flex items-center justify-between">
           <button
             onClick={() => router.push("/")}
-            className="flex items-center gap-3 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 hover:opacity-100 transition-opacity"
+            className="flex items-center gap-2 md:gap-3 font-mono text-[10px] md:text-sm uppercase tracking-widest opacity-80 hover:opacity-100 transition-opacity"
           >
-            <ArrowLeft className="w-4 h-4" />
-            Return to Threshold
+            <ArrowLeft className="w-3 h-3 md:w-4 md:h-4" />
+            <span className="hidden sm:inline">Return to Threshold</span>
+            <span className="sm:hidden">Threshold</span>
           </button>
-          <span className="font-mono text-xs md:text-sm uppercase tracking-[0.6em] text-theme-gold">
+          <span className="font-mono text-[10px] md:text-sm uppercase tracking-[0.4em] md:tracking-[0.6em] text-theme-gold">
             The Relic
           </span>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="pt-32 pb-16 md:pt-48 md:pb-24 px-6 md:px-24">
+      <section className="pt-24 md:pt-48 pb-12 md:pb-24 px-4 md:px-24">
         <div className="max-w-[1800px] mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -68,17 +69,17 @@ export function RelicClient({ categories, totalCount }: Props) {
             transition={{ duration: 0.8 }}
             className="max-w-3xl"
           >
-            <span className="font-mono text-xs md:text-sm uppercase tracking-[0.8em] text-theme-gold mb-6 block">
-              {totalCount} Specimens · Pure Line
+            <span className="font-mono text-[10px] md:text-sm uppercase tracking-[0.6em] md:tracking-[0.8em] text-theme-gold mb-4 md:mb-6 block leading-tight">
+              {totalCount} Specimens{'\u00A0'}·{'\u00A0'}Pure Line
             </span>
-            <h1 className="text-5xl md:text-8xl font-serif tracking-tighter leading-[0.9] mb-8">
+            <h1 className="text-4xl md:text-8xl font-serif tracking-tighter leading-[0.95] md:leading-[0.9] mb-6 md:mb-8">
               The Relic
             </h1>
-            <p className="font-serif italic text-xl md:text-2xl opacity-80 leading-relaxed max-w-xl mb-6">
+            <p className="font-serif italic text-base md:text-2xl opacity-80 leading-relaxed max-w-xl mb-4 md:mb-6">
               Pure resins. Rare ouds. Aged materials sourced for the devoted 
               collector. Each specimen arrives with provenance documentation.
             </p>
-            <p className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-70">
+            <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.3em] md:tracking-widest opacity-70 leading-tight">
               Limited quantities. Verified authenticity.
             </p>
           </motion.div>
@@ -86,34 +87,34 @@ export function RelicClient({ categories, totalCount }: Props) {
       </section>
 
       {/* Categories */}
-      <section className="pb-32 px-6 md:px-24">
-        <div className="max-w-[1800px] mx-auto space-y-20">
+      <section className="pb-20 md:pb-32 px-4 md:px-24">
+        <div className="max-w-[1800px] mx-auto space-y-12 md:space-y-20">
           {categories.map((category, index) => (
             <motion.div
               key={category.id}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.15 }}
-              className="space-y-8"
+              className="space-y-6 md:space-y-8"
             >
               {/* Category Header */}
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-4 border-b border-white/10 pb-4 md:pb-6">
                 <div>
-                  <h2 className="text-3xl md:text-5xl font-serif tracking-tighter mb-2">
+                  <h2 className="text-2xl md:text-5xl font-serif tracking-tighter mb-1 md:mb-2 leading-tight">
                     {category.name}
                   </h2>
-                  <p className="font-serif italic text-lg md:text-xl opacity-80">
+                  <p className="font-serif italic text-base md:text-xl opacity-80 leading-relaxed">
                     {category.description}
                   </p>
                 </div>
-                <p className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-70">
+                <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest opacity-70">
                   {category.count} Specimen{category.count !== 1 ? "s" : ""}
                 </p>
               </div>
 
               {/* Product Grid */}
               {category.products.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
                   {category.products.map((product) => {
                     // Debug: Log product details
                     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
@@ -151,19 +152,19 @@ export function RelicClient({ categories, totalCount }: Props) {
                           </span>
                         </div>
                       )}
-                      <div className="p-4 flex-1 flex flex-col justify-between">
+                      <div className="p-3 md:p-4 flex-1 flex flex-col justify-between">
                         <div>
-                          <h3 className="font-serif italic text-base md:text-lg mb-1 group-hover:tracking-tighter transition-all line-clamp-2">
+                          <h3 className="font-serif italic text-sm md:text-lg mb-1 group-hover:tracking-tighter transition-all line-clamp-2 leading-tight">
                             {product.title}
                           </h3>
                           {product.price && (
-                            <p className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 tabular-nums">
+                            <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.1em] md:tracking-widest opacity-80 tabular-nums">
                               ${product.price}
                             </p>
                           )}
                         </div>
                         {!product.inStock && (
-                          <span className="font-mono text-[10px] uppercase tracking-widest opacity-40 mt-2">
+                          <span className="font-mono text-[8px] md:text-[10px] uppercase tracking-widest opacity-40 mt-1 md:mt-2">
                             Out of Stock
                           </span>
                         )}
@@ -187,21 +188,21 @@ export function RelicClient({ categories, totalCount }: Props) {
       </section>
 
       {/* Collector Notice */}
-      <section className="bg-white/[0.02] py-20 px-6 md:px-24 border-y border-white/5">
+      <section className="bg-white/[0.02] py-12 md:py-20 px-4 md:px-24 border-y border-white/5">
         <div className="max-w-[1800px] mx-auto">
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="max-w-3xl mx-auto text-center space-y-6"
+            className="max-w-3xl mx-auto text-center space-y-4 md:space-y-6"
           >
-            <span className="font-mono text-xs md:text-sm uppercase tracking-[0.6em] text-theme-gold">
+            <span className="font-mono text-[10px] md:text-sm uppercase tracking-[0.4em] md:tracking-[0.6em] text-theme-gold">
               Collector Protocol
             </span>
-            <h3 className="text-2xl md:text-4xl font-serif italic">
+            <h3 className="text-xl md:text-4xl font-serif italic leading-tight">
               For the Devoted Few
             </h3>
-            <p className="font-serif italic opacity-80 leading-relaxed">
+            <p className="font-serif italic text-sm md:text-base opacity-80 leading-relaxed px-2">
               Relic specimens are sourced in limited quantities from verified suppliers. 
               Each arrives with documentation of origin, age, and distillation method. 
               Priority access available to registered collectors.
