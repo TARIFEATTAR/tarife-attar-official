@@ -290,23 +290,41 @@ export function ProductDetailClient({ product }: Props) {
           <div className="space-y-4">
             {/* Main Image with Parallax */}
             <div className="relative aspect-[4/5] bg-theme-charcoal/5 overflow-hidden border border-theme-charcoal/10 group">
-              {mainImageUrl ? (
-                <motion.div 
-                  className="w-full h-full relative"
-                  style={{ y: imageY }}
-                >
-                  <Image
-                    src={mainImageUrl.width(800).height(1000).url()}
-                    alt={product.title}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover scale-110 group-hover:scale-[1.12] transition-transform duration-[2s] ease-out"
-                    priority
-                  />
-                  {/* Atmospheric Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-theme-charcoal/5 to-transparent pointer-events-none" />
-                </motion.div>
-              ) : (
+              {mainImageUrl ? (() => {
+                try {
+                  const imageSrc = mainImageUrl.width(800).height(1000).url();
+                  return (
+                    <motion.div 
+                      className="w-full h-full relative"
+                      style={{ y: imageY }}
+                    >
+                      <Image
+                        src={imageSrc}
+                        alt={product.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                        className="object-cover scale-110 group-hover:scale-[1.12] transition-transform duration-[2s] ease-out"
+                        priority
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                      {/* Atmospheric Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-theme-charcoal/5 to-transparent pointer-events-none" />
+                    </motion.div>
+                  );
+                } catch (error) {
+                  console.warn('Failed to generate main image URL:', error);
+                  return (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="font-mono text-xs uppercase tracking-widest opacity-20">
+                        No Image
+                      </span>
+                    </div>
+                  );
+                }
+              })() : (
                 <div className="w-full h-full flex items-center justify-center">
                   <span className="font-mono text-xs uppercase tracking-widest opacity-20">
                     No Image
@@ -330,15 +348,27 @@ export function ProductDetailClient({ product }: Props) {
                           : "border-theme-charcoal/10 hover:border-theme-charcoal/30"
                       }`}
                     >
-                      {thumbUrl ? (
-                        <Image
-                          src={thumbUrl.width(200).height(200).url()}
-                          alt={`${product.title} view ${index + 1}`}
-                          fill
-                          sizes="(max-width: 1024px) 25vw, 12.5vw"
-                          className="object-cover"
-                        />
-                      ) : (
+                      {thumbUrl ? (() => {
+                        try {
+                          const thumbSrc = thumbUrl.width(200).height(200).url();
+                          return (
+                            <Image
+                              src={thumbSrc}
+                              alt={`${product.title} view ${index + 1}`}
+                              fill
+                              sizes="(max-width: 1024px) 25vw, 12.5vw"
+                              className="object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                              }}
+                            />
+                          );
+                        } catch (error) {
+                          console.warn('Failed to generate thumbnail URL:', error);
+                          return <div className="w-full h-full bg-theme-charcoal/5" />;
+                        }
+                      })() : (
                         <div className="w-full h-full bg-theme-charcoal/5" />
                       )}
                     </button>

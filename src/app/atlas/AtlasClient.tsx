@@ -162,23 +162,44 @@ export function AtlasClient({ territories, totalCount }: Props) {
                       >
                         {product.mainImage ? (() => {
                           const imageUrl = urlForImage(product.mainImage);
-                          return imageUrl ? (
-                            <div className="relative w-full h-4/5 bg-theme-charcoal/5">
-                              <Image
-                                src={imageUrl.width(400).height(500).url()}
-                                alt={product.title || 'Product image'}
-                                fill
-                                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 16vw"
-                                className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                              />
-                            </div>
-                          ) : (
-                            <div className="w-full h-4/5 bg-theme-charcoal/5 flex items-center justify-center">
-                              <span className="font-mono text-[8px] uppercase tracking-widest opacity-20">
-                                No Image
-                              </span>
-                            </div>
-                          );
+                          if (!imageUrl) {
+                            return (
+                              <div className="w-full h-4/5 bg-theme-charcoal/5 flex items-center justify-center">
+                                <span className="font-mono text-[8px] uppercase tracking-widest opacity-20">
+                                  No Image
+                                </span>
+                              </div>
+                            );
+                          }
+                          
+                          try {
+                            const imageSrc = imageUrl.width(400).height(500).url();
+                            return (
+                              <div className="relative w-full h-4/5 bg-theme-charcoal/5">
+                                <Image
+                                  src={imageSrc}
+                                  alt={product.title || 'Product image'}
+                                  fill
+                                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 16vw"
+                                  className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                                  onError={(e) => {
+                                    // Hide broken images
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                            );
+                          } catch (error) {
+                            console.warn('Failed to generate image URL for product:', product.title, error);
+                            return (
+                              <div className="w-full h-4/5 bg-theme-charcoal/5 flex items-center justify-center">
+                                <span className="font-mono text-[8px] uppercase tracking-widest opacity-20">
+                                  No Image
+                                </span>
+                              </div>
+                            );
+                          }
                         })() : (
                           <div className="w-full h-3/4 bg-theme-charcoal/5 flex items-center justify-center">
                             <span className="font-mono text-[8px] uppercase tracking-widest opacity-20">

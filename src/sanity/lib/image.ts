@@ -18,7 +18,12 @@ export const urlForImage = (source: SanityImageSource | undefined) => {
     return undefined;
   }
 
-  return imageBuilder.image(source).auto("format").fit("max");
+  try {
+    return imageBuilder.image(source).auto("format").fit("max");
+  } catch (error) {
+    console.warn('Failed to build image URL:', error);
+    return undefined;
+  }
 };
 
 // Helper to get URL string directly
