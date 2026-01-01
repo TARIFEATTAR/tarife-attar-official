@@ -32,6 +32,7 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
   const [isMobile, setIsMobile] = useState(false);
   const [isShortViewport, setIsShortViewport] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [viewportWidth, setViewportWidth] = useState(0);
 
   const { scrollYProgress } = useScroll();
   const rawRotation = useTransform(scrollYProgress, [0, 1], [0, 360]);
@@ -44,26 +45,50 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
   useEffect(() => {
     setIsMounted(true);
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-      setIsShortViewport(window.innerHeight < 600);
+      if (typeof window !== 'undefined') {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        setIsMobile(width < 768);
+        setIsShortViewport(height < 600);
+        setViewportWidth(width);
+      }
     };
     handleResize();
-    window.addEventListener('resize', handleResize);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', handleResize);
+    }
 
     // Load interaction state from localStorage
-    const interacted = localStorage.getItem('compass-interacted');
-    if (interacted) setHasInteracted(true);
+    if (typeof window !== 'undefined') {
+      const interacted = localStorage.getItem('compass-interacted');
+      if (interacted) setHasInteracted(true);
+    }
 
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', handleResize);
+      }
+    };
   }, []);
 
-  const sizeConfig = { sm: isMobile ? 64 : 80, md: isMobile ? 72 : 100, lg: isMobile ? 100 : 140 };
+  // Responsive sizing - better mobile support
+  const sizeConfig = { 
+    sm: isMobile ? 56 : 80, 
+    md: isMobile ? 64 : 100, 
+    lg: isMobile ? 80 : 140 
+  };
   const compassSize = sizeConfig[size];
   
-  // Expanded state dimensions - slightly smaller on short viewports
-  const expandedSize = isMobile ? (isShortViewport ? 140 : 180) : 240;
+  // Expanded state dimensions - responsive to viewport
+  const expandedSize = isMobile 
+    ? (isShortViewport 
+        ? 160 
+        : viewportWidth > 0 
+          ? Math.min(viewportWidth * 0.5, 200)
+          : 180)
+    : 240;
   const compassRadius = expandedSize / 2;
-  const labelGap = isMobile ? (isShortViewport ? 20 : 30) : 50;
+  const labelGap = isMobile ? (isShortViewport ? 24 : 32) : 50;
   
   const needleBaseOffset = 45;
 
@@ -115,15 +140,16 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                   onMouseEnter={() => !isMobile && setHoveredDirection('N')}
                   onMouseLeave={() => !isMobile && setHoveredDirection(null)}
                   onTouchStart={() => setHoveredDirection('N')}
-                  className="pointer-events-auto flex flex-col items-center group touch-manipulation min-h-[44px] px-6 py-2"
+                  onTouchEnd={() => setTimeout(() => setHoveredDirection(null), 200)}
+                  className="pointer-events-auto flex flex-col items-center group touch-manipulation min-h-[48px] min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
                 >
-                  <span className={`font-mono text-sm md:text-lg uppercase tracking-[0.5em] transition-all duration-300 ${
+                  <span className={`font-mono ${isMobile ? 'text-base' : 'text-lg'} uppercase tracking-[0.4em] md:tracking-[0.5em] transition-all duration-300 ${
                     hoveredDirection === 'N' ? 'text-theme-gold scale-105' : 'text-white/90'
                   }`}>
                     {NAV_ITEMS[0].label}
                   </span>
                   {!isShortViewport && (
-                    <span className={`font-serif italic text-[10px] md:text-xs mt-2 tracking-widest transition-opacity ${
+                    <span className={`font-serif italic ${isMobile ? 'text-[11px]' : 'text-xs'} mt-1.5 md:mt-2 tracking-widest transition-opacity ${
                       hoveredDirection === 'N' ? 'text-white/70' : 'text-white/40'
                     }`}>
                       {NAV_ITEMS[0].description}
@@ -143,15 +169,16 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                   onMouseEnter={() => !isMobile && setHoveredDirection('S')}
                   onMouseLeave={() => !isMobile && setHoveredDirection(null)}
                   onTouchStart={() => setHoveredDirection('S')}
-                  className="pointer-events-auto flex flex-col items-center group touch-manipulation min-h-[44px] px-6 py-2"
+                  onTouchEnd={() => setTimeout(() => setHoveredDirection(null), 200)}
+                  className="pointer-events-auto flex flex-col items-center group touch-manipulation min-h-[48px] min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
                 >
-                  <span className={`font-mono text-sm md:text-lg uppercase tracking-[0.5em] transition-all duration-300 ${
+                  <span className={`font-mono ${isMobile ? 'text-base' : 'text-lg'} uppercase tracking-[0.4em] md:tracking-[0.5em] transition-all duration-300 ${
                     hoveredDirection === 'S' ? 'text-theme-gold scale-105' : 'text-white/90'
                   }`}>
                     {NAV_ITEMS[2].label}
                   </span>
                   {!isShortViewport && (
-                    <span className={`font-serif italic text-[10px] md:text-xs mt-2 tracking-widest transition-opacity ${
+                    <span className={`font-serif italic ${isMobile ? 'text-[11px]' : 'text-xs'} mt-1.5 md:mt-2 tracking-widest transition-opacity ${
                       hoveredDirection === 'S' ? 'text-white/70' : 'text-white/40'
                     }`}>
                       {NAV_ITEMS[2].description}
@@ -171,15 +198,16 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                   onMouseEnter={() => !isMobile && setHoveredDirection('E')}
                   onMouseLeave={() => !isMobile && setHoveredDirection(null)}
                   onTouchStart={() => setHoveredDirection('E')}
-                  className="pointer-events-auto flex flex-col items-center group touch-manipulation min-h-[44px] px-6 py-2"
+                  onTouchEnd={() => setTimeout(() => setHoveredDirection(null), 200)}
+                  className="pointer-events-auto flex flex-col items-center group touch-manipulation min-h-[48px] min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
                 >
-                  <span className={`font-mono text-sm md:text-lg uppercase tracking-[0.5em] transition-all duration-300 ${
+                  <span className={`font-mono ${isMobile ? 'text-base' : 'text-lg'} uppercase tracking-[0.4em] md:tracking-[0.5em] transition-all duration-300 ${
                     hoveredDirection === 'E' ? 'text-theme-gold scale-105' : 'text-white/90'
                   }`}>
                     {NAV_ITEMS[1].label}
                   </span>
                   {!isShortViewport && (
-                    <span className={`font-serif italic text-[10px] md:text-xs mt-2 tracking-widest transition-opacity ${
+                    <span className={`font-serif italic ${isMobile ? 'text-[11px]' : 'text-xs'} mt-1.5 md:mt-2 tracking-widest transition-opacity ${
                       hoveredDirection === 'E' ? 'text-white/70' : 'text-white/40'
                     }`}>
                       {NAV_ITEMS[1].description}
@@ -199,15 +227,16 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                   onMouseEnter={() => !isMobile && setHoveredDirection('W')}
                   onMouseLeave={() => !isMobile && setHoveredDirection(null)}
                   onTouchStart={() => setHoveredDirection('W')}
-                  className="pointer-events-auto flex flex-col items-center group touch-manipulation min-h-[44px] px-6 py-2"
+                  onTouchEnd={() => setTimeout(() => setHoveredDirection(null), 200)}
+                  className="pointer-events-auto flex flex-col items-center group touch-manipulation min-h-[48px] min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
                 >
-                  <span className={`font-mono text-sm md:text-lg uppercase tracking-[0.5em] transition-all duration-300 ${
+                  <span className={`font-mono ${isMobile ? 'text-base' : 'text-lg'} uppercase tracking-[0.4em] md:tracking-[0.5em] transition-all duration-300 ${
                     hoveredDirection === 'W' ? 'text-theme-gold scale-105' : 'text-white/90'
                   }`}>
                     {NAV_ITEMS[3].label}
                   </span>
                   {!isShortViewport && (
-                    <span className={`font-serif italic text-[10px] md:text-xs mt-2 tracking-widest transition-opacity ${
+                    <span className={`font-serif italic ${isMobile ? 'text-[11px]' : 'text-xs'} mt-1.5 md:mt-2 tracking-widest transition-opacity ${
                       hoveredDirection === 'W' ? 'text-white/70' : 'text-white/40'
                     }`}>
                       {NAV_ITEMS[3].description}
@@ -217,12 +246,12 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
               </div>
 
               {/* Close Hint */}
-              <div className="absolute bottom-10 left-0 right-0 flex justify-center">
+              <div className={`absolute ${isMobile ? 'bottom-6' : 'bottom-10'} left-0 right-0 flex justify-center`}>
                 <motion.span 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="font-mono text-[10px] uppercase tracking-[0.5em] text-white/20 whitespace-nowrap"
+                  className={`font-mono ${isMobile ? 'text-xs' : 'text-[10px]'} uppercase tracking-[0.3em] md:tracking-[0.5em] text-white/30 md:text-white/20 whitespace-nowrap`}
                 >
                   {isMobile ? 'Tap anywhere to close' : 'Click anywhere to close'}
                 </motion.span>
@@ -239,7 +268,9 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
         className={`fixed z-[3000] ${
           isOpen 
             ? 'inset-0 flex items-center justify-center pointer-events-none' 
-            : 'bottom-4 right-4 md:bottom-6 md:right-6 pointer-events-auto'
+            : isMobile
+            ? 'bottom-3 right-3 pointer-events-auto'
+            : 'bottom-6 right-6 pointer-events-auto'
         }`}
         style={{
           bottom: isOpen ? '0' : undefined,
@@ -250,7 +281,7 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
         <motion.button
           layout
           layoutId="compass-trigger"
-          className="cursor-pointer relative pointer-events-auto touch-manipulation shadow-2xl rounded-full"
+          className="cursor-pointer relative pointer-events-auto touch-manipulation shadow-2xl rounded-full active:scale-95 transition-transform"
           animate={{
             width: isOpen ? expandedSize : compassSize,
             height: isOpen ? expandedSize : compassSize,
@@ -285,7 +316,21 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
             
             if (!hasInteracted) {
               setHasInteracted(true);
-              localStorage.setItem('compass-interacted', 'true');
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('compass-interacted', 'true');
+              }
+            }
+          }}
+          onTouchStart={(e) => {
+            e.stopPropagation();
+            // Prevent body scroll when touching compass
+            if (typeof document !== 'undefined') {
+              document.body.style.overflow = 'hidden';
+            }
+          }}
+          onTouchEnd={() => {
+            if (typeof document !== 'undefined') {
+              document.body.style.overflow = '';
             }
           }}
           onMouseEnter={() => !isMobile && setIsHovered(true)}
