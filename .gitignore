@@ -42,6 +42,8 @@ next-env.d.ts
 
 # Sanity
 /sanity/dist
+/.sanity/
+/dist/
 
 # Legacy MVP folder (reference only, not part of production build)
 /Tarife-Attar-Headless
