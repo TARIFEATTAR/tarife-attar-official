@@ -281,11 +281,18 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
         <motion.button
           layout
           layoutId="compass-trigger"
-          className="cursor-pointer relative pointer-events-auto touch-manipulation shadow-2xl rounded-full active:scale-95 transition-transform"
-          animate={{
+          className="cursor-pointer relative pointer-events-auto touch-manipulation shadow-2xl rounded-full active:scale-95"
+          style={{
             width: isOpen ? expandedSize : compassSize,
             height: isOpen ? expandedSize : compassSize,
-            scale: isOpen ? 1 : (hasInteracted ? 1 : [1, 1.08, 1]),
+            willChange: isOpen ? 'transform' : 'auto',
+          }}
+          animate={{
+            scale: isOpen 
+              ? 1 
+              : (hasInteracted 
+                  ? 1 
+                  : [1, 1.08, 1]),
             boxShadow: isOpen 
               ? 'none' 
               : (hasInteracted 
@@ -297,7 +304,8 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                   ])
           }}
           transition={{
-            ...springTransition,
+            width: { type: "spring", stiffness: 200, damping: 25, mass: 0.5 },
+            height: { type: "spring", stiffness: 200, damping: 25, mass: 0.5 },
             scale: {
               duration: 2.5,
               repeat: isOpen || hasInteracted ? 0 : Infinity,
@@ -341,6 +349,7 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
             animate={{ rotate: isHovered && !isOpen && !isMobile ? [0, 5, -5, 0] : 0 }}
             transition={{ duration: 0.4 }}
             className="absolute inset-0"
+            style={{ willChange: 'transform' }}
           >
             <Image
               src="/assets/compass-body.png"
@@ -349,6 +358,7 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
               sizes={isOpen ? `${expandedSize}px` : `${compassSize}px`}
               className="object-contain"
               priority
+              quality={90}
             />
           </motion.div>
 
@@ -362,12 +372,18 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                     : -needleBaseOffset)
                 : needleRotation.get()
             }}
-            style={{ rotate: isOpen ? undefined : needleRotation }}
+            style={{ 
+              rotate: isOpen ? undefined : needleRotation,
+              willChange: 'transform'
+            }}
             transition={springTransition}
           >
             <motion.div 
               className="relative w-full h-full"
-              style={{ transform: `rotate(-${needleBaseOffset}deg)` }}
+              style={{ 
+                transform: `rotate(-${needleBaseOffset}deg)`,
+                willChange: 'transform'
+              }}
               animate={{ 
                 rotate: isHovered && !isOpen && !isMobile 
                   ? [0, 15, -15, 0] 
@@ -395,6 +411,7 @@ export const RealisticCompass: React.FC<Props> = ({ onNavigate, size = 'md' }) =
                 sizes={isOpen ? `${expandedSize}px` : `${compassSize}px`}
                 className="object-contain"
                 priority
+                quality={90}
               />
             </motion.div>
           </motion.div>

@@ -43,19 +43,19 @@ export function AtlasClient({ territories, totalCount }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-theme-alabaster text-theme-charcoal">
+    <div className="min-h-screen bg-theme-alabaster text-theme-charcoal overflow-x-hidden">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-theme-alabaster/80 backdrop-blur-md border-b border-theme-charcoal/5">
-        <div className="max-w-[1800px] mx-auto px-4 md:px-24 py-4 md:py-6 flex items-center justify-between">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-theme-alabaster/80 backdrop-blur-md border-b border-theme-charcoal/5 overflow-hidden">
+        <div className="max-w-[1800px] mx-auto px-4 md:px-24 py-4 md:py-6 flex items-center justify-between min-w-0">
           <button
             onClick={() => router.push("/")}
-            className="flex items-center gap-2 md:gap-3 font-mono text-[10px] md:text-sm uppercase tracking-widest opacity-80 hover:opacity-100 transition-opacity"
+            className="flex items-center gap-2 md:gap-3 font-mono text-[10px] md:text-sm uppercase tracking-widest opacity-80 hover:opacity-100 transition-opacity flex-shrink-0 min-w-0"
           >
-            <ArrowLeft className="w-3 h-3 md:w-4 md:h-4" />
-            <span className="hidden sm:inline">Return to Threshold</span>
-            <span className="sm:hidden">Threshold</span>
+            <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
+            <span className="hidden sm:inline truncate">Return to Threshold</span>
+            <span className="sm:hidden truncate">Threshold</span>
           </button>
-          <span className="font-mono text-[10px] md:text-sm uppercase tracking-[0.4em] md:tracking-[0.6em] text-theme-gold">
+          <span className="font-mono text-[10px] md:text-sm uppercase tracking-[0.4em] md:tracking-[0.6em] text-theme-gold flex-shrink-0 whitespace-nowrap">
             The Atlas
           </span>
         </div>
@@ -70,17 +70,17 @@ export function AtlasClient({ territories, totalCount }: Props) {
             transition={{ duration: 0.8 }}
             className="max-w-3xl"
           >
-            <span className="font-mono text-[10px] md:text-sm uppercase tracking-[0.6em] md:tracking-[0.8em] text-theme-gold mb-4 md:mb-6 block leading-tight">
+            <span className="font-mono text-[10px] md:text-sm uppercase tracking-[0.6em] md:tracking-[0.8em] text-theme-gold mb-4 md:mb-6 block leading-tight break-words">
               {totalCount} Perfume Oils{'\u00A0'}·{'\u00A0'}4 Territories
             </span>
             <h1 className="text-4xl md:text-8xl font-serif italic tracking-tighter leading-[0.95] md:leading-[0.9] mb-6 md:mb-8">
               The Atlas
             </h1>
-            <p className="font-serif italic text-base md:text-2xl opacity-80 leading-relaxed max-w-xl mb-4 md:mb-6">
+            <p className="font-serif italic text-base md:text-2xl opacity-80 leading-relaxed max-w-xl mb-4 md:mb-6 break-words">
               Clean, skin-safe perfume oils. Intentional formulations 
               crafted for those who travel by scent.
             </p>
-            <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.3em] md:tracking-widest opacity-70 leading-tight">
+            <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.3em] md:tracking-widest opacity-70 leading-tight break-words">
               Navigate by territory. Discover by instinct.
             </p>
           </motion.div>
@@ -137,16 +137,16 @@ export function AtlasClient({ territories, totalCount }: Props) {
                 className="space-y-6 md:space-y-8"
               >
                 {/* Territory Header */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-4 border-b border-theme-charcoal/10 pb-4 md:pb-6">
-                  <div>
-                    <h2 className="text-3xl md:text-6xl font-serif italic tracking-tighter mb-1 md:mb-2 leading-tight">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-4 border-b border-theme-charcoal/10 pb-4 md:pb-6 min-w-0">
+                  <div className="min-w-0 flex-1">
+                    <h2 className="text-3xl md:text-6xl font-serif italic tracking-tighter mb-1 md:mb-2 leading-tight break-words">
                       {territory.name}
                     </h2>
-                    <p className="font-serif italic text-base md:text-xl opacity-80 leading-relaxed">
+                    <p className="font-serif italic text-base md:text-xl opacity-80 leading-relaxed break-words">
                       {territory.tagline}
                     </p>
                   </div>
-                  <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest opacity-70">
+                  <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest opacity-70 flex-shrink-0 whitespace-nowrap">
                     {territory.count} Specimen{territory.count !== 1 ? "s" : ""}
                   </p>
                 </div>
@@ -186,19 +186,19 @@ export function AtlasClient({ territories, totalCount }: Props) {
                             </span>
                           </div>
                         )}
-                        <div className="p-3 md:p-4 flex-1 flex flex-col justify-between">
-                          <div>
-                            <h3 className="font-serif italic text-sm md:text-lg mb-1 group-hover:tracking-tighter transition-all line-clamp-2 leading-tight">
+                        <div className="p-3 md:p-4 flex-1 flex flex-col justify-between min-w-0">
+                          <div className="min-w-0">
+                            <h3 className="font-serif italic text-sm md:text-lg mb-1 group-hover:tracking-tighter transition-all line-clamp-2 leading-tight break-words overflow-hidden">
                               {product.title}
                             </h3>
                             {product.price && (
-                              <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.1em] md:tracking-widest opacity-80 tabular-nums">
+                              <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.1em] md:tracking-widest opacity-80 tabular-nums break-words">
                                 ${product.price}
                               </p>
                             )}
                           </div>
                           {!product.inStock && (
-                            <span className="font-mono text-[8px] uppercase tracking-widest opacity-20 mt-1 md:mt-2">
+                            <span className="font-mono text-[8px] uppercase tracking-widest opacity-20 mt-1 md:mt-2 break-words">
                               Out of Stock
                             </span>
                           )}

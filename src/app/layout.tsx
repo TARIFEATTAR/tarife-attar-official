@@ -38,8 +38,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${ebGaramond.variable} ${jetbrainsMono.variable}`}>
-      <body className="min-h-screen bg-theme-alabaster text-theme-charcoal antialiased font-serif">
+    <html lang="en" className={`${ebGaramond.variable} ${jetbrainsMono.variable} overflow-x-hidden`}>
+      <body className="min-h-screen bg-theme-alabaster text-theme-charcoal antialiased font-serif overflow-x-hidden">
         <Providers>
           {children}
         </Providers>
