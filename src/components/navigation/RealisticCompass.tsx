@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence, useScroll, useTransform, useSpring, LayoutGroup } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 
 interface NavItem {
   label: string;
@@ -154,24 +154,37 @@ export const RealisticCompass: React.FC<Props> = ({
 
   const springTransition = { type: "spring" as const, stiffness: 120, damping: 24, mass: 0.8 };
 
-  // Position classes based on mode
-  const getPositionClasses = () => {
+  // Position styles based on mode - using inline styles for stability
+  const getPositionStyles = (): React.CSSProperties => {
     if (isOpen) {
-      return 'inset-0 flex items-center justify-center pointer-events-none';
+      return {
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        pointerEvents: 'none' as const,
+      };
     }
     if (position === 'center') {
-      return 'bottom-12 left-1/2 -translate-x-1/2 pointer-events-auto';
+      return {
+        bottom: isMobile ? 24 : 48,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        pointerEvents: 'auto' as const,
+      };
     }
-    return isMobile 
-      ? 'bottom-3 right-3 pointer-events-auto'
-      : 'bottom-6 right-6 pointer-events-auto';
+    return {
+      bottom: isMobile ? 12 : 24,
+      right: isMobile ? 12 : 24,
+      pointerEvents: 'auto' as const,
+    };
   };
 
   // Determine if needle should use external control or scroll
   const useExternalNeedle = externalHoveredDirection !== null || isOpen;
 
   return (
-    <LayoutGroup>
+    <>
       {/* 1. NAVIGATION OVERLAY LAYER */}
       <AnimatePresence>
         {isOpen && (
@@ -325,18 +338,16 @@ export const RealisticCompass: React.FC<Props> = ({
         )}
       </AnimatePresence>
 
-      {/* 2. COMPASS BUTTON LAYER - Morphs position using layoutId */}
+      {/* 2. COMPASS BUTTON LAYER */}
       <motion.div
-        layout
-        layoutId="compass-root"
-        className={`fixed z-[3000] ${getPositionClasses()}`}
-        transition={springTransition}
+        className="fixed z-[3000]"
+        style={getPositionStyles()}
+        animate={getPositionStyles()}
+        transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
       >
         {/* Compass Container with Hint */}
         <div className="flex flex-col items-center">
           <motion.button
-            layout
-            layoutId="compass-trigger"
             className="cursor-pointer relative pointer-events-auto touch-manipulation shadow-2xl rounded-full active:scale-95"
             style={{
               width: isOpen ? expandedSize : compassSize,
@@ -478,7 +489,7 @@ export const RealisticCompass: React.FC<Props> = ({
           )}
         </div>
       </motion.div>
-    </LayoutGroup>
+    </>
   );
 };
 
