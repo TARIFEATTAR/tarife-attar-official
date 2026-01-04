@@ -83,3 +83,14 @@ body {
     letter-spacing: 0.1em;
   }
 }
+
+/* Hide compass in Sanity Studio */
+/* This is a fallback in case the pathname check doesn't work */
+[data-sanity] [data-compass-navigation],
+body:has([data-sanity]) [data-compass-navigation],
+[data-sanity] ~ [data-compass-navigation] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

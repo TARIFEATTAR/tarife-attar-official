@@ -22,7 +22,16 @@ export function CompassProvider({ children }: CompassProviderProps) {
   // Don't render compass in layout if we're on split entry page or Studio
   // (SplitEntry renders its own centered compass)
   const isSplitEntryPage = pathname === '/';
-  const isStudioPage = pathname?.startsWith('/studio');
+  
+  // Check for Studio routes - be very aggressive about this
+  const isStudioPage = 
+    typeof window !== 'undefined' && (
+      pathname?.startsWith('/studio') || 
+      pathname?.includes('/studio') ||
+      window.location.pathname?.startsWith('/studio') ||
+      window.location.pathname?.includes('/studio') ||
+      document.querySelector('[data-sanity]') !== null
+    );
   
   const handleNavigate = (path: string) => {
     const routes: Record<string, string> = {
@@ -35,12 +44,17 @@ export function CompassProvider({ children }: CompassProviderProps) {
     router.push(routes[path] || `/${path}`);
   };
 
+  // Early return for Studio pages - don't render compass at all
+  if (isStudioPage) {
+    return <>{children}</>;
+  }
+
   return (
     <>
       {children}
       
-      {/* Only render corner compass on non-entry and non-studio pages */}
-      {!isSplitEntryPage && !isStudioPage && (
+      {/* Only render corner compass on non-entry pages */}
+      {!isSplitEntryPage && (
         <RealisticCompass
           onNavigate={handleNavigate}
           position="corner"

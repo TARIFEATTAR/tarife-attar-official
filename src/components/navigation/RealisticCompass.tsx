@@ -335,6 +335,7 @@ export const RealisticCompass: React.FC<Props> = ({
 
       {/* 2. COMPASS BUTTON LAYER */}
       <motion.div
+        data-compass-navigation
         className={`fixed z-[3000] ${getPositionClasses()} ${isOpen ? 'pointer-events-none' : 'pointer-events-auto'}`}
         style={getTransformStyle()}
         transition={{ duration: 0.3, ease: "easeOut" }}

@@ -4,8 +4,8 @@
  * Separate layout for Sanity Studio to avoid conflicts with site styling.
  * Studio needs a clean, full-screen layout without site-specific styles.
  * 
- * Note: We use a route group approach - Studio gets minimal styling
- * to allow Sanity's own styles to take over.
+ * IMPORTANT: This layout bypasses Providers to prevent compass and other
+ * site components from appearing in Studio.
  */
 
 export default function StudioLayout({
@@ -25,7 +25,9 @@ export default function StudioLayout({
         top: 0,
         left: 0,
         right: 0,
-        bottom: 0
+        bottom: 0,
+        zIndex: 9999,
+        isolation: 'isolate'
       }}
     >
       {children}
