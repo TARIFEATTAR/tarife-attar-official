@@ -97,106 +97,133 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, onGuidedEntry }) => {
         )}
       </AnimatePresence>
 
-      {/* Atlas Side (Left/West) */}
+      {/* Atlas Side (Left/West) - Fixed 50% */}
       <motion.section
         onMouseEnter={() => setHovered('atlas')}
         onMouseLeave={() => setHovered('idle')}
         onClick={() => setShowChoice('atlas')}
-        className={`relative flex flex-col items-center justify-center overflow-hidden cursor-pointer
-          ${hovered === 'atlas' ? 'w-full h-2/3 md:w-[75%] md:h-full' : 
-            hovered === 'relic' ? 'w-full h-1/3 md:w-[25%] md:h-full' : 'w-full h-1/2 md:w-1/2 md:h-full'}
-          bg-theme-alabaster text-theme-charcoal transition-all duration-1000`}
+        className="relative flex flex-col items-center justify-center overflow-hidden cursor-pointer
+          w-full h-1/2 md:w-1/2 md:h-full
+          bg-theme-alabaster text-theme-charcoal
+          group"
       >
-        <motion.div
+        {/* Subtle hover overlay */}
+        <motion.div 
+          className="absolute inset-0 bg-theme-gold/5 pointer-events-none"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={{ opacity: hovered === 'atlas' ? 1 : 0 }}
+          transition={{ duration: 0.5 }}
+        />
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
           className="text-center px-6 md:px-10 relative z-10"
         >
           <div className="flex flex-col items-center">
-            {/* A insignia - matches EntryLoader layoutId for morphing */}
+            {/* A insignia */}
             <motion.span 
               layoutId="atlas-insignia"
-              className="text-5xl sm:text-6xl md:text-[12rem] font-serif font-bold mb-2 leading-none text-theme-gold"
+              className="text-5xl sm:text-6xl md:text-[10rem] font-serif font-bold mb-2 leading-none text-theme-gold"
             >
               A
             </motion.span>
-            <motion.h2 className="text-2xl sm:text-3xl md:text-6xl italic font-light mb-2 md:mb-6 tracking-tighter">
+            <motion.h2 className="text-2xl sm:text-3xl md:text-5xl italic font-light mb-4 md:mb-6 tracking-tighter">
               Atlas
             </motion.h2>
           </div>
-          <motion.p className="max-w-[160px] sm:max-w-[200px] md:max-w-xs mx-auto text-xs sm:text-sm md:text-lg opacity-80 leading-relaxed font-serif italic">
-            {hovered === 'atlas' ? "Explore Territories" : "Clean perfume oils. Four sensory territories. Twenty-four destinations."}
+          
+          {/* Always visible description */}
+          <motion.p className="max-w-[200px] sm:max-w-[240px] md:max-w-sm mx-auto text-xs sm:text-sm md:text-base opacity-60 leading-relaxed font-serif italic mb-6 md:mb-8">
+            Clean perfume oils organized across four sensory territories. Twenty-four destinations for the modern explorer.
           </motion.p>
-        </motion.div>
 
-        {/* Directional hint on hover */}
-        <AnimatePresence>
-          {hovered === 'atlas' && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 hidden md:block"
-            >
-              <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-theme-gold/60 [writing-mode:vertical-rl]">
-                West
-              </span>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          {/* Territory preview */}
+          <div className="flex flex-wrap justify-center gap-3 md:gap-4 font-mono text-[8px] md:text-[9px] uppercase tracking-[0.3em] opacity-40 mb-6 md:mb-8">
+            <span className="group-hover:text-theme-gold group-hover:opacity-100 transition-all">Tidal</span>
+            <span className="group-hover:text-theme-gold group-hover:opacity-100 transition-all delay-75">Ember</span>
+            <span className="group-hover:text-theme-gold group-hover:opacity-100 transition-all delay-100">Petal</span>
+            <span className="group-hover:text-theme-gold group-hover:opacity-100 transition-all delay-150">Terra</span>
+          </div>
+
+          {/* CTA Button */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            <span className="inline-block px-6 sm:px-8 py-3 sm:py-4 border border-theme-charcoal/20 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.4em] group-hover:bg-theme-charcoal group-hover:text-white transition-all duration-500">
+              Explore Territories
+            </span>
+          </motion.div>
+        </motion.div>
       </motion.section>
 
-      {/* Relic Side (Right/East) */}
+      {/* Relic Side (Right/East) - Fixed 50% */}
       <motion.section
         onMouseEnter={() => setHovered('relic')}
         onMouseLeave={() => setHovered('idle')}
         onClick={() => setShowChoice('relic')}
-        className={`relative flex flex-col items-center justify-center overflow-hidden cursor-pointer
-          ${hovered === 'relic' ? 'w-full h-2/3 md:w-[75%] md:h-full' : 
-            hovered === 'atlas' ? 'w-full h-1/3 md:w-[25%] md:h-full' : 'w-full h-1/2 md:w-1/2 md:h-full'}
-          bg-theme-obsidian text-theme-alabaster transition-all duration-1000`}
+        className="relative flex flex-col items-center justify-center overflow-hidden cursor-pointer
+          w-full h-1/2 md:w-1/2 md:h-full
+          bg-theme-obsidian text-theme-alabaster
+          group"
       >
-        <motion.div
+        {/* Subtle hover overlay */}
+        <motion.div 
+          className="absolute inset-0 bg-theme-gold/5 pointer-events-none"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={{ opacity: hovered === 'relic' ? 1 : 0 }}
+          transition={{ duration: 0.5 }}
+        />
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
           className="text-center px-6 md:px-10 relative z-10"
         >
           <div className="flex flex-col items-center">
-            {/* R insignia - matches EntryLoader layoutId for morphing */}
+            {/* R insignia */}
             <motion.span 
               layoutId="relic-insignia"
-              className="text-5xl sm:text-6xl md:text-[12rem] font-serif font-bold mb-2 leading-none text-theme-gold"
+              className="text-5xl sm:text-6xl md:text-[10rem] font-serif font-bold mb-2 leading-none text-theme-gold"
             >
               R
             </motion.span>
-            <motion.h2 className="text-2xl sm:text-3xl md:text-6xl font-light mb-2 md:mb-6 tracking-tighter">
+            <motion.h2 className="text-2xl sm:text-3xl md:text-5xl font-light mb-4 md:mb-6 tracking-tighter">
               Relic
             </motion.h2>
           </div>
-          <motion.p className="max-w-[160px] sm:max-w-[200px] md:max-w-xs mx-auto text-xs sm:text-sm md:text-lg leading-relaxed font-serif italic">
-            {hovered === 'relic' ? "Enter Vault" : "Pure resins. Rare materials. For the devoted collector."}
+          
+          {/* Always visible description */}
+          <motion.p className="max-w-[200px] sm:max-w-[240px] md:max-w-sm mx-auto text-xs sm:text-sm md:text-base opacity-50 leading-relaxed font-serif italic mb-6 md:mb-8">
+            Pure resins, rare ouds, and aged materials for the devoted collector. Each specimen arrives with provenance documentation.
           </motion.p>
-        </motion.div>
 
-        {/* Directional hint on hover */}
-        <AnimatePresence>
-          {hovered === 'relic' && (
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 hidden md:block"
-            >
-              <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-theme-gold/60 [writing-mode:vertical-rl]">
-                East
-              </span>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          {/* Material preview */}
+          <div className="flex flex-wrap justify-center gap-3 md:gap-4 font-mono text-[8px] md:text-[9px] uppercase tracking-[0.3em] opacity-30 mb-6 md:mb-8">
+            <span className="group-hover:text-theme-gold group-hover:opacity-100 transition-all">Resins</span>
+            <span className="group-hover:text-theme-gold group-hover:opacity-100 transition-all delay-75">Ouds</span>
+            <span className="group-hover:text-theme-gold group-hover:opacity-100 transition-all delay-100">Ambers</span>
+            <span className="group-hover:text-theme-gold group-hover:opacity-100 transition-all delay-150">Musks</span>
+          </div>
+
+          {/* CTA Button */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            <span className="inline-block px-6 sm:px-8 py-3 sm:py-4 border border-white/20 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.4em] group-hover:bg-white group-hover:text-black transition-all duration-500">
+              Enter Vault
+            </span>
+          </motion.div>
+        </motion.div>
       </motion.section>
 
       {/* Centered Compass - Teaching Mode */}
-      {/* This compass will morph to corner position when user navigates away */}
       <RealisticCompass
         onNavigate={handleCompassNavigate}
         position="center"
