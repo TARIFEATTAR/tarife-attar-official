@@ -61,10 +61,6 @@ export default function Home() {
     }
   };
 
-  const handleGuidedEntry = (path: 'atlas' | 'relic') => {
-    router.push(`/${path}`);
-  };
-
   const handleLoaderComplete = useCallback(() => {
     setShowLoader(false);
   }, []);
@@ -91,10 +87,7 @@ export default function Home() {
       >
             {/* Hero Entry Section */}
             <div className="h-screen w-full relative">
-              <SplitEntry 
-                onNavigate={handleNavigate}
-                onGuidedEntry={handleGuidedEntry}
-              />
+              <SplitEntry onNavigate={handleNavigate} />
             </div>
 
             {/* Featured Grid Section */}
