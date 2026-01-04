@@ -154,30 +154,25 @@ export const RealisticCompass: React.FC<Props> = ({
 
   const springTransition = { type: "spring" as const, stiffness: 120, damping: 24, mass: 0.8 };
 
-  // Position styles based on mode - using inline styles for stability
-  const getPositionStyles = (): React.CSSProperties => {
+  // Position classes based on mode
+  const getPositionClasses = () => {
     if (isOpen) {
-      return {
-        inset: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        pointerEvents: 'none' as const,
-      };
+      return 'inset-0 flex items-center justify-center';
     }
     if (position === 'center') {
-      return {
-        bottom: isMobile ? 24 : 48,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        pointerEvents: 'auto' as const,
-      };
+      return 'bottom-12 left-1/2';
     }
-    return {
-      bottom: isMobile ? 12 : 24,
-      right: isMobile ? 12 : 24,
-      pointerEvents: 'auto' as const,
-    };
+    return isMobile 
+      ? 'bottom-3 right-3'
+      : 'bottom-6 right-6';
+  };
+
+  // Transform style for center position (can't use -translate-x-1/2 class with other positions)
+  const getTransformStyle = (): React.CSSProperties => {
+    if (position === 'center' && !isOpen) {
+      return { transform: 'translateX(-50%)' };
+    }
+    return {};
   };
 
   // Determine if needle should use external control or scroll
@@ -340,10 +335,9 @@ export const RealisticCompass: React.FC<Props> = ({
 
       {/* 2. COMPASS BUTTON LAYER */}
       <motion.div
-        className="fixed z-[3000]"
-        style={getPositionStyles()}
-        animate={getPositionStyles()}
-        transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+        className={`fixed z-[3000] ${getPositionClasses()} ${isOpen ? 'pointer-events-none' : 'pointer-events-auto'}`}
+        style={getTransformStyle()}
+        transition={{ duration: 0.3, ease: "easeOut" }}
       >
         {/* Compass Container with Hint */}
         <div className="flex flex-col items-center">
