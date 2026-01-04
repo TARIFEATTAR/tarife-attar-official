@@ -53,7 +53,9 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate }) => {
           <div className="flex flex-col items-center">
             {/* A insignia */}
             <motion.span 
-              layoutId="atlas-insignia"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
               className="text-5xl sm:text-6xl md:text-[10rem] font-serif font-bold mb-2 leading-none text-theme-gold"
             >
               A
@@ -116,7 +118,9 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate }) => {
           <div className="flex flex-col items-center">
             {/* R insignia */}
             <motion.span 
-              layoutId="relic-insignia"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
               className="text-5xl sm:text-6xl md:text-[10rem] font-serif font-bold mb-2 leading-none text-theme-gold"
             >
               R
