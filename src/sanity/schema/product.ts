@@ -161,6 +161,84 @@ export const productSchema = {
     // Shopify Specific Fields
     ...shopifyFields,
 
+    // Shopify Store Data (read-only, synced from Shopify Connect)
+    {
+      name: 'store',
+      title: 'Shopify Store Data',
+      type: 'object',
+      group: 'commerce',
+      readOnly: true,
+      description: 'Auto-synced from Shopify. To use this product, create a custom product and link via shopifyProductId.',
+      fields: [
+        {
+          name: 'title',
+          title: 'Shopify Title',
+          type: 'string',
+          readOnly: true,
+        },
+        {
+          name: 'descriptionHtml',
+          title: 'Shopify Description',
+          type: 'text',
+          readOnly: true,
+        },
+        {
+          name: 'slug',
+          title: 'Shopify Slug',
+          type: 'slug',
+          readOnly: true,
+        },
+        {
+          name: 'priceRange',
+          title: 'Price Range',
+          type: 'object',
+          readOnly: true,
+          fields: [
+            {
+              name: 'minVariantPrice',
+              type: 'number',
+              readOnly: true,
+            },
+            {
+              name: 'maxVariantPrice',
+              type: 'number',
+              readOnly: true,
+            },
+          ],
+        },
+        {
+          name: 'productType',
+          title: 'Product Type',
+          type: 'string',
+          readOnly: true,
+        },
+        {
+          name: 'vendor',
+          title: 'Vendor',
+          type: 'string',
+          readOnly: true,
+        },
+        {
+          name: 'status',
+          title: 'Status',
+          type: 'string',
+          readOnly: true,
+        },
+        {
+          name: 'id',
+          title: 'Shopify Product ID',
+          type: 'string',
+          readOnly: true,
+        },
+        {
+          name: 'gid',
+          title: 'Shopify GID',
+          type: 'string',
+          readOnly: true,
+        },
+      ],
+    },
+
     // ===== THE ATLAS DATA (Hidden if collectionType != 'atlas') =====
     {
       name: 'atlasData',
@@ -379,35 +457,66 @@ export const productSchema = {
   preview: {
     select: {
       title: 'title',
+      shopifyTitle: 'store.title',
       collectionType: 'collectionType',
       internalName: 'internalName',
       media: 'mainImage',
+      shopifyImage: 'store.previewImageUrl',
       atlasAtmosphere: 'atlasData.atmosphere',
       relicViscosity: 'relicData.viscosity',
+      shopifyPrice: 'store.priceRange.minVariantPrice',
+      shopifyStatus: 'store.status',
     },
     prepare(selection: {
       title?: string;
+      shopifyTitle?: string;
       collectionType?: string;
       internalName?: string;
       media?: unknown;
+      shopifyImage?: string;
       atlasAtmosphere?: string;
       relicViscosity?: number;
+      shopifyPrice?: number;
+      shopifyStatus?: string;
     }) {
-      const { title, collectionType, internalName, media, atlasAtmosphere, relicViscosity } =
-        selection;
+      const { 
+        title, 
+        shopifyTitle, 
+        collectionType, 
+        internalName, 
+        media, 
+        shopifyImage,
+        atlasAtmosphere, 
+        relicViscosity,
+        shopifyPrice,
+        shopifyStatus,
+      } = selection;
 
+      // Use Shopify title if no custom title
+      const displayTitle = title || shopifyTitle || 'Untitled Product';
+      
+      // Determine if this is a Shopify-synced product
+      const isShopifyProduct = !!shopifyTitle && !title;
+      
       const subtitleParts: string[] = [];
-      if (internalName) subtitleParts.push(`[${internalName}]`);
-      if (collectionType === 'atlas' && atlasAtmosphere) {
-        subtitleParts.push(`Atlas: ${atlasAtmosphere}`);
-      } else if (collectionType === 'relic' && relicViscosity !== undefined) {
-        subtitleParts.push(`Relic: Viscosity ${relicViscosity}`);
+      
+      if (isShopifyProduct) {
+        subtitleParts.push('🛒 Shopify');
+        if (shopifyPrice) subtitleParts.push(`$${shopifyPrice}`);
+        if (shopifyStatus) subtitleParts.push(shopifyStatus);
+      } else {
+        if (internalName) subtitleParts.push(`[${internalName}]`);
+        if (collectionType === 'atlas' && atlasAtmosphere) {
+          subtitleParts.push(`Atlas: ${atlasAtmosphere}`);
+        } else if (collectionType === 'relic' && relicViscosity !== undefined) {
+          subtitleParts.push(`Relic: Viscosity ${relicViscosity}`);
+        }
       }
 
       return {
-        title: title || 'Untitled Product',
+        title: displayTitle,
         subtitle: subtitleParts.join(' · '),
-        media,
+        media: media || (shopifyImage ? { _type: 'image', asset: { _ref: shopifyImage } } : undefined),
       };
     },
   },

@@ -65,6 +65,21 @@ export const structure = (S: StructureBuilder, context: StructureResolverContext
       // Divider
       S.divider(),
 
+      // Group 4: Shopify Products (Synced from Shopify Connect)
+      S.listItem()
+        .title('🛒 Shopify Products (Synced)')
+        .id('shopify-products')
+        .child(
+          S.documentList()
+            .title('Shopify Products')
+            .filter('_type == "product" && defined(store) && !defined(collectionType)')
+            .defaultOrdering([{ field: 'store.title', direction: 'asc' }])
+            .canHandleIntent(() => false) // Prevent creating new Shopify products
+        ),
+
+      // Divider
+      S.divider(),
+
       // Other document types (Exhibits, etc.)
       ...S.documentTypeListItems().filter(
         (listItem) => !['product'].includes(listItem.getId() || '')
