@@ -19,9 +19,10 @@ export function CompassProvider({ children }: CompassProviderProps) {
   const pathname = usePathname();
   const router = useRouter();
   
-  // Don't render compass in layout if we're on split entry page
+  // Don't render compass in layout if we're on split entry page or Studio
   // (SplitEntry renders its own centered compass)
   const isSplitEntryPage = pathname === '/';
+  const isStudioPage = pathname?.startsWith('/studio');
   
   const handleNavigate = (path: string) => {
     const routes: Record<string, string> = {
@@ -38,8 +39,8 @@ export function CompassProvider({ children }: CompassProviderProps) {
     <>
       {children}
       
-      {/* Only render corner compass on non-entry pages */}
-      {!isSplitEntryPage && (
+      {/* Only render corner compass on non-entry and non-studio pages */}
+      {!isSplitEntryPage && !isStudioPage && (
         <RealisticCompass
           onNavigate={handleNavigate}
           position="corner"
