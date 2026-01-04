@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { SplitEntry } from "@/components/home";
-import { RealisticCompass, GlobalFooter } from "@/components/navigation";
+import { GlobalFooter } from "@/components/navigation";
 import { EntryLoader } from "@/components/intro";
 import { Product } from "@/types";
 
@@ -183,12 +183,6 @@ export default function Home() {
 
             {/* Global Footer */}
             <GlobalFooter theme="dark" />
-
-            {/* Realistic Compass Navigation */}
-            <RealisticCompass 
-              onNavigate={handleNavigate}
-              size="md"
-            />
       </div>
     </>
   );

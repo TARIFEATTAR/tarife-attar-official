@@ -8,7 +8,7 @@ import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import { ArrowLeft, Plus, Minus, Gift, MapPin, Calendar, Droplets, Check, AlertCircle, Map as MapIcon, Info } from "lucide-react";
 import { urlForImage } from "@/sanity/lib/image";
 import { useShopifyCart } from "@/context";
-import { RealisticCompass, GlobalFooter } from "@/components/navigation";
+import { GlobalFooter } from "@/components/navigation";
 import { PortableText } from "@portabletext/react";
 
 // Portable Text type
@@ -825,8 +825,6 @@ export function ProductDetailClient({ product }: Props) {
       </div>
 
       <GlobalFooter theme="light" />
-
-      <RealisticCompass onNavigate={handleNavigate} size="md" />
 
       {/* Mobile Sticky Add to Satchel Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-theme-alabaster border-t border-theme-charcoal/10 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { RealisticCompass } from '@/components/navigation/RealisticCompass';
 import { EntryState } from '@/types';
 
 interface Props {
@@ -15,14 +16,29 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, onGuidedEntry }) => {
 
   const handleChoice = (isGuided: boolean) => {
     const target = showChoice as 'atlas' | 'relic';
-    // Both options now navigate to the proper page
     if (isGuided) {
       onGuidedEntry?.(target);
     } else {
-      // Direct entry also navigates to the page
       onNavigate?.(target);
     }
     setShowChoice('idle');
+  };
+
+  // Convert hover state to compass direction
+  // Atlas is on the LEFT (West), Relic is on the RIGHT (East)
+  const getCompassDirection = (): 'W' | 'E' | null => {
+    if (hovered === 'atlas') return 'W';
+    if (hovered === 'relic') return 'E';
+    return null;
+  };
+
+  const handleCompassNavigate = (path: string) => {
+    // Handle compass navigation from split entry
+    if (path === 'atlas' || path === 'relic') {
+      setShowChoice(path as EntryState);
+    } else {
+      onNavigate?.(path);
+    }
   };
 
   return (
@@ -42,28 +58,32 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, onGuidedEntry }) => {
                 onClick={() => handleChoice(true)}
                 className="relative group p-8 sm:p-10 md:p-20 bg-theme-alabaster text-theme-charcoal flex flex-col items-center text-center space-y-4 sm:space-y-6 md:space-y-8 transition-all duration-700 hover:brightness-105"
               >
-                 <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.8em] text-theme-gold">Protocol_Alpha</span>
-                 <h3 className="text-3xl sm:text-4xl md:text-6xl font-serif italic tracking-tighter">Guided Entry</h3>
-                 <p className="font-serif italic text-base sm:text-lg md:text-xl opacity-60 max-w-xs leading-relaxed">
-                   Recommended for new seekers. A sensory orientation through the Tarife Attär system.
-                 </p>
-                 <div className="pt-2 md:pt-8">
-                   <span className="inline-block px-8 sm:px-10 md:px-12 py-3 sm:py-4 md:py-5 bg-theme-charcoal text-white font-mono text-[10px] uppercase tracking-[0.4em] shadow-xl group-hover:scale-105 transition-transform">Start Onboarding</span>
-                 </div>
+                <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.8em] text-theme-gold">Protocol_Alpha</span>
+                <h3 className="text-3xl sm:text-4xl md:text-6xl font-serif italic tracking-tighter">Guided Entry</h3>
+                <p className="font-serif italic text-base sm:text-lg md:text-xl opacity-60 max-w-xs leading-relaxed">
+                  Recommended for new seekers. A sensory orientation through the Tarife Attär system.
+                </p>
+                <div className="pt-2 md:pt-8">
+                  <span className="inline-block px-8 sm:px-10 md:px-12 py-3 sm:py-4 md:py-5 bg-theme-charcoal text-white font-mono text-[10px] uppercase tracking-[0.4em] shadow-xl group-hover:scale-105 transition-transform">
+                    Start Onboarding
+                  </span>
+                </div>
               </button>
 
               <button 
                 onClick={() => handleChoice(false)}
                 className="relative group p-8 sm:p-10 md:p-20 bg-theme-obsidian text-theme-alabaster flex flex-col items-center text-center space-y-4 sm:space-y-6 md:space-y-8 transition-all duration-700 hover:bg-[#1a1a1a]"
               >
-                 <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.8em] opacity-30">Protocol_Beta</span>
-                 <h3 className="text-3xl sm:text-4xl md:text-6xl font-serif italic tracking-tighter">Direct Entry</h3>
-                 <p className="font-serif italic text-base sm:text-lg md:text-xl opacity-40 max-w-xs leading-relaxed">
-                   For established archivists. Bypass orientation to access the full specimen vault.
-                 </p>
-                 <div className="pt-2 md:pt-8">
-                   <span className="inline-block px-8 sm:px-10 md:px-12 py-3 sm:py-4 md:py-5 border border-white/20 text-white font-mono text-[10px] uppercase tracking-[0.4em] group-hover:bg-white group-hover:text-black transition-all shadow-xl">Enter Archive</span>
-                 </div>
+                <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.8em] opacity-30">Protocol_Beta</span>
+                <h3 className="text-3xl sm:text-4xl md:text-6xl font-serif italic tracking-tighter">Direct Entry</h3>
+                <p className="font-serif italic text-base sm:text-lg md:text-xl opacity-40 max-w-xs leading-relaxed">
+                  For established archivists. Bypass orientation to access the full specimen vault.
+                </p>
+                <div className="pt-2 md:pt-8">
+                  <span className="inline-block px-8 sm:px-10 md:px-12 py-3 sm:py-4 md:py-5 border border-white/20 text-white font-mono text-[10px] uppercase tracking-[0.4em] group-hover:bg-white group-hover:text-black transition-all shadow-xl">
+                    Enter Archive
+                  </span>
+                </div>
               </button>
 
               <button 
@@ -77,7 +97,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, onGuidedEntry }) => {
         )}
       </AnimatePresence>
 
-      {/* Atlas Side */}
+      {/* Atlas Side (Left/West) */}
       <motion.section
         onMouseEnter={() => setHovered('atlas')}
         onMouseLeave={() => setHovered('idle')}
@@ -100,15 +120,33 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, onGuidedEntry }) => {
             >
               A
             </motion.span>
-            <motion.h2 className="text-2xl sm:text-3xl md:text-6xl italic font-light mb-2 md:mb-6 tracking-tighter">Atlas</motion.h2>
+            <motion.h2 className="text-2xl sm:text-3xl md:text-6xl italic font-light mb-2 md:mb-6 tracking-tighter">
+              Atlas
+            </motion.h2>
           </div>
           <motion.p className="max-w-[160px] sm:max-w-[200px] md:max-w-xs mx-auto text-xs sm:text-sm md:text-lg opacity-80 leading-relaxed font-serif italic">
             {hovered === 'atlas' ? "Explore Territories" : "Clean perfume oils. Four sensory territories. Twenty-four destinations."}
           </motion.p>
         </motion.div>
+
+        {/* Directional hint on hover */}
+        <AnimatePresence>
+          {hovered === 'atlas' && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 hidden md:block"
+            >
+              <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-theme-gold/60 [writing-mode:vertical-rl]">
+                West
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.section>
 
-      {/* Relic Side */}
+      {/* Relic Side (Right/East) */}
       <motion.section
         onMouseEnter={() => setHovered('relic')}
         onMouseLeave={() => setHovered('idle')}
@@ -131,13 +169,43 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, onGuidedEntry }) => {
             >
               R
             </motion.span>
-            <motion.h2 className="text-2xl sm:text-3xl md:text-6xl font-light mb-2 md:mb-6 tracking-tighter">Relic</motion.h2>
+            <motion.h2 className="text-2xl sm:text-3xl md:text-6xl font-light mb-2 md:mb-6 tracking-tighter">
+              Relic
+            </motion.h2>
           </div>
           <motion.p className="max-w-[160px] sm:max-w-[200px] md:max-w-xs mx-auto text-xs sm:text-sm md:text-lg leading-relaxed font-serif italic">
             {hovered === 'relic' ? "Enter Vault" : "Pure resins. Rare materials. For the devoted collector."}
           </motion.p>
         </motion.div>
+
+        {/* Directional hint on hover */}
+        <AnimatePresence>
+          {hovered === 'relic' && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 hidden md:block"
+            >
+              <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-theme-gold/60 [writing-mode:vertical-rl]">
+                East
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.section>
+
+      {/* Centered Compass - Teaching Mode */}
+      {/* This compass will morph to corner position when user navigates away */}
+      <RealisticCompass
+        onNavigate={handleCompassNavigate}
+        position="center"
+        hoveredDirection={getCompassDirection()}
+        showHint={true}
+        size="lg"
+      />
     </div>
   );
 };
+
+export default SplitEntry;

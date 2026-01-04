@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { RealisticCompass, GlobalFooter } from "@/components/navigation";
+import { GlobalFooter } from "@/components/navigation";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -233,11 +233,6 @@ export function RelicClient({ categories, totalCount }: Props) {
       </section>
 
       <GlobalFooter theme="dark" />
-
-      <RealisticCompass
-        onNavigate={handleNavigate}
-        size="md"
-      />
     </div>
   );
 }
