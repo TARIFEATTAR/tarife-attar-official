@@ -227,7 +227,7 @@ export const productSchema = {
         {
           name: 'id',
           title: 'Shopify Product ID',
-          type: 'string',
+          type: 'number',
           readOnly: true,
         },
         {
