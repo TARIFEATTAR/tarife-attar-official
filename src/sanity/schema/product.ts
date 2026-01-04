@@ -236,6 +236,67 @@ export const productSchema = {
           type: 'string',
           readOnly: true,
         },
+        {
+          name: 'createdAt',
+          title: 'Created At',
+          type: 'datetime',
+          readOnly: true,
+        },
+        {
+          name: 'isDeleted',
+          title: 'Is Deleted',
+          type: 'boolean',
+          readOnly: true,
+        },
+        {
+          name: 'options',
+          title: 'Product Options',
+          type: 'array',
+          readOnly: true,
+          of: [
+            {
+              type: 'object',
+              fields: [
+                {
+                  name: 'name',
+                  type: 'string',
+                  readOnly: true,
+                },
+                {
+                  name: 'values',
+                  type: 'array',
+                  readOnly: true,
+                  of: [{ type: 'string' }],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          name: 'shop',
+          title: 'Shop Info',
+          type: 'object',
+          readOnly: true,
+          fields: [
+            {
+              name: 'domain',
+              type: 'string',
+              readOnly: true,
+            },
+          ],
+        },
+        {
+          name: 'tags',
+          title: 'Tags',
+          type: 'string',
+          readOnly: true,
+        },
+        {
+          name: 'previewImageUrl',
+          title: 'Preview Image URL',
+          type: 'url',
+          readOnly: true,
+        },
       ],
     },
 
