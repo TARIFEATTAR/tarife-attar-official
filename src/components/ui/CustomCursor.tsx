@@ -36,14 +36,45 @@ export const CustomCursor = () => {
         };
     }, [mouseX, mouseY, isVisible]);
 
-    // Don't render on touch devices roughly checked via matchMedia
+    const [isTouch, setIsTouch] = useState(false);
+
     useEffect(() => {
-        if (window.matchMedia("(pointer: coarse)").matches) {
-            setIsVisible(false);
+        // Robust check for touch devices
+        const checkTouch = () => {
+            if (typeof window === 'undefined') return false;
+            return window.matchMedia("(pointer: coarse)").matches ||
+                window.matchMedia("(hover: none)").matches;
+        };
+
+        setIsTouch(checkTouch());
+
+        // Listen for changes
+        const mediaQuery = window.matchMedia("(pointer: coarse)");
+        const handleChange = (e: MediaQueryListEvent) => setIsTouch(e.matches);
+
+        try {
+            mediaQuery.addEventListener("change", handleChange);
+        } catch (e) {
+            // Safari < 14 support
+            try {
+                mediaQuery.addListener(handleChange);
+            } catch (e2) {
+                console.warn("Media query listener not supported");
+            }
         }
+
+        return () => {
+            try {
+                mediaQuery.removeEventListener("change", handleChange);
+            } catch (e) {
+                try {
+                    mediaQuery.removeListener(handleChange);
+                } catch (e2) { }
+            }
+        };
     }, []);
 
-    if (!isVisible) return null;
+    if (isTouch || !isVisible) return null;
 
     return (
         <motion.div
