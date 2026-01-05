@@ -169,7 +169,7 @@ export const RealisticCompass: React.FC<Props> = ({
       // atan2: 0 = East, 90 = South
       // +90 converts to CSS rotation (0 = North)
       // -needleBaseOffset compensates for needle image's built-in 45° rotation
-      let angleDeg = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+      const angleDeg = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
 
       // Debug log
       if (Math.random() > 0.95) { // Throttle logs
@@ -206,7 +206,7 @@ export const RealisticCompass: React.FC<Props> = ({
 
   if (!isMounted) return null;
 
-  const springTransition = { type: "spring" as const, stiffness: 120, damping: 24, mass: 0.8 };
+
 
   // Position classes based on mode
   const getPositionClasses = () => {
