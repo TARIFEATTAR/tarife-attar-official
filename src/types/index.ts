@@ -66,20 +66,20 @@ export interface FieldReport {
 }
 
 // Product System
-export type ProductFormat = 
-  | 'Perfume Oil' 
-  | 'Atmosphere Mist' 
-  | 'Traditional Attar' 
+export type ProductFormat =
+  | 'Perfume Oil'
+  | 'Atmosphere Mist'
+  | 'Traditional Attar'
   | 'Pure Distillate'
   | 'Pure Oud'
   | 'Aged Resin'
   | 'Rare Attar';
 
-export type HardwareType = 
-  | 'Roller' 
-  | 'Spray' 
-  | 'Dropper' 
-  | 'Dip Stick' 
+export type HardwareType =
+  | 'Roller'
+  | 'Spray'
+  | 'Dropper'
+  | 'Dip Stick'
   | 'Vial';
 
 export interface Product {
@@ -93,12 +93,12 @@ export interface Product {
   productFormat: ProductFormat;
   volume: string;
   hardware?: HardwareType;
-  
+
   // Rich Content
   fieldReport?: ShoppableImage;
   museumExhibit?: MuseumExhibit;
   description?: string;
-  
+
   // Metadata
   gpsCoordinates?: string;
   scentVibe?: string;
@@ -106,14 +106,14 @@ export interface Product {
   distillationYear?: string;
   origin?: string;
   materialType?: string;
-  
+
   // Wholesale
   isWholesaleEnabled?: boolean;
   wholesalePrice?: string;
   caseQuantity?: number;
   leadTime?: string;
   replenishToken?: string;
-  
+
   // Retail/Kiosk
   kioskBlurb?: string;
   printLabelQr?: string;

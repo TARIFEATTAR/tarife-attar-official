@@ -71,6 +71,41 @@ export const productSchema = {
       validation: (Rule: SanityRule) => Rule.required(),
     },
 
+    // ===== LEGACY NAME FIELDS (Rebrand Transition) =====
+    {
+      name: 'legacyName',
+      title: 'Legacy Name',
+      type: 'string',
+      group: 'general',
+      description: 'Previous product name for rebrand transition (e.g., "Honey Oud"). Displays as "Formerly [name]" during transition period.',
+      placeholder: 'e.g., Honey Oud',
+    },
+    {
+      name: 'showLegacyName',
+      title: 'Show Legacy Name',
+      type: 'boolean',
+      group: 'general',
+      description: 'Display "Formerly..." notation on product cards and detail pages. Disable once customers recognize the new name.',
+      initialValue: true,
+    },
+    {
+      name: 'legacyNameStyle',
+      title: 'Legacy Name Display Style',
+      type: 'string',
+      group: 'general',
+      description: 'How to phrase the legacy name reference',
+      options: {
+        list: [
+          { title: 'Formerly [Name]', value: 'formerly' },
+          { title: 'Once known as [Name]', value: 'once-known' },
+          { title: 'Previously [Name]', value: 'previously' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'formerly',
+      hidden: ({ parent }: { parent?: { legacyName?: string } }) => !parent?.legacyName,
+    },
+
     // Public Title
     {
       name: 'title',
@@ -357,7 +392,7 @@ export const productSchema = {
         {
           name: 'fieldReport',
           title: 'Field Report',
-          type: 'fieldReport',
+          type: 'shoppableImage',
           description: 'Shoppable lifestyle image with product hotspots',
         },
       ],
@@ -431,10 +466,10 @@ export const productSchema = {
           },
         },
         {
-          name: 'fieldReport',
-          title: 'Field Report',
-          type: 'fieldReport',
-          description: 'Shoppable lifestyle image showcasing the material origin, distillation process, or collector context',
+          name: 'museumExhibit',
+          title: 'Purity Exhibit (Glass Box)',
+          type: 'museumExhibit',
+          description: 'Digital Vitrine: Macro photography with technical specimen data',
         },
         // Heritage Distillation Classification (v3.0)
         {
@@ -543,6 +578,7 @@ export const productSchema = {
       shopifyTitle: 'store.title',
       collectionType: 'collectionType',
       internalName: 'internalName',
+      legacyName: 'legacyName',
       media: 'mainImage',
       shopifyImage: 'store.previewImageUrl',
       atlasAtmosphere: 'atlasData.atmosphere',
@@ -555,6 +591,7 @@ export const productSchema = {
       shopifyTitle?: string;
       collectionType?: string;
       internalName?: string;
+      legacyName?: string;
       media?: unknown;
       shopifyImage?: string;
       atlasAtmosphere?: string;
@@ -567,6 +604,7 @@ export const productSchema = {
         shopifyTitle,
         collectionType,
         internalName,
+        legacyName,
         media,
         shopifyImage,
         atlasAtmosphere,
@@ -582,6 +620,10 @@ export const productSchema = {
       const isShopifyProduct = !!shopifyTitle && !title;
 
       const subtitleParts: string[] = [];
+
+      if (legacyName) {
+        subtitleParts.push(`← ${legacyName}`);
+      }
 
       if (isShopifyProduct) {
         subtitleParts.push('🛒 Shopify');

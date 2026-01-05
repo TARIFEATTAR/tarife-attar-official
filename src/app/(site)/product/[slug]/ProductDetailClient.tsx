@@ -70,17 +70,11 @@ interface Product {
     viscosity?: number;
     museumDescription?: PortableTextBlock[];
     badges?: string[];
-    fieldReport?: {
-      image?: any;
-      hotspots?: Array<{
-        product?: {
-          _id: string;
-          title: string;
-          slug: { current: string };
-        };
-        x: number;
-        y: number;
-        note?: string;
+    museumExhibit?: {
+      exhibitImage?: any;
+      artifacts?: Array<{
+        label?: string;
+        specimenData?: string;
       }>;
     };
     isHeritageDistillation?: boolean;

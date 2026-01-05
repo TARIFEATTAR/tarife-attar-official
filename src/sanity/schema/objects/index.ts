@@ -2,4 +2,5 @@
  * Sanity object schemas exports
  */
 
-export { fieldReportSchema } from './fieldReport';
+export { default as shoppableImage } from './shoppableImage';
+export { default as museumExhibit } from './museumExhibit';

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { motion, useSpring, useMotionValue } from "framer-motion";
 
 export const CustomCursor = () => {
@@ -74,7 +75,10 @@ export const CustomCursor = () => {
         };
     }, []);
 
-    if (isTouch || !isVisible) return null;
+    const pathname = usePathname();
+    const isStudio = pathname?.startsWith('/studio');
+
+    if (isTouch || !isVisible || isStudio) return null;
 
     return (
         <motion.div

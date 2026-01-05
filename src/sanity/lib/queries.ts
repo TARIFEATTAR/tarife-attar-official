@@ -12,6 +12,9 @@ export const atlasProductsByTerritoryQuery = groq`
     _id,
     "title": coalesce(title, store.title),
     "slug": coalesce(slug, store.slug),
+    legacyName,
+    showLegacyName,
+    legacyNameStyle,
     internalName,
     "price": coalesce(price, store.priceRange.minVariantPrice),
     volume,
@@ -48,6 +51,9 @@ export const atlasProductsByTerritoryFilterQuery = groq`
     _id,
     "title": coalesce(title, store.title),
     "slug": coalesce(slug, store.slug),
+    legacyName,
+    showLegacyName,
+    legacyNameStyle,
     internalName,
     "price": coalesce(price, store.priceRange.minVariantPrice),
     volume,
@@ -89,6 +95,9 @@ export const relicProductsQuery = groq`
     _id,
     "title": coalesce(title, store.title),
     "slug": coalesce(slug, store.slug),
+    legacyName,
+    showLegacyName,
+    legacyNameStyle,
     internalName,
     "price": coalesce(price, store.priceRange.minVariantPrice),
     volume,
@@ -100,17 +109,11 @@ export const relicProductsQuery = groq`
     "gpsCoordinates": relicData.gpsCoordinates,
     "viscosity": relicData.viscosity,
     "museumDescription": relicData.museumDescription,
-    "fieldReport": relicData.fieldReport {
-      image,
-      hotspots[] {
-        product-> {
-          _id,
-          title,
-          slug
-        },
-        x,
-        y,
-        note
+    "museumExhibit": relicData.museumExhibit {
+      exhibitImage,
+      artifacts[] {
+        label,
+        specimenData
       }
     },
     notes,
@@ -127,6 +130,9 @@ export const relicProductsByCategoryQuery = groq`
     _id,
     "title": coalesce(title, store.title),
     "slug": coalesce(slug, store.slug),
+    legacyName,
+    showLegacyName,
+    legacyNameStyle,
     internalName,
     "price": coalesce(price, store.priceRange.minVariantPrice),
     volume,
@@ -138,17 +144,11 @@ export const relicProductsByCategoryQuery = groq`
     "gpsCoordinates": relicData.gpsCoordinates,
     "viscosity": relicData.viscosity,
     "museumDescription": relicData.museumDescription,
-    "fieldReport": relicData.fieldReport {
-      image,
-      hotspots[] {
-        product-> {
-          _id,
-          title,
-          slug
-        },
-        x,
-        y,
-        note
+    "museumExhibit": relicData.museumExhibit {
+      exhibitImage,
+      artifacts[] {
+        label,
+        specimenData
       }
     },
     notes,
@@ -168,6 +168,9 @@ export const productBySlugQuery = groq`
     _id,
     "title": coalesce(title, store.title),
     "slug": coalesce(slug, store.slug),
+    legacyName,
+    showLegacyName,
+    legacyNameStyle,
     internalName,
     collectionType,
     "price": coalesce(price, store.priceRange.minVariantPrice),
@@ -184,6 +187,9 @@ export const productBySlugQuery = groq`
       _id,
       "title": coalesce(title, store.title),
       "slug": coalesce(slug, store.slug),
+      legacyName,
+      showLegacyName,
+      legacyNameStyle,
       "price": coalesce(price, store.priceRange.minVariantPrice),
       mainImage
     },
@@ -218,17 +224,11 @@ export const productBySlugQuery = groq`
       viscosity,
       museumDescription,
       badges,
-      fieldReport {
-        image,
-        hotspots[] {
-          product-> {
-            _id,
-            title,
-            slug
-          },
-          x,
-          y,
-          note
+      museumExhibit {
+        exhibitImage,
+        artifacts[] {
+          label,
+          specimenData
         }
       }
     }
@@ -246,6 +246,9 @@ export const featuredProductsQuery = groq`
     _id,
     title,
     slug,
+    legacyName,
+    showLegacyName,
+    legacyNameStyle,
     collectionType,
     price,
     volume,
