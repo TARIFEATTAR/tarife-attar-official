@@ -237,8 +237,7 @@ export const RealisticCompass: React.FC<Props> = ({
     return {};
   };
 
-  // Determine if needle should use external control or scroll or MOUSE
-  const useExternalNeedle = externalHoveredDirection !== null || isOpen || (mousePosition && !isMobile);
+
 
   return (
     <>

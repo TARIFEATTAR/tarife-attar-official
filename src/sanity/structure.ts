@@ -10,7 +10,7 @@
 
 import { StructureBuilder, StructureResolverContext } from 'sanity/structure';
 
-export const structure = (S: StructureBuilder, context: StructureResolverContext) => {
+export const structure = (S: StructureBuilder, _context: StructureResolverContext) => {
   return S.list()
     .title('Content')
     .items([
