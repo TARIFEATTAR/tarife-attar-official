@@ -163,6 +163,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate }) => {
         hoveredDirection={getCompassDirection()}
         showHint={true}
         size="lg"
+        absolutePosition={true}
       />
     </div>
   );

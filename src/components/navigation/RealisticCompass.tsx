@@ -40,6 +40,12 @@ interface Props {
    * Whether to show the hint text below compass in center mode
    */
   showHint?: boolean;
+  /**
+   * Whether to use absolute positioning instead of fixed.
+   * Useful for the Split Entry hero where the compass should scroll away.
+   * Note: When open, it will always revert to fixed to act as an overlay.
+   */
+  absolutePosition?: boolean;
 }
 
 export const RealisticCompass: React.FC<Props> = ({
@@ -48,6 +54,7 @@ export const RealisticCompass: React.FC<Props> = ({
   position = 'corner',
   hoveredDirection: externalHoveredDirection = null,
   showHint = true,
+  absolutePosition = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -136,15 +143,16 @@ export const RealisticCompass: React.FC<Props> = ({
   const compassSize = position === 'center' ? baseSizeValue * 1.2 : baseSizeValue;
 
   // Expanded state dimensions - responsive to viewport
+  // Expanded state dimensions - responsive to viewport
   const expandedSize = isMobile
     ? (isShortViewport
-      ? 160
+      ? 120
       : viewportWidth > 0
-        ? Math.min(viewportWidth * 0.5, 200)
-        : 180)
+        ? Math.min(viewportWidth * 0.35, 130)
+        : 130)
     : 240;
   const compassRadius = expandedSize / 2;
-  const labelGap = isMobile ? (isShortViewport ? 24 : 32) : 50;
+  const labelGap = isMobile ? 12 : 50;
 
   const needleBaseOffset = 45;
 
@@ -274,9 +282,9 @@ export const RealisticCompass: React.FC<Props> = ({
                   onMouseLeave={() => !isMobile && setHoveredDirection(null)}
                   onTouchStart={() => setHoveredDirection('N')}
                   onTouchEnd={() => setTimeout(() => setHoveredDirection(null), 200)}
-                  className="pointer-events-auto flex flex-col items-center group touch-manipulation min-h-[48px] min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
+                  className="pointer-events-auto flex flex-col items-center group touch-manipulation min-h-[48px] min-w-[80px] md:min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
                 >
-                  <span className={`font-mono ${isMobile ? 'text-base' : 'text-lg'} uppercase tracking-[0.4em] md:tracking-[0.5em] transition-all duration-300 ${hoveredDirection === 'N' ? 'text-theme-gold scale-110' : 'text-white/60'
+                  <span className={`font-mono ${isMobile ? 'text-[10px] tracking-[0.2em] whitespace-normal max-w-[80px] text-center' : 'text-lg tracking-[0.5em] whitespace-nowrap'} uppercase transition-all duration-300 ${hoveredDirection === 'N' ? 'text-theme-gold scale-110' : 'text-white/60'
                     }`}>
                     {NAV_ITEMS[0].label}
                   </span>
@@ -301,9 +309,9 @@ export const RealisticCompass: React.FC<Props> = ({
                   onMouseLeave={() => !isMobile && setHoveredDirection(null)}
                   onTouchStart={() => setHoveredDirection('E')}
                   onTouchEnd={() => setTimeout(() => setHoveredDirection(null), 200)}
-                  className="pointer-events-auto flex flex-col items-start group touch-manipulation min-h-[48px] min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
+                  className="pointer-events-auto flex flex-col items-start group touch-manipulation min-h-[48px] min-w-[80px] md:min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
                 >
-                  <span className={`font-mono ${isMobile ? 'text-base' : 'text-lg'} uppercase tracking-[0.4em] md:tracking-[0.5em] transition-all duration-300 ${hoveredDirection === 'E' ? 'text-theme-gold scale-110' : 'text-white/60'
+                  <span className={`font-mono ${isMobile ? 'text-[10px] tracking-[0.2em] whitespace-normal max-w-[80px] text-left' : 'text-lg tracking-[0.5em] whitespace-nowrap'} uppercase transition-all duration-300 ${hoveredDirection === 'E' ? 'text-theme-gold scale-110' : 'text-white/60'
                     }`}>
                     {NAV_ITEMS[1].label}
                   </span>
@@ -328,9 +336,9 @@ export const RealisticCompass: React.FC<Props> = ({
                   onMouseLeave={() => !isMobile && setHoveredDirection(null)}
                   onTouchStart={() => setHoveredDirection('S')}
                   onTouchEnd={() => setTimeout(() => setHoveredDirection(null), 200)}
-                  className="pointer-events-auto flex flex-col items-center group touch-manipulation min-h-[48px] min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
+                  className="pointer-events-auto flex flex-col items-center group touch-manipulation min-h-[48px] min-w-[80px] md:min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
                 >
-                  <span className={`font-mono ${isMobile ? 'text-base' : 'text-lg'} uppercase tracking-[0.4em] md:tracking-[0.5em] transition-all duration-300 ${hoveredDirection === 'S' ? 'text-theme-gold scale-110' : 'text-white/60'
+                  <span className={`font-mono ${isMobile ? 'text-[10px] tracking-[0.2em] whitespace-normal max-w-[80px] text-center' : 'text-lg tracking-[0.5em] whitespace-nowrap'} uppercase transition-all duration-300 ${hoveredDirection === 'S' ? 'text-theme-gold scale-110' : 'text-white/60'
                     }`}>
                     {NAV_ITEMS[2].label}
                   </span>
@@ -355,9 +363,9 @@ export const RealisticCompass: React.FC<Props> = ({
                   onMouseLeave={() => !isMobile && setHoveredDirection(null)}
                   onTouchStart={() => setHoveredDirection('W')}
                   onTouchEnd={() => setTimeout(() => setHoveredDirection(null), 200)}
-                  className="pointer-events-auto flex flex-col items-end group touch-manipulation min-h-[48px] min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
+                  className="pointer-events-auto flex flex-col items-end group touch-manipulation min-h-[48px] min-w-[80px] md:min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
                 >
-                  <span className={`font-mono ${isMobile ? 'text-base' : 'text-lg'} uppercase tracking-[0.4em] md:tracking-[0.5em] transition-all duration-300 ${hoveredDirection === 'W' ? 'text-theme-gold scale-110' : 'text-white/60'
+                  <span className={`font-mono ${isMobile ? 'text-[10px] tracking-[0.2em] whitespace-normal max-w-[80px] text-right' : 'text-lg tracking-[0.5em] whitespace-nowrap'} uppercase transition-all duration-300 ${hoveredDirection === 'W' ? 'text-theme-gold scale-110' : 'text-white/60'
                     }`}>
                     {NAV_ITEMS[3].label}
                   </span>
@@ -389,7 +397,7 @@ export const RealisticCompass: React.FC<Props> = ({
       {/* 2. COMPASS BUTTON LAYER */}
       <motion.div
         data-compass-navigation
-        className={`fixed z-[3000] ${getPositionClasses()} ${isOpen ? 'pointer-events-none' : 'pointer-events-auto'}`}
+        className={`${absolutePosition && !isOpen ? 'absolute' : 'fixed'} z-[3000] ${getPositionClasses()} ${isOpen ? 'pointer-events-none' : 'pointer-events-auto'}`}
         style={getTransformStyle()}
         transition={{ duration: 0.3, ease: "easeOut" }}
       >
