@@ -88,7 +88,7 @@ export function HomeClient({ featuredProducts }: HomeClientProps) {
                                     <div className="relative w-full aspect-[4/5] bg-[#F8F7F2] overflow-hidden shadow-sm border border-theme-charcoal/5">
                                         {product.mainImage ? (
                                             <Image
-                                                src={urlForImage(product.mainImage).width(800).height(1000).url()}
+                                                src={urlForImage(product.mainImage!).width(800).height(1000).url()}
                                                 alt={product.title}
                                                 fill
                                                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
