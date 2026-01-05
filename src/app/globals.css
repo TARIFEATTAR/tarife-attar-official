@@ -3,94 +3,37 @@
 @tailwind utilities;
 
 :root {
-  /* Amber & Parchment Design System Variables */
-  --alabaster: #F2F0E9;
-  --charcoal: #1A1A1A;
-  --obsidian: #121212;
-  --industrial: #B3B3B3;
-  --gold: #c5a66a;
-}
-
-/* Base Styles */
-html {
-  scroll-behavior: smooth;
-  overflow-x: hidden;
-  width: 100%;
+  --font-eb-garamond: 'EB Garamond', serif;
+  --font-jetbrains-mono: 'JetBrains Mono', monospace;
 }
 
 body {
-  font-family: var(--font-eb-garamond), Georgia, serif;
-  background-color: var(--alabaster);
-  color: var(--charcoal);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-  width: 100%;
-  position: relative;
+  @apply bg-theme-alabaster text-theme-charcoal antialiased transition-colors duration-500;
 }
 
-/* Selection styling */
-::selection {
-  background-color: var(--charcoal);
-  color: var(--alabaster);
+/* Hide system cursor globally with maximum specificity */
+*,
+*::before,
+*::after {
+  cursor: none !important;
 }
 
-/* Custom scrollbar for webkit browsers */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--alabaster);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--industrial);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--charcoal);
-}
-
-/* Utility classes for the design system */
-@layer utilities {
+/* Design Tokens */
+@layer base {
   .text-balance {
     text-wrap: balance;
   }
-  
-  .font-technical {
-    font-family: var(--font-jetbrains-mono), monospace;
-  }
-  
-  .bg-atlas {
-    background-color: var(--alabaster);
-  }
-  
-  .bg-relic {
-    background-color: var(--charcoal);
-  }
-  
-  .bg-relic-dark {
-    background-color: var(--obsidian);
-  }
-  
-  .text-metadata {
-    color: var(--industrial);
-    font-family: var(--font-jetbrains-mono), monospace;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
 }
 
-/* Hide compass in Sanity Studio */
-/* This is a fallback in case the pathname check doesn't work */
-[data-sanity] [data-compass-navigation],
-body:has([data-sanity]) [data-compass-navigation],
-[data-sanity] ~ [data-compass-navigation] {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-theme-charcoal/20 rounded-full hover:bg-theme-charcoal/40 transition-colors;
 }

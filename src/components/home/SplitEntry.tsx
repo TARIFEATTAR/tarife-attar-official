@@ -37,7 +37,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate }) => {
           group"
       >
         {/* Subtle hover overlay */}
-        <motion.div 
+        <motion.div
           className="absolute inset-0 bg-theme-gold/5 pointer-events-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: hovered === 'atlas' ? 1 : 0 }}
@@ -52,7 +52,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate }) => {
         >
           <div className="flex flex-col items-center">
             {/* A insignia */}
-            <motion.span 
+            <motion.span
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
@@ -64,7 +64,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate }) => {
               Atlas
             </motion.h2>
           </div>
-          
+
           {/* Always visible description */}
           <motion.p className="max-w-[200px] sm:max-w-[240px] md:max-w-sm mx-auto text-xs sm:text-sm md:text-base opacity-60 leading-relaxed font-serif italic mb-6 md:mb-8">
             Clean perfume oils organized across four sensory territories. Twenty-four destinations for the modern explorer.
@@ -84,7 +84,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate }) => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
-            <span className="inline-block px-6 sm:px-8 py-3 sm:py-4 border border-theme-charcoal/20 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.4em] group-hover:bg-theme-charcoal group-hover:text-white transition-all duration-500">
+            <span className={`inline-block px-6 sm:px-8 py-3 sm:py-4 border border-theme-charcoal/20 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.4em] transition-all duration-500 ${hovered === 'atlas' ? 'bg-theme-charcoal text-white' : ''}`}>
               Explore Territories
             </span>
           </motion.div>
@@ -102,7 +102,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate }) => {
           group"
       >
         {/* Subtle hover overlay */}
-        <motion.div 
+        <motion.div
           className="absolute inset-0 bg-theme-gold/5 pointer-events-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: hovered === 'relic' ? 1 : 0 }}
@@ -117,7 +117,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate }) => {
         >
           <div className="flex flex-col items-center">
             {/* R insignia */}
-            <motion.span 
+            <motion.span
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
@@ -129,7 +129,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate }) => {
               Relic
             </motion.h2>
           </div>
-          
+
           {/* Always visible description */}
           <motion.p className="max-w-[200px] sm:max-w-[240px] md:max-w-sm mx-auto text-xs sm:text-sm md:text-base opacity-50 leading-relaxed font-serif italic mb-6 md:mb-8">
             Pure resins, rare ouds, and aged materials for the devoted collector. Each specimen arrives with provenance documentation.
@@ -149,7 +149,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate }) => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
           >
-            <span className="inline-block px-6 sm:px-8 py-3 sm:py-4 border border-white/20 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.4em] group-hover:bg-white group-hover:text-black transition-all duration-500">
+            <span className={`inline-block px-6 sm:px-8 py-3 sm:py-4 border border-white/20 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.4em] transition-all duration-500 ${hovered === 'relic' ? 'bg-white text-black' : ''}`}>
               Enter Vault
             </span>
           </motion.div>

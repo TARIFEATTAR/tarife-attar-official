@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { urlForImage } from "@/sanity/lib/image";
+import { getItemLabel } from "@/lib/brandSystem";
 
 interface RelicProduct {
   _id: string;
@@ -70,13 +71,13 @@ export function RelicClient({ categories, totalCount }: Props) {
             className="max-w-3xl"
           >
             <span className="font-mono text-[10px] md:text-sm uppercase tracking-[0.6em] md:tracking-[0.8em] text-theme-gold mb-4 md:mb-6 block leading-tight break-words">
-              {totalCount} Specimens{'\u00A0'}·{'\u00A0'}Pure Line
+              {totalCount} {getItemLabel('relic', totalCount)}{'\u00A0'}·{'\u00A0'}Pure Line
             </span>
             <h1 className="text-4xl md:text-8xl font-serif tracking-tighter leading-[0.95] md:leading-[0.9] mb-6 md:mb-8">
               The Relic
             </h1>
             <p className="font-serif italic text-base md:text-2xl opacity-80 leading-relaxed max-w-xl mb-4 md:mb-6 break-words">
-              Pure resins. Rare ouds. Aged materials sourced for the devoted 
+              Pure resins. Rare ouds. Aged materials sourced for the devoted
               collector. Each specimen arrives with provenance documentation.
             </p>
             <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.3em] md:tracking-widest opacity-70 leading-tight break-words">
@@ -108,7 +109,7 @@ export function RelicClient({ categories, totalCount }: Props) {
                   </p>
                 </div>
                 <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest opacity-70 flex-shrink-0 whitespace-nowrap">
-                  {category.count} Specimen{category.count !== 1 ? "s" : ""}
+                  {category.count} {getItemLabel('relic', category.count)}
                 </p>
               </div>
 
@@ -121,76 +122,76 @@ export function RelicClient({ categories, totalCount }: Props) {
                       console.log('[RelicClient] Rendering product:', product.title, product.slug?.current);
                     }
                     return (
-                    <Link
-                      key={product._id}
-                      href={`/product/${product.slug.current}`}
-                      className="group aspect-[4/5] bg-white/[0.02] border border-white/10 flex flex-col overflow-hidden hover:border-white/20 transition-colors"
-                    >
-                      {product.mainImage ? (() => {
-                        const imageUrl = urlForImage(product.mainImage);
-                        if (!imageUrl) {
-                          return (
-                            <div className="w-full h-4/5 bg-white/[0.02] flex items-center justify-center">
-                              <span className="font-mono text-xs uppercase tracking-widest opacity-20">
-                                No Image
-                              </span>
-                            </div>
-                          );
-                        }
-                        
-                        try {
-                          const imageSrc = imageUrl.width(400).height(500).url();
-                          return (
-                            <div className="relative w-full h-4/5 bg-white/[0.02]">
-                              <Image
-                                src={imageSrc}
-                                alt={product.title || 'Product image'}
-                                fill
-                                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                                className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                                onError={(e) => {
-                                  // Hide broken images
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = 'none';
-                                }}
-                              />
-                            </div>
-                          );
-                        } catch (error) {
-                          console.warn('Failed to generate image URL for product:', product.title, error);
-                          return (
-                            <div className="w-full h-4/5 bg-white/[0.02] flex items-center justify-center">
-                              <span className="font-mono text-xs uppercase tracking-widest opacity-20">
-                                No Image
-                              </span>
-                            </div>
-                          );
-                        }
-                      })() : (
-                        <div className="w-full h-3/4 bg-white/[0.02] flex items-center justify-center">
-                          <span className="font-mono text-xs uppercase tracking-widest opacity-20">
-                            No Image
-                          </span>
-                        </div>
-                      )}
-                      <div className="p-3 md:p-4 flex-1 flex flex-col justify-between min-w-0">
-                        <div className="min-w-0">
-                          <h3 className="font-serif italic text-sm md:text-lg mb-1 group-hover:tracking-tighter transition-all line-clamp-2 leading-tight break-words overflow-hidden">
-                            {product.title}
-                          </h3>
-                          {product.price && (
-                            <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.1em] md:tracking-widest opacity-80 tabular-nums break-words">
-                              ${product.price}
-                            </p>
+                      <Link
+                        key={product._id}
+                        href={`/product/${product.slug.current}`}
+                        className="group aspect-[4/5] bg-white/[0.02] border border-white/10 flex flex-col overflow-hidden hover:border-white/20 transition-colors"
+                      >
+                        {product.mainImage ? (() => {
+                          const imageUrl = urlForImage(product.mainImage);
+                          if (!imageUrl) {
+                            return (
+                              <div className="w-full h-4/5 bg-white/[0.02] flex items-center justify-center">
+                                <span className="font-mono text-xs uppercase tracking-widest opacity-20">
+                                  No Image
+                                </span>
+                              </div>
+                            );
+                          }
+
+                          try {
+                            const imageSrc = imageUrl.width(400).height(500).url();
+                            return (
+                              <div className="relative w-full h-4/5 bg-white/[0.02]">
+                                <Image
+                                  src={imageSrc}
+                                  alt={product.title || 'Product image'}
+                                  fill
+                                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                                  className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                                  onError={(e) => {
+                                    // Hide broken images
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                            );
+                          } catch (error) {
+                            console.warn('Failed to generate image URL for product:', product.title, error);
+                            return (
+                              <div className="w-full h-4/5 bg-white/[0.02] flex items-center justify-center">
+                                <span className="font-mono text-xs uppercase tracking-widest opacity-20">
+                                  No Image
+                                </span>
+                              </div>
+                            );
+                          }
+                        })() : (
+                          <div className="w-full h-3/4 bg-white/[0.02] flex items-center justify-center">
+                            <span className="font-mono text-xs uppercase tracking-widest opacity-20">
+                              No Image
+                            </span>
+                          </div>
+                        )}
+                        <div className="p-3 md:p-4 flex-1 flex flex-col justify-between min-w-0">
+                          <div className="min-w-0">
+                            <h3 className="font-serif italic text-sm md:text-lg mb-1 group-hover:tracking-tighter transition-all line-clamp-2 leading-tight break-words overflow-hidden">
+                              {product.title}
+                            </h3>
+                            {product.price && (
+                              <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.1em] md:tracking-widest opacity-80 tabular-nums break-words">
+                                ${product.price}
+                              </p>
+                            )}
+                          </div>
+                          {!product.inStock && (
+                            <span className="font-mono text-[8px] md:text-[10px] uppercase tracking-widest opacity-40 mt-1 md:mt-2 break-words">
+                              Out of Stock
+                            </span>
                           )}
                         </div>
-                        {!product.inStock && (
-                          <span className="font-mono text-[8px] md:text-[10px] uppercase tracking-widest opacity-40 mt-1 md:mt-2 break-words">
-                            Out of Stock
-                          </span>
-                        )}
-                      </div>
-                    </Link>
+                      </Link>
                     );
                   })}
                 </div>
@@ -224,8 +225,8 @@ export function RelicClient({ categories, totalCount }: Props) {
               For the Devoted Few
             </h3>
             <p className="font-serif italic text-sm md:text-base opacity-80 leading-relaxed px-2">
-              Relic specimens are sourced in limited quantities from verified suppliers. 
-              Each arrives with documentation of origin, age, and distillation method. 
+              Relic specimens are sourced in limited quantities from verified suppliers.
+              Each arrives with documentation of origin, age, and distillation method.
               Priority access available to registered collectors.
             </p>
           </motion.div>

@@ -10,6 +10,7 @@ import { urlForImage } from "@/sanity/lib/image";
 import { useShopifyCart } from "@/context";
 import { GlobalFooter } from "@/components/navigation";
 import { PortableText } from "@portabletext/react";
+import { getClassLabel, getCoordinateLabel, COLLECTION_LABELS } from "@/lib/brandSystem";
 
 // Portable Text type
 type PortableTextBlock = any;
@@ -82,6 +83,8 @@ interface Product {
         note?: string;
       }>;
     };
+    isHeritageDistillation?: boolean;
+    heritageType?: string;
   };
 }
 
@@ -114,36 +117,36 @@ const ScentPyramid = ({ notes }: { notes: Product["notes"] }) => {
           animate={{ pathLength: 1, opacity: 1 }}
           transition={{ duration: 1.5, ease: "easeInOut" }}
         />
-        
+
         {/* Horizontal Dividers */}
         <line x1="60" y1="70" x2="140" y2="70" stroke="currentColor" strokeWidth="0.5" className="text-theme-charcoal/10" />
         <line x1="40" y1="120" x2="160" y2="120" stroke="currentColor" strokeWidth="0.5" className="text-theme-charcoal/10" />
 
         {/* TOP notes (Apex) */}
         <g className="group cursor-help">
-          <motion.circle 
-            cx="100" cy="45" r="5" 
+          <motion.circle
+            cx="100" cy="45" r="5"
             className="fill-theme-gold"
             whileHover={{ scale: 1.5 }}
           />
           <text x="110" y="48" className="font-mono text-[8px] uppercase tracking-widest fill-theme-charcoal/60">Top</text>
         </g>
-        
+
         {/* HEART notes (Center) */}
         <g className="group cursor-help">
-          <motion.circle 
-            cx="85" cy="95" r="6" 
+          <motion.circle
+            cx="85" cy="95" r="6"
             className="fill-theme-gold/70"
             whileHover={{ scale: 1.5 }}
           />
-          <motion.circle 
-            cx="115" cy="95" r="6" 
+          <motion.circle
+            cx="115" cy="95" r="6"
             className="fill-theme-gold/70"
             whileHover={{ scale: 1.5 }}
           />
           <text x="100" y="108" textAnchor="middle" className="font-mono text-[8px] uppercase tracking-widest fill-theme-charcoal/60">Heart</text>
         </g>
-        
+
         {/* BASE notes (Bottom) */}
         <g className="group cursor-help">
           <motion.circle cx="70" cy="145" r="7" className="fill-theme-gold/40" whileHover={{ scale: 1.5 }} />
@@ -160,19 +163,19 @@ const ScentPyramid = ({ notes }: { notes: Product["notes"] }) => {
 const TrustBadges = ({ isAtlas, isRelic, product }: { isAtlas: boolean; isRelic: boolean; product: Product }) => {
   // Use custom badges from Sanity if available, otherwise fall back to defaults
   const customBadges = isAtlas ? product.atlasData?.badges : product.relicData?.badges;
-  
-  const badges = customBadges && customBadges.length > 0 
+
+  const badges = customBadges && customBadges.length > 0
     ? customBadges.map(label => ({ label, icon: Check }))
-    : isAtlas 
+    : isAtlas
       ? [
-          { label: "Skin Safe", icon: Check },
-          { label: "Clean", icon: Check },
-          { label: "Cruelty-Free", icon: Check },
-        ]
+        { label: "Skin Safe", icon: Check },
+        { label: "Clean", icon: Check },
+        { label: "Cruelty-Free", icon: Check },
+      ]
       : [
-          { label: "Pure Origin", icon: Check },
-          { label: "Wild Harvested", icon: Check },
-        ];
+        { label: "Pure Origin", icon: Check },
+        { label: "Wild Harvested", icon: Check },
+      ];
 
   return (
     <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-6 border-t border-theme-charcoal/5">
@@ -231,7 +234,7 @@ export function ProductDetailClient({ product }: Props) {
     }
 
     setIsAdding(true);
-    
+
     // Haptic feedback
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
       navigator.vibrate(40);
@@ -241,7 +244,7 @@ export function ProductDetailClient({ product }: Props) {
       console.log('Adding to cart:', { variantId: product.shopifyVariantId, quantity });
       await addItem(product.shopifyVariantId, quantity);
       console.log('Successfully added to cart');
-      
+
       // Success state feedback
       setTimeout(() => {
         setIsAdding(false);
@@ -294,7 +297,7 @@ export function ProductDetailClient({ product }: Props) {
                 try {
                   const imageSrc = mainImageUrl.width(800).height(1000).url();
                   return (
-                    <motion.div 
+                    <motion.div
                       className="w-full h-full relative"
                       style={{ y: imageY }}
                     >
@@ -342,11 +345,10 @@ export function ProductDetailClient({ product }: Props) {
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
-                      className={`relative aspect-square border-2 transition-all ${
-                        selectedImage === index
-                          ? "border-theme-charcoal"
-                          : "border-theme-charcoal/10 hover:border-theme-charcoal/30"
-                      }`}
+                      className={`relative aspect-square border-2 transition-all ${selectedImage === index
+                        ? "border-theme-charcoal"
+                        : "border-theme-charcoal/10 hover:border-theme-charcoal/30"
+                        }`}
                     >
                       {thumbUrl ? (() => {
                         try {
@@ -380,14 +382,21 @@ export function ProductDetailClient({ product }: Props) {
 
           {/* Right: Product Details */}
           <div className="flex flex-col justify-center space-y-8">
-            {/* Collection Badge */}
-            <div className="flex items-center gap-4">
-              <span className="font-mono text-xs md:text-sm uppercase tracking-[0.4em] opacity-80">
-                {isAtlas ? "ATLAS COLLECTION" : "RELIC VAULT"}
-              </span>
-              {isAtlas && product.atlasData?.atmosphere && (
-                <span className="font-mono text-xs md:text-sm uppercase tracking-widest text-theme-gold">
-                  {TERRITORY_NAMES[product.atlasData.atmosphere] || product.atlasData.atmosphere}
+            {/* Collection Badge & Class Label */}
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-4">
+                <span className="font-mono text-xs md:text-sm uppercase tracking-[0.4em] opacity-80">
+                  {getClassLabel(product.collectionType, product.relicData?.isHeritageDistillation)}
+                </span>
+                {isAtlas && product.atlasData?.atmosphere && (
+                  <span className="font-mono text-xs md:text-sm uppercase tracking-widest text-theme-gold">
+                    {TERRITORY_NAMES[product.atlasData.atmosphere] || product.atlasData.atmosphere}
+                  </span>
+                )}
+              </div>
+              {isRelic && product.relicData?.isHeritageDistillation && product.relicData?.heritageType && (
+                <span className="font-mono text-[10px] uppercase tracking-widest opacity-60">
+                  {product.relicData.heritageType}
                 </span>
               )}
             </div>
@@ -438,17 +447,17 @@ export function ProductDetailClient({ product }: Props) {
               <div className="space-y-3 pt-4 border-t border-theme-charcoal/10">
                 {product.atlasData.gpsCoordinates && (
                   <div className="group flex flex-col gap-3">
-                    <button 
+                    <button
                       onClick={() => setShowMap(!showMap)}
                       className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 hover:opacity-100 hover:text-theme-gold transition-all"
                     >
                       <MapPin className={`w-4 h-4 transition-transform ${showMap ? 'scale-110 text-theme-gold' : ''}`} />
                       <span className="border-b border-transparent group-hover:border-theme-gold/30">
-                        {product.atlasData.gpsCoordinates}
+                        <span className="text-theme-gold">{getCoordinateLabel('atlas')}:</span> {product.atlasData.gpsCoordinates}
                       </span>
                       <Info className="w-3 h-3 opacity-30" />
                     </button>
-                    
+
                     <AnimatePresence>
                       {showMap && (
                         <motion.div
@@ -478,7 +487,7 @@ export function ProductDetailClient({ product }: Props) {
               <div className="space-y-4 pt-4 border-t border-theme-charcoal/10">
                 {(product.relicData.originRegion || product.relicData.gpsCoordinates) && (
                   <div className="group flex flex-col gap-3">
-                    <button 
+                    <button
                       onClick={() => setShowMap(!showMap)}
                       className="flex flex-col gap-1 items-start font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 hover:opacity-100 hover:text-theme-gold transition-all"
                     >
@@ -488,11 +497,11 @@ export function ProductDetailClient({ product }: Props) {
                       </div>
                       {product.relicData.gpsCoordinates && (
                         <span className="pl-6 text-[10px] opacity-60 font-mono tracking-widest">
-                          {product.relicData.gpsCoordinates}
+                          <span className="text-theme-gold">{getCoordinateLabel('relic', product.relicData.isHeritageDistillation)}:</span> {product.relicData.gpsCoordinates}
                         </span>
                       )}
                     </button>
-                    
+
                     <AnimatePresence>
                       {showMap && (
                         <motion.div
@@ -528,7 +537,7 @@ export function ProductDetailClient({ product }: Props) {
                     </div>
                     {/* Visual Viscosity Meter */}
                     <div className="w-full h-[2px] bg-theme-charcoal/5 relative overflow-hidden">
-                      <motion.div 
+                      <motion.div
                         initial={{ x: "-100%" }}
                         animate={{ x: `${product.relicData.viscosity - 100}%` }}
                         transition={{ duration: 1.5, ease: "circOut", delay: 0.5 }}
@@ -576,15 +585,14 @@ export function ProductDetailClient({ product }: Props) {
               disabled={!product.inStock || isAdding || !product.shopifyVariantId}
               whileHover={product.inStock && !isAdding && product.shopifyVariantId ? { scale: 1.01 } : {}}
               whileTap={product.inStock && !isAdding && product.shopifyVariantId ? { scale: 0.99 } : {}}
-              className={`hidden md:flex items-center justify-center gap-3 w-full py-5 font-mono text-sm md:text-base uppercase tracking-[0.4em] transition-all relative overflow-hidden ${
-                product.inStock
-                  ? isAdding 
-                    ? "bg-theme-gold text-theme-alabaster"
-                    : product.shopifyVariantId
+              className={`hidden md:flex items-center justify-center gap-3 w-full py-5 font-mono text-sm md:text-base uppercase tracking-[0.4em] transition-all relative overflow-hidden ${product.inStock
+                ? isAdding
+                  ? "bg-theme-gold text-theme-alabaster"
+                  : product.shopifyVariantId
                     ? "bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90"
                     : "bg-theme-charcoal/40 text-theme-alabaster/60 cursor-not-allowed"
-                  : "bg-theme-charcoal/20 text-theme-charcoal/40 cursor-not-allowed"
-              }`}
+                : "bg-theme-charcoal/20 text-theme-charcoal/40 cursor-not-allowed"
+                }`}
             >
               <AnimatePresence mode="wait">
                 {isAdding ? (
@@ -605,11 +613,11 @@ export function ProductDetailClient({ product }: Props) {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    {!product.inStock 
-                      ? "Out of Stock" 
+                    {!product.inStock
+                      ? "Out of Stock"
                       : !product.shopifyVariantId
-                      ? "Not Connected to Shopify"
-                      : "Add to Satchel"}
+                        ? "Not Connected to Shopify"
+                        : "Add to Satchel"}
                   </motion.span>
                 )}
               </AnimatePresence>
@@ -649,7 +657,7 @@ export function ProductDetailClient({ product }: Props) {
             <TrustBadges isAtlas={isAtlas} isRelic={isRelic} product={product} />
 
             {/* Gift Option */}
-            <motion.button 
+            <motion.button
               whileHover={{ x: 5 }}
               className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 hover:opacity-100 transition-all hover:text-theme-gold"
             >
@@ -666,9 +674,8 @@ export function ProductDetailClient({ product }: Props) {
               >
                 <span>Product Description</span>
                 <Plus
-                  className={`w-4 h-4 transition-transform ${
-                    expandedSections.description ? "rotate-45" : ""
-                  }`}
+                  className={`w-4 h-4 transition-transform ${expandedSections.description ? "rotate-45" : ""
+                    }`}
                 />
               </button>
               <AnimatePresence>
@@ -699,9 +706,8 @@ export function ProductDetailClient({ product }: Props) {
               >
                 <span>Scent Architecture</span>
                 <Plus
-                  className={`w-4 h-4 transition-transform ${
-                    expandedSections.notes ? "rotate-45" : ""
-                  }`}
+                  className={`w-4 h-4 transition-transform ${expandedSections.notes ? "rotate-45" : ""
+                    }`}
                 />
               </button>
               <AnimatePresence>
@@ -760,7 +766,7 @@ export function ProductDetailClient({ product }: Props) {
                           </motion.div>
                         )}
                       </div>
-                      
+
                       {product.perfumer && (
                         <div className="pt-4 border-t border-theme-charcoal/5">
                           <span className="font-mono text-[9px] uppercase tracking-widest opacity-40 block mb-2">
@@ -870,15 +876,14 @@ export function ProductDetailClient({ product }: Props) {
               <button
                 onClick={handleAddToSatchel}
                 disabled={!product.inStock || isAdding || !product.shopifyVariantId}
-                className={`flex-1 py-4 font-mono text-sm uppercase tracking-[0.4em] transition-all relative overflow-hidden ${
-                  product.inStock
-                    ? isAdding
-                      ? "bg-theme-gold text-theme-alabaster"
-                      : product.shopifyVariantId
+                className={`flex-1 py-4 font-mono text-sm uppercase tracking-[0.4em] transition-all relative overflow-hidden ${product.inStock
+                  ? isAdding
+                    ? "bg-theme-gold text-theme-alabaster"
+                    : product.shopifyVariantId
                       ? "bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90 active:bg-theme-charcoal/80"
                       : "bg-theme-charcoal/40 text-theme-alabaster/60 cursor-not-allowed"
-                    : "bg-theme-charcoal/20 text-theme-charcoal/40 cursor-not-allowed"
-                }`}
+                  : "bg-theme-charcoal/20 text-theme-charcoal/40 cursor-not-allowed"
+                  }`}
               >
                 <AnimatePresence mode="wait">
                   {isAdding ? (
@@ -899,11 +904,11 @@ export function ProductDetailClient({ product }: Props) {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                     >
-                      {!product.inStock 
-                        ? "Out of Stock" 
+                      {!product.inStock
+                        ? "Out of Stock"
                         : !product.shopifyVariantId
-                        ? "Not Connected"
-                        : "Add to Satchel"}
+                          ? "Not Connected"
+                          : "Add to Satchel"}
                     </motion.span>
                   )}
                 </AnimatePresence>

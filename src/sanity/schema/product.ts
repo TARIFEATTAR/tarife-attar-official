@@ -327,9 +327,9 @@ export const productSchema = {
         },
         {
           name: 'gpsCoordinates',
-          title: 'GPS Coordinates',
+          title: 'GPS Coordinates (Inspiration Point)',
           type: 'string',
-          description: 'Optional geographic coordinates (e.g., "45.5017° N, 73.5673° W")',
+          description: 'Inspiration Point: The memory or atmosphere this scent captures (e.g., "A market in Tangier"). Coordinates like "45.5017° N, 73.5673° W".',
         },
         {
           name: 'travelLog',
@@ -389,9 +389,9 @@ export const productSchema = {
         },
         {
           name: 'gpsCoordinates',
-          title: 'GPS Coordinates',
+          title: 'GPS Coordinates (Provenance)',
           type: 'string',
-          description: 'Optional geographic coordinates for the origin (e.g., "12.5657° N, 102.5065° E" for Trat, Thailand)',
+          description: 'Provenance: The exact harvest site (e.g., a specific Aquilaria grove in Laos). For Heritage Distillations, this is the Distillery (The Kiln) where the artifact was born.',
         },
         {
           name: 'viscosity',
@@ -435,6 +435,28 @@ export const productSchema = {
           title: 'Field Report',
           type: 'fieldReport',
           description: 'Shoppable lifestyle image showcasing the material origin, distillation process, or collector context',
+        },
+        // Heritage Distillation Classification (v3.0)
+        {
+          name: 'isHeritageDistillation',
+          title: 'Heritage Distillation',
+          type: 'boolean',
+          description: 'Enable for traditional co-distillations (e.g., Majmua, Shamama). Changes Class label to "Heritage Distillation" and GPS to "Distillery (The Kiln)".',
+          initialValue: false,
+        },
+        {
+          name: 'heritageType',
+          title: 'Heritage Type',
+          type: 'string',
+          description: 'Display subtitle for Heritage Distillations.',
+          options: {
+            list: [
+              { title: 'Traditional Hydro-Distillation', value: 'Traditional Hydro-Distillation' },
+              { title: 'Ancient Co-Distillation', value: 'Ancient Co-Distillation' },
+            ],
+          },
+          hidden: ({ parent }: { parent?: { isHeritageDistillation?: boolean } }) =>
+            !parent?.isHeritageDistillation,
         },
       ],
     },
@@ -540,14 +562,14 @@ export const productSchema = {
       shopifyPrice?: number;
       shopifyStatus?: string;
     }) {
-      const { 
-        title, 
-        shopifyTitle, 
-        collectionType, 
-        internalName, 
-        media, 
+      const {
+        title,
+        shopifyTitle,
+        collectionType,
+        internalName,
+        media,
         shopifyImage,
-        atlasAtmosphere, 
+        atlasAtmosphere,
         relicViscosity,
         shopifyPrice,
         shopifyStatus,
@@ -555,12 +577,12 @@ export const productSchema = {
 
       // Use Shopify title if no custom title
       const displayTitle = title || shopifyTitle || 'Untitled Product';
-      
+
       // Determine if this is a Shopify-synced product
       const isShopifyProduct = !!shopifyTitle && !title;
-      
+
       const subtitleParts: string[] = [];
-      
+
       if (isShopifyProduct) {
         subtitleParts.push('🛒 Shopify');
         if (shopifyPrice) subtitleParts.push(`$${shopifyPrice}`);

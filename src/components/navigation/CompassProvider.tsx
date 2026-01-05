@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { RealisticCompass } from './RealisticCompass';
+import { CustomCursor } from '@/components/ui/CustomCursor';
 import { ReactNode } from 'react';
 
 interface CompassProviderProps {
@@ -18,21 +19,21 @@ interface CompassProviderProps {
 export function CompassProvider({ children }: CompassProviderProps) {
   const pathname = usePathname();
   const router = useRouter();
-  
+
   // Don't render compass in layout if we're on split entry page or Studio
   // (SplitEntry renders its own centered compass)
   const isSplitEntryPage = pathname === '/';
-  
+
   // Check for Studio routes - be very aggressive about this
-  const isStudioPage = 
+  const isStudioPage =
     typeof window !== 'undefined' && (
-      pathname?.startsWith('/studio') || 
+      pathname?.startsWith('/studio') ||
       pathname?.includes('/studio') ||
       window.location.pathname?.startsWith('/studio') ||
       window.location.pathname?.includes('/studio') ||
       document.querySelector('[data-sanity]') !== null
     );
-  
+
   const handleNavigate = (path: string) => {
     const routes: Record<string, string> = {
       'home': '/',
@@ -51,8 +52,9 @@ export function CompassProvider({ children }: CompassProviderProps) {
 
   return (
     <>
+      <CustomCursor />
       {children}
-      
+
       {/* Only render corner compass on non-entry pages */}
       {!isSplitEntryPage && (
         <RealisticCompass

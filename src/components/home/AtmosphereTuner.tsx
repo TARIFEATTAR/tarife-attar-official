@@ -16,7 +16,7 @@ const FIELD_REPORTS: FieldReport[] = [
   {
     id: 'sun',
     name: 'Solar Stillness',
-    imageUrl: 'https://images.unsplash.com/photo-1547483238-2cbf88bd1423?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://images.unsplash.com/photo-1590736969955-71cc94801759?auto=format&fit=crop&q=80&w=800',
     description: 'Warm linen, amber resins, and the weight of a summer afternoon.',
     coordinates: '36.7783° N, 119.4179° W'
   },
@@ -39,7 +39,7 @@ export const AtmosphereTuner: React.FC<Props> = ({ onBack, onNavigate }) => {
     <div className="w-full h-full flex flex-col max-w-6xl mx-auto">
       <header className="flex justify-between items-end mb-16">
         <div className="z-50">
-          <button 
+          <button
             onClick={(e) => { e.stopPropagation(); onBack(); }}
             className="group flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase mb-4 opacity-60 hover:opacity-100 transition-opacity pointer-events-auto"
           >
@@ -67,8 +67,8 @@ export const AtmosphereTuner: React.FC<Props> = ({ onBack, onNavigate }) => {
             className="group relative flex flex-col h-full cursor-pointer pointer-events-auto z-40"
           >
             <div className="relative aspect-[3/4] overflow-hidden mb-6 bg-theme-charcoal/5 border border-transparent group-hover:border-theme-charcoal/20 transition-colors">
-              <Image 
-                src={report.imageUrl} 
+              <Image
+                src={report.imageUrl}
                 alt={report.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
@@ -77,7 +77,7 @@ export const AtmosphereTuner: React.FC<Props> = ({ onBack, onNavigate }) => {
               <div className="absolute top-4 left-4 p-2 bg-white/10 backdrop-blur-sm">
                 <span className="font-mono text-[9px] tracking-tighter text-white uppercase">{report.coordinates}</span>
               </div>
-              
+
               {/* Hover Portal Indicator */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-theme-alabaster/10 backdrop-blur-[2px]">
                 <div className="px-6 py-3 border border-theme-charcoal bg-theme-alabaster text-theme-charcoal font-mono text-[9px] uppercase tracking-[0.3em]">
@@ -102,7 +102,7 @@ export const AtmosphereTuner: React.FC<Props> = ({ onBack, onNavigate }) => {
       </div>
 
       <div className="mt-12 text-center opacity-20 z-50">
-        <button 
+        <button
           onClick={(e) => {
             e.stopPropagation();
             onNavigate?.('atlas');

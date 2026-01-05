@@ -8,6 +8,7 @@ import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { urlForImage } from "@/sanity/lib/image";
+import { getItemLabel } from "@/lib/brandSystem";
 
 interface Territory {
   id: string;
@@ -71,13 +72,13 @@ export function AtlasClient({ territories, totalCount }: Props) {
             className="max-w-3xl"
           >
             <span className="font-mono text-[10px] md:text-sm uppercase tracking-[0.6em] md:tracking-[0.8em] text-theme-gold mb-4 md:mb-6 block leading-tight break-words">
-              {totalCount} Perfume Oils{'\u00A0'}·{'\u00A0'}4 Territories
+              {totalCount} {getItemLabel('atlas', totalCount)}{'\u00A0'}·{'\u00A0'}4 Territories
             </span>
             <h1 className="text-4xl md:text-8xl font-serif italic tracking-tighter leading-[0.95] md:leading-[0.9] mb-6 md:mb-8">
               The Atlas
             </h1>
             <p className="font-serif italic text-base md:text-2xl opacity-80 leading-relaxed max-w-xl mb-4 md:mb-6 break-words">
-              Clean, skin-safe perfume oils. Intentional formulations 
+              Clean, skin-safe perfume oils. Intentional formulations
               crafted for those who travel by scent.
             </p>
             <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.3em] md:tracking-widest opacity-70 leading-tight break-words">
@@ -98,11 +99,10 @@ export function AtlasClient({ territories, totalCount }: Props) {
           >
             <button
               onClick={() => setActiveTerritory(null)}
-              className={`px-4 md:px-6 py-2 md:py-3 font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest transition-all ${
-                activeTerritory === null
+              className={`px-4 md:px-6 py-2 md:py-3 font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest transition-all ${activeTerritory === null
                   ? "bg-theme-charcoal text-theme-alabaster"
                   : "bg-theme-charcoal/5 opacity-80 hover:opacity-100"
-              }`}
+                }`}
             >
               All Territories
             </button>
@@ -110,11 +110,10 @@ export function AtlasClient({ territories, totalCount }: Props) {
               <button
                 key={territory.id}
                 onClick={() => setActiveTerritory(territory.id)}
-                className={`px-4 md:px-6 py-2 md:py-3 font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest transition-all ${
-                  activeTerritory === territory.id
+                className={`px-4 md:px-6 py-2 md:py-3 font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest transition-all ${activeTerritory === territory.id
                     ? "bg-theme-charcoal text-theme-alabaster"
                     : "bg-theme-charcoal/5 opacity-80 hover:opacity-100"
-                }`}
+                  }`}
               >
                 {territory.name}
               </button>
@@ -147,7 +146,7 @@ export function AtlasClient({ territories, totalCount }: Props) {
                     </p>
                   </div>
                   <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest opacity-70 flex-shrink-0 whitespace-nowrap">
-                    {territory.count} Specimen{territory.count !== 1 ? "s" : ""}
+                    {territory.count} {getItemLabel('atlas', territory.count)}
                   </p>
                 </div>
 
@@ -171,7 +170,7 @@ export function AtlasClient({ territories, totalCount }: Props) {
                               </div>
                             );
                           }
-                          
+
                           try {
                             const imageSrc = imageUrl.width(400).height(500).url();
                             return (
@@ -254,7 +253,7 @@ export function AtlasClient({ territories, totalCount }: Props) {
               Clean. Safe. Intentional.
             </h3>
             <p className="font-serif italic text-sm md:text-base opacity-60 leading-relaxed px-2">
-              Every Atlas oil is clean, skin-safe, and crafted with 
+              Every Atlas oil is clean, skin-safe, and crafted with
               transparent ingredient sourcing. No synthetics that don&apos;t serve the scent.
             </p>
             <div className="flex flex-wrap justify-center gap-4 md:gap-8 pt-3 md:pt-4 font-mono text-[9px] uppercase tracking-[0.2em] md:tracking-widest opacity-30">
