@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { EB_Garamond, JetBrains_Mono } from "next/font/google";
 import { Providers } from "@/components/Providers";
 import "../globals.css";
@@ -19,31 +18,18 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "500", "700"],
 });
 
-export const metadata: Metadata = {
-  title: "Tarife Attär | Scent Archive",
-  description:
-    "A curated archive of rare and vintage fragrances. Explore the Atlas of scent history.",
-  keywords: ["perfume", "fragrance", "vintage", "archive", "scent", "attar"],
-  authors: [{ name: "Tarife Attär" }],
-  openGraph: {
-    title: "Tarife Attär | Scent Archive",
-    description: "A curated archive of rare and vintage fragrances.",
-    type: "website",
-  },
-};
+// Metadata export removed as it's now in the root layout or handled by pages
 
-export default function RootLayout({
+export default function SiteLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${ebGaramond.variable} ${jetbrainsMono.variable} overflow-x-hidden`}>
-      <body className="min-h-screen bg-theme-alabaster text-theme-charcoal antialiased font-serif overflow-x-hidden">
-        <Providers>
-          {children}
-        </Providers>
-      </body>
-    </html>
+    <div className={`${ebGaramond.variable} ${jetbrainsMono.variable} min-h-screen bg-theme-alabaster text-theme-charcoal antialiased font-serif overflow-x-hidden cursor-none`}>
+      <Providers>
+        {children}
+      </Providers>
+    </div>
   );
 }

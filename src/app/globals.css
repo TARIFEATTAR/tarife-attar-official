@@ -11,12 +11,7 @@ body {
   @apply bg-theme-alabaster text-theme-charcoal antialiased transition-colors duration-500;
 }
 
-/* Hide system cursor globally with maximum specificity */
-*,
-*::before,
-*::after {
-  cursor: none !important;
-}
+
 
 /* Design Tokens */
 @layer base {
