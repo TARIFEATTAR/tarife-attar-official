@@ -255,7 +255,9 @@ export const featuredProductsQuery = groq`
     productFormat,
     mainImage,
     "atmosphere": atlasData.atmosphere,
-    "viscosity": relicData.viscosity
+    "viscosity": relicData.viscosity,
+    "atlasImage": atlasData.fieldReport.image,
+    "relicImage": relicData.museumExhibit.exhibitImage
   }
 `;
 

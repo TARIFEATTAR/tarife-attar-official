@@ -26,6 +26,9 @@ interface Territory {
     volume?: string;
     productFormat?: string;
     mainImage?: any;
+    fieldReport?: {
+      image?: any;
+    };
     inStock?: boolean;
     legacyName?: string;
     showLegacyName?: boolean;
@@ -163,8 +166,9 @@ export function AtlasClient({ territories, totalCount }: Props) {
                         href={`/product/${product.slug.current}`}
                         className="group aspect-[4/5] bg-gradient-to-b bg-theme-charcoal/[0.03] border border-theme-charcoal/10 flex flex-col overflow-hidden hover:border-theme-charcoal/20 transition-colors"
                       >
-                        {product.mainImage ? (() => {
-                          const imageUrl = urlForImage(product.mainImage);
+                        {product.mainImage || product.fieldReport?.image ? (() => {
+                          const displayImage = product.mainImage || product.fieldReport?.image;
+                          const imageUrl = urlForImage(displayImage);
                           if (!imageUrl) {
                             return (
                               <div className="w-full h-4/5 bg-theme-charcoal/5 flex items-center justify-center">

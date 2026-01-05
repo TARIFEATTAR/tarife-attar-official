@@ -12,7 +12,7 @@ import { urlForImage } from "@/sanity/lib/image";
 import { LegacyName } from "@/components/product/LegacyName";
 
 interface HomeClientProps {
-    featuredProducts: Product[];
+    featuredProducts: (Product & { atlasImage?: any; relicImage?: any })[];
 }
 
 export function HomeClient({ featuredProducts }: HomeClientProps) {
@@ -86,19 +86,25 @@ export function HomeClient({ featuredProducts }: HomeClientProps) {
                                     className="group cursor-pointer flex flex-col space-y-6 md:space-y-10"
                                 >
                                     <div className="relative w-full aspect-[4/5] bg-[#F8F7F2] overflow-hidden shadow-sm border border-theme-charcoal/5">
-                                        {product.mainImage ? (
-                                            <Image
-                                                src={urlForImage(product.mainImage!).width(800).height(1000).url()}
-                                                alt={product.title}
-                                                fill
-                                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                                className="object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-theme-charcoal/5">
-                                                <span className="font-mono text-xs uppercase tracking-widest opacity-20">No Image</span>
-                                            </div>
-                                        )}
+                                        {(() => {
+                                            const displayImage = product.atlasImage || product.relicImage || product.mainImage;
+                                            if (displayImage) {
+                                                return (
+                                                    <Image
+                                                        src={urlForImage(displayImage).width(800).height(1000).url()}
+                                                        alt={product.title}
+                                                        fill
+                                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                                        className="object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000"
+                                                    />
+                                                );
+                                            }
+                                            return (
+                                                <div className="w-full h-full flex items-center justify-center bg-theme-charcoal/5">
+                                                    <span className="font-mono text-xs uppercase tracking-widest opacity-20">No Image</span>
+                                                </div>
+                                            );
+                                        })()}
                                     </div>
                                     <div className="space-y-3">
                                         <div className="flex flex-col gap-1">
