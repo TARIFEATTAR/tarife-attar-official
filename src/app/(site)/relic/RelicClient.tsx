@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { urlForImage } from "@/sanity/lib/image";
 import { getItemLabel } from "@/lib/brandSystem";
+import { LegacyName } from "@/components/product/LegacyName";
 
 interface RelicProduct {
   _id: string;
@@ -17,7 +18,13 @@ interface RelicProduct {
   volume?: string;
   productFormat?: string;
   mainImage?: any;
+  museumExhibit?: {
+    exhibitImage?: any;
+  };
   inStock?: boolean;
+  legacyName?: string;
+  showLegacyName?: boolean;
+  legacyNameStyle?: 'formerly' | 'once-known' | 'previously';
 }
 
 interface Category {
@@ -127,8 +134,9 @@ export function RelicClient({ categories, totalCount }: Props) {
                         href={`/product/${product.slug.current}`}
                         className="group aspect-[4/5] bg-white/[0.02] border border-white/10 flex flex-col overflow-hidden hover:border-white/20 transition-colors"
                       >
-                        {product.mainImage ? (() => {
-                          const imageUrl = urlForImage(product.mainImage);
+                        {product.museumExhibit?.exhibitImage || product.mainImage ? (() => {
+                          const displayImage = product.museumExhibit?.exhibitImage || product.mainImage;
+                          const imageUrl = urlForImage(displayImage);
                           if (!imageUrl) {
                             return (
                               <div className="w-full h-4/5 bg-white/[0.02] flex items-center justify-center">
@@ -179,6 +187,12 @@ export function RelicClient({ categories, totalCount }: Props) {
                             <h3 className="font-serif italic text-sm md:text-lg mb-1 group-hover:tracking-tighter transition-all line-clamp-2 leading-tight break-words overflow-hidden">
                               {product.title}
                             </h3>
+                            <LegacyName
+                              legacyName={product.legacyName}
+                              showLegacyName={product.showLegacyName}
+                              style={product.legacyNameStyle}
+                              className="text-[10px] md:text-xs opacity-60 mb-1"
+                            />
                             {product.price && (
                               <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.1em] md:tracking-widest opacity-80 tabular-nums break-words">
                                 ${product.price}

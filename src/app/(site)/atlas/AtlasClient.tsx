@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { urlForImage } from "@/sanity/lib/image";
 import { getItemLabel } from "@/lib/brandSystem";
+import { LegacyName } from "@/components/product/LegacyName";
 
 interface Territory {
   id: string;
@@ -26,6 +27,9 @@ interface Territory {
     productFormat?: string;
     mainImage?: any;
     inStock?: boolean;
+    legacyName?: string;
+    showLegacyName?: boolean;
+    legacyNameStyle?: 'formerly' | 'once-known' | 'previously';
   }>;
 }
 
@@ -100,8 +104,8 @@ export function AtlasClient({ territories, totalCount }: Props) {
             <button
               onClick={() => setActiveTerritory(null)}
               className={`px-4 md:px-6 py-2 md:py-3 font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest transition-all ${activeTerritory === null
-                  ? "bg-theme-charcoal text-theme-alabaster"
-                  : "bg-theme-charcoal/5 opacity-80 hover:opacity-100"
+                ? "bg-theme-charcoal text-theme-alabaster"
+                : "bg-theme-charcoal/5 opacity-80 hover:opacity-100"
                 }`}
             >
               All Territories
@@ -111,8 +115,8 @@ export function AtlasClient({ territories, totalCount }: Props) {
                 key={territory.id}
                 onClick={() => setActiveTerritory(territory.id)}
                 className={`px-4 md:px-6 py-2 md:py-3 font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest transition-all ${activeTerritory === territory.id
-                    ? "bg-theme-charcoal text-theme-alabaster"
-                    : "bg-theme-charcoal/5 opacity-80 hover:opacity-100"
+                  ? "bg-theme-charcoal text-theme-alabaster"
+                  : "bg-theme-charcoal/5 opacity-80 hover:opacity-100"
                   }`}
               >
                 {territory.name}
@@ -211,6 +215,12 @@ export function AtlasClient({ territories, totalCount }: Props) {
                             <h3 className="font-serif italic text-sm md:text-lg mb-1 group-hover:tracking-tighter transition-all line-clamp-2 leading-tight break-words overflow-hidden">
                               {product.title}
                             </h3>
+                            <LegacyName
+                              legacyName={product.legacyName}
+                              showLegacyName={product.showLegacyName}
+                              style={product.legacyNameStyle}
+                              className="text-[10px] md:text-xs opacity-60 mb-1"
+                            />
                             {product.price && (
                               <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.1em] md:tracking-widest opacity-80 tabular-nums break-words">
                                 ${product.price}

@@ -14,12 +14,12 @@ export default function StudioLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div 
-      style={{ 
-        height: '100vh', 
-        width: '100vw', 
-        margin: 0, 
-        padding: 0, 
+    <div
+      style={{
+        height: '100vh',
+        width: '100vw',
+        margin: 0,
+        padding: 0,
         overflow: 'hidden',
         position: 'fixed',
         top: 0,
@@ -30,6 +30,12 @@ export default function StudioLayout({
         isolation: 'isolate'
       }}
     >
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        html, body, #__next, [data-sanity], button, a, input, [role="button"] { 
+          cursor: auto !important; 
+        }
+      `}} />
       {children}
     </div>
   );

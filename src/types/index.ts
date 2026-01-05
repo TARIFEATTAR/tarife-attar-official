@@ -83,16 +83,23 @@ export type HardwareType =
   | 'Vial';
 
 export interface Product {
-  id: string;
+  id?: string; // Legacy ID support
+  _id?: string; // Sanity ID
   title: string;
-  slug?: string;
-  price: string;
-  imageUrl: string;
+  slug?: { current: string };
+  price?: number | string;
+  imageUrl?: string;
   mainImage?: SanityImage;
-  collectionType: CollectionType;
-  productFormat: ProductFormat;
-  volume: string;
+  collectionType?: CollectionType;
+  productFormat?: ProductFormat | string;
+  volume?: string;
   hardware?: HardwareType;
+  inStock?: boolean;
+
+  // Legacy Name System (Rebrand)
+  legacyName?: string;
+  showLegacyName?: boolean;
+  legacyNameStyle?: 'formerly' | 'once-known' | 'previously';
 
   // Rich Content
   fieldReport?: ShoppableImage;

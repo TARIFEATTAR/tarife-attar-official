@@ -11,6 +11,7 @@ import { useShopifyCart } from "@/context";
 import { GlobalFooter } from "@/components/navigation";
 import { PortableText } from "@portabletext/react";
 import { getClassLabel, getCoordinateLabel, COLLECTION_LABELS } from "@/lib/brandSystem";
+import { LegacyName } from "@/components/product/LegacyName";
 
 // Portable Text type
 type PortableTextBlock = any;
@@ -19,6 +20,9 @@ interface Product {
   _id: string;
   title: string;
   slug: { current: string };
+  legacyName?: string;
+  showLegacyName?: boolean;
+  legacyNameStyle?: 'formerly' | 'once-known' | 'previously';
   collectionType: "atlas" | "relic";
   price?: number;
   volume?: string;
@@ -34,6 +38,9 @@ interface Product {
     _id: string;
     title: string;
     slug: { current: string };
+    legacyName?: string;
+    showLegacyName?: boolean;
+    legacyNameStyle?: 'formerly' | 'once-known' | 'previously';
     price?: number;
     mainImage?: any;
   }>;
@@ -399,6 +406,12 @@ export function ProductDetailClient({ product }: Props) {
             <h1 className="text-4xl md:text-6xl font-serif italic tracking-tighter leading-[0.9]">
               {product.title}
             </h1>
+            <LegacyName
+              legacyName={product.legacyName}
+              showLegacyName={product.showLegacyName}
+              style={product.legacyNameStyle}
+              className="text-sm md:text-base opacity-60 mt-2"
+            />
 
             {/* Product Essence/Notes Preview */}
             {product.notes && (
@@ -806,11 +819,17 @@ export function ProductDetailClient({ product }: Props) {
                             No Image
                           </div>
                         )}
-                      </div>
-                      <div className="space-y-2">
                         <h3 className="font-serif italic text-xl group-hover:tracking-tighter transition-all">
                           {related.title}
                         </h3>
+                        {related.legacyName && related.showLegacyName && (
+                          <LegacyName
+                            legacyName={related.legacyName}
+                            showLegacyName={related.showLegacyName}
+                            style={related.legacyNameStyle}
+                            className="text-xs opacity-60 mb-2"
+                          />
+                        )}
                         <p className="font-mono text-xs opacity-40 uppercase tracking-widest">
                           ${related.price}
                         </p>
