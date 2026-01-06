@@ -20,7 +20,7 @@ async function shopifyFetch({
     throw new Error('Shopify configuration missing. Please set NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN and NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN');
   }
 
-  const endpoint = `https://${domain}/api/2024-01/graphql.json`;
+  const endpoint = `https://${domain}/api/2026-01/graphql.json`;
 
   try {
     const response = await fetch(endpoint, {

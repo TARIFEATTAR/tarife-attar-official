@@ -30,7 +30,7 @@ export const EntryLoader: React.FC<Props> = ({ onComplete }) => {
   }, [onComplete]);
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
@@ -41,11 +41,11 @@ export const EntryLoader: React.FC<Props> = ({ onComplete }) => {
         {/* Left - Alabaster */}
         <div className="w-1/2 h-full bg-theme-alabaster" />
         {/* Right - Obsidian */}
-        <motion.div 
+        <motion.div
           className="w-1/2 h-full bg-theme-obsidian"
           initial={{ x: '100%' }}
           animate={{ x: stage >= 3 ? 0 : '100%' }}
-          transition={{ 
+          transition={{
             duration: 0.6,
             ease: [0.4, 0, 0.2, 1]
           }}
@@ -53,7 +53,7 @@ export const EntryLoader: React.FC<Props> = ({ onComplete }) => {
       </div>
 
       {/* Center text container - fades out during split */}
-      <motion.div 
+      <motion.div
         className="relative z-10 flex items-center justify-center"
         animate={{
           opacity: stage >= 3 ? 0 : 1,
@@ -61,30 +61,30 @@ export const EntryLoader: React.FC<Props> = ({ onComplete }) => {
         }}
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
-        {/* TARIFE */}
+        {/* TARIFÉ */}
         <motion.span
           initial={{ opacity: 0, y: 10 }}
-          animate={{ 
+          animate={{
             opacity: stage >= 1 ? 1 : 0,
             y: stage >= 1 ? 0 : 10,
           }}
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="text-3xl sm:text-4xl md:text-7xl tracking-[0.15em] font-serif font-light text-theme-charcoal mr-[0.3em]"
         >
-          TARIFE
+          TARIFÉ
         </motion.span>
 
         {/* A - flies to left */}
         <motion.span
           initial={{ opacity: 0, y: 10 }}
-          animate={{ 
+          animate={{
             opacity: stage >= 1 ? 1 : 0,
             y: stage >= 1 ? 0 : 10,
             color: stage >= 2 ? '#c5a66a' : '#1A1A1A',
             scale: stage === 2 ? 1.1 : 1,
           }}
-          transition={{ 
-            duration: 0.5, 
+          transition={{
+            duration: 0.5,
             ease: "easeOut",
             color: { duration: 0.3 },
             scale: { duration: 0.3 }
@@ -97,7 +97,7 @@ export const EntryLoader: React.FC<Props> = ({ onComplete }) => {
         {/* TT */}
         <motion.span
           initial={{ opacity: 0, y: 10 }}
-          animate={{ 
+          animate={{
             opacity: stage >= 1 ? (stage >= 3 ? 0 : 1) : 0,
             y: stage >= 1 ? 0 : 10,
           }}
@@ -110,7 +110,7 @@ export const EntryLoader: React.FC<Props> = ({ onComplete }) => {
         {/* Ä */}
         <motion.span
           initial={{ opacity: 0, y: 10 }}
-          animate={{ 
+          animate={{
             opacity: stage >= 1 ? (stage >= 3 ? 0 : 1) : 0,
             y: stage >= 1 ? 0 : 10,
           }}
@@ -123,14 +123,14 @@ export const EntryLoader: React.FC<Props> = ({ onComplete }) => {
         {/* R - flies to right */}
         <motion.span
           initial={{ opacity: 0, y: 10 }}
-          animate={{ 
+          animate={{
             opacity: stage >= 1 ? 1 : 0,
             y: stage >= 1 ? 0 : 10,
             color: stage >= 2 ? '#c5a66a' : '#1A1A1A',
             scale: stage === 2 ? 1.1 : 1,
           }}
-          transition={{ 
-            duration: 0.5, 
+          transition={{
+            duration: 0.5,
             ease: "easeOut",
             color: { duration: 0.3 },
             scale: { duration: 0.3 }
@@ -143,19 +143,19 @@ export const EntryLoader: React.FC<Props> = ({ onComplete }) => {
 
       {/* Flying A - appears during stage 3, flies to left position */}
       <motion.span
-        initial={{ 
+        initial={{
           opacity: 0,
           x: 0,
           y: 0,
           scale: 1
         }}
-        animate={{ 
+        animate={{
           opacity: stage >= 3 ? 1 : 0,
           x: stage >= 3 ? '-25vw' : 0,
           y: stage >= 3 ? 0 : 0,
           scale: stage >= 3 ? 2.5 : 1,
         }}
-        transition={{ 
+        transition={{
           duration: 0.6,
           ease: [0.4, 0, 0.2, 1]
         }}
@@ -166,19 +166,19 @@ export const EntryLoader: React.FC<Props> = ({ onComplete }) => {
 
       {/* Flying R - appears during stage 3, flies to right position */}
       <motion.span
-        initial={{ 
+        initial={{
           opacity: 0,
           x: 0,
           y: 0,
           scale: 1
         }}
-        animate={{ 
+        animate={{
           opacity: stage >= 3 ? 1 : 0,
           x: stage >= 3 ? '25vw' : 0,
           y: stage >= 3 ? 0 : 0,
           scale: stage >= 3 ? 2.5 : 1,
         }}
-        transition={{ 
+        transition={{
           duration: 0.6,
           ease: [0.4, 0, 0.2, 1]
         }}
@@ -190,7 +190,7 @@ export const EntryLoader: React.FC<Props> = ({ onComplete }) => {
       {/* Subtle tagline */}
       <motion.p
         initial={{ opacity: 0 }}
-        animate={{ 
+        animate={{
           opacity: stage >= 1 && stage < 3 ? 0.4 : 0,
         }}
         transition={{ duration: 0.4, delay: stage === 1 ? 0.3 : 0 }}
@@ -201,7 +201,7 @@ export const EntryLoader: React.FC<Props> = ({ onComplete }) => {
 
       {/* Gold glow during highlight */}
       {stage === 2 && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.08 }}
           className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#c5a66a_0%,_transparent_50%)] pointer-events-none"

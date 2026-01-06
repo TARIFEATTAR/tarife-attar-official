@@ -3,6 +3,8 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { RealisticCompass } from './RealisticCompass';
 import { CustomCursor } from '@/components/ui/CustomCursor';
+import { GhostLabels } from '@/components/ui/GhostLabels';
+import { Satchel } from '@/components/cart/Satchel';
 import { ReactNode, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -11,25 +13,37 @@ interface CompassProviderProps {
 }
 
 /**
- * CompassProvider manages the compass position across pages.
+ * CompassProvider - Global Navigation Manager
+ * 
+ * Manages the compass position across pages and integrates:
+ * - RealisticCompass (bottom-right navigation)
+ * - Satchel (bottom-left cart)
+ * - GhostLabels (first-visit hints)
+ * - CustomCursor (branded cursor)
  * 
  * Architecture:
  * - SplitEntry page: Compass rendered BY SplitEntry component (position="center")
  * - All other pages: Compass rendered HERE in layout (position="corner")
  * 
- * UX Update:
+ * UX Flow:
  * - On Homepage: Centered compass scrolls away. Global corner compass FADES IN when scrolling.
+ * - On Other Pages: Corner compass always visible
+ * - Ghost labels appear on first visit, fade after 5s or on scroll
  */
 export function CompassProvider({ children }: CompassProviderProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [showCornerCompass, setShowCornerCompass] = useState(false);
+  const [showGhostLabels, setShowGhostLabels] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState<'atlas' | 'relic'>('atlas');
 
-  // Don't render compass in layout if we're on split entry page or Studio
-  // (SplitEntry renders its own centered compass)
+  // Page detection
   const isSplitEntryPage = pathname === '/';
+  const isAtlasPage = pathname?.startsWith('/atlas') || pathname?.startsWith('/product');
+  const isRelicPage = pathname?.startsWith('/relic');
+  const isCartPage = pathname === '/cart';
 
-  // Check for Studio routes - be very aggressive about this
+  // Check for Studio routes
   const isStudioPage =
     typeof window !== 'undefined' && (
       pathname?.startsWith('/studio') ||
@@ -39,6 +53,16 @@ export function CompassProvider({ children }: CompassProviderProps) {
       document.querySelector('[data-sanity]') !== null
     );
 
+  // Update theme based on current page
+  useEffect(() => {
+    if (isRelicPage) {
+      setCurrentTheme('relic');
+    } else {
+      setCurrentTheme('atlas');
+    }
+  }, [isRelicPage]);
+
+  // Scroll handler for compass visibility
   useEffect(() => {
     const handleScroll = () => {
       if (!isSplitEntryPage) {
@@ -62,6 +86,19 @@ export function CompassProvider({ children }: CompassProviderProps) {
     };
   }, [isSplitEntryPage, pathname]);
 
+  // Ghost labels visibility (only on first scroll into corner compass territory)
+  useEffect(() => {
+    if (showCornerCompass && !isSplitEntryPage) {
+      // Small delay to prevent flash
+      const timer = setTimeout(() => {
+        setShowGhostLabels(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    } else {
+      setShowGhostLabels(false);
+    }
+  }, [showCornerCompass, isSplitEntryPage]);
+
   const handleNavigate = (path: string) => {
     const routes: Record<string, string> = {
       'home': '/',
@@ -73,7 +110,7 @@ export function CompassProvider({ children }: CompassProviderProps) {
     router.push(routes[path] || `/${path}`);
   };
 
-  // Early return for Studio pages - don't render compass at all
+  // Early return for Studio pages
   if (isStudioPage) {
     return <>{children}</>;
   }
@@ -83,7 +120,20 @@ export function CompassProvider({ children }: CompassProviderProps) {
       <CustomCursor />
       {children}
 
-      {/* Render corner compass with fade transition */}
+      {/* Ghost Labels (First-visit navigation hints) */}
+      <GhostLabels 
+        show={showGhostLabels} 
+        compassPosition="corner"
+        showSatchelLabel={!isCartPage}
+        onDismiss={() => setShowGhostLabels(false)}
+      />
+
+      {/* Satchel (Bottom-left cart icon) */}
+      {!isCartPage && (
+        <Satchel theme={currentTheme} />
+      )}
+
+      {/* Corner Compass with fade transition */}
       <AnimatePresence>
         {showCornerCompass && (
           <motion.div
@@ -91,7 +141,7 @@ export function CompassProvider({ children }: CompassProviderProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="fixed z-[2999] pointer-events-none" // Container is pointer-events-none, compass button resets it
+            className="fixed z-[2999] pointer-events-none"
           >
             <RealisticCompass
               onNavigate={handleNavigate}
@@ -104,3 +154,5 @@ export function CompassProvider({ children }: CompassProviderProps) {
     </>
   );
 }
+
+export default CompassProvider;

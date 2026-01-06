@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
+import { useIdleHeartbeat, useScrollActivity } from '@/Hooks/useIdleHeartbeat';
 
 interface NavItem {
   label: string;
@@ -22,29 +23,9 @@ const NAV_ITEMS: NavItem[] = [
 interface Props {
   onNavigate: (path: string) => void;
   size?: 'sm' | 'md' | 'lg';
-  /** 
-   * Position mode:
-   * - 'corner': Fixed bottom-right (default navigation state)
-   * - 'center': Centered at bottom (Split Entry teaching state)
-   */
   position?: 'corner' | 'center';
-  /**
-   * External hover direction for Split Entry teaching mode.
-   * When provided, overrides scroll-based needle rotation.
-   * - 'W': Points to Atlas (West/Left)
-   * - 'E': Points to Relic (East/Right)
-   * - null: Points North (neutral)
-   */
   hoveredDirection?: 'W' | 'E' | null;
-  /**
-   * Whether to show the hint text below compass in center mode
-   */
   showHint?: boolean;
-  /**
-   * Whether to use absolute positioning instead of fixed.
-   * Useful for the Split Entry hero where the compass should scroll away.
-   * Note: When open, it will always revert to fixed to act as an overlay.
-   */
   absolutePosition?: boolean;
 }
 
@@ -63,11 +44,22 @@ export const RealisticCompass: React.FC<Props> = ({
   const [isMobile, setIsMobile] = useState(false);
   const [isShortViewport, setIsShortViewport] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
-
   const [viewportWidth, setViewportWidth] = useState(0);
   const [mousePosition, setMousePosition] = useState<{ x: number, y: number } | null>(null);
+
   const compassRef = React.useRef<HTMLButtonElement>(null);
 
+  // === ZERO-UI MITIGATIONS ===
+
+  // 1. Idle Heartbeat Detection
+  const { isIdle, markInteracted } = useIdleHeartbeat({
+    enabled: !isOpen && position === 'corner', // Only in corner mode when closed
+  });
+
+  // 2. Scroll Activity Detection (for shrink behavior)
+  const isScrolling = useScrollActivity(300);
+
+  // === EXISTING SCROLL-BASED ROTATION ===
   const { scrollYProgress } = useScroll();
   const rawRotation = useTransform(scrollYProgress, [0, 1], [0, 360]);
   const needleRotation = useSpring(rawRotation, {
@@ -76,6 +68,7 @@ export const RealisticCompass: React.FC<Props> = ({
     mass: 0.8,
   });
 
+  // === INITIALIZATION ===
   useEffect(() => {
     setIsMounted(true);
     const handleResize = () => {
@@ -92,7 +85,6 @@ export const RealisticCompass: React.FC<Props> = ({
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
 
-    // Touch handlers for mobile magnetic tracking
     const handleTouchMove = (e: TouchEvent) => {
       if (e.touches.length > 0) {
         const touch = e.touches[0];
@@ -101,11 +93,7 @@ export const RealisticCompass: React.FC<Props> = ({
     };
 
     const handleTouchEnd = () => {
-      // Keep the last position for a moment, then clear
-      // This prevents jarring snaps when lifting finger
-      setTimeout(() => {
-        setMousePosition(null);
-      }, 300);
+      setTimeout(() => setMousePosition(null), 300);
     };
 
     handleResize();
@@ -116,7 +104,7 @@ export const RealisticCompass: React.FC<Props> = ({
       window.addEventListener('touchend', handleTouchEnd);
     }
 
-    // Load interaction state from localStorage
+    // Load interaction state
     if (typeof window !== 'undefined') {
       const interacted = localStorage.getItem('compass-interacted');
       if (interacted) setHasInteracted(true);
@@ -132,8 +120,7 @@ export const RealisticCompass: React.FC<Props> = ({
     };
   }, []);
 
-  // Responsive sizing - better mobile support
-  // Center position gets slightly larger for teaching visibility
+  // === SIZING ===
   const sizeConfig = {
     sm: isMobile ? 56 : 80,
     md: isMobile ? 64 : 100,
@@ -142,69 +129,59 @@ export const RealisticCompass: React.FC<Props> = ({
   const baseSizeValue = sizeConfig[size];
   const compassSize = position === 'center' ? baseSizeValue * 1.2 : baseSizeValue;
 
-  // Expanded state dimensions - responsive to viewport
-  // Expanded state dimensions - responsive to viewport
   const expandedSize = isMobile
-    ? (isShortViewport
-      ? 120
-      : viewportWidth > 0
-        ? Math.min(viewportWidth * 0.35, 130)
-        : 130)
+    ? (isShortViewport ? 120 : viewportWidth > 0 ? Math.min(viewportWidth * 0.35, 130) : 130)
     : 240;
   const compassRadius = expandedSize / 2;
   const labelGap = isMobile ? 12 : 50;
-
   const needleBaseOffset = 45;
 
-  // Calculate needle angle based on external hover (Split Entry) or internal state
-  const getActiveNeedleAngle = (): number => {
-    // Priority 1: Open menu with internal hover
+  // === SCROLL-SHRINK BEHAVIOR ===
+  // When scrolling, shrink compass to get out of the way
+  const scrollShrinkScale = isScrolling && !isOpen ? 0.85 : 1;
+  const scrollShrinkOpacity = isScrolling && !isOpen ? 0.6 : 1;
+
+  // === NEEDLE ANGLE CALCULATION ===
+  const getActiveNeedleAngle = useCallback((): number => {
     if (isOpen && hoveredDirection) {
       return NAV_ITEMS.find(i => i.direction === hoveredDirection)!.angle - needleBaseOffset;
     }
 
-    // Priority 2: Magnetic Tracking (Mouse on desktop, Touch on mobile)
-    // Works when user moves cursor OR drags finger on touch screen
     if (mousePosition && compassRef.current) {
       const rect = compassRef.current.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
-
       const deltaX = mousePosition.x - centerX;
       const deltaY = mousePosition.y - centerY;
-
-      // Calculate angle in degrees
-      // atan2: 0 = East, 90 = South
-      // +90 converts to CSS rotation (0 = North)
-      // -needleBaseOffset compensates for needle image's built-in 45° rotation
       const angleDeg = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-
-      // Debug log
-      if (Math.random() > 0.95) { // Throttle logs
-        console.log('Compass Debug:', { mouseX: mousePosition.x, mouseY: mousePosition.y, centerX, centerY, angleDeg, result: angleDeg + 90 - needleBaseOffset });
-      }
-
       return angleDeg + 90 - needleBaseOffset;
     }
 
-    // Priority 3: External hover direction from Split Entry
     if (externalHoveredDirection) {
       const externalAngle = externalHoveredDirection === 'W' ? 270 : 90;
       return externalAngle - needleBaseOffset;
     }
 
-    // Priority 4: Open menu without hover (point North)
     if (isOpen) {
       return -needleBaseOffset;
     }
 
-    // Priority 5: Use scroll-based rotation (handled by motion style)
     return needleRotation.get();
-  };
+  }, [isOpen, hoveredDirection, mousePosition, externalHoveredDirection, needleRotation, needleBaseOffset]);
 
+  // === EVENT HANDLERS ===
   const handleNavClick = (item: NavItem) => {
     onNavigate(item.path);
     setIsOpen(false);
+
+    // Mark as interacted
+    if (!hasInteracted) {
+      setHasInteracted(true);
+      markInteracted();
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('compass-interacted', 'true');
+      }
+    }
   };
 
   const handleOverlayClick = () => {
@@ -212,40 +189,61 @@ export const RealisticCompass: React.FC<Props> = ({
     setHoveredDirection(null);
   };
 
+  const handleCompassClick = () => {
+    setIsOpen(!isOpen);
+
+    // Mark as interacted on first click
+    if (!hasInteracted) {
+      setHasInteracted(true);
+      markInteracted();
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('compass-interacted', 'true');
+      }
+    }
+  };
+
   if (!isMounted) return null;
 
-
-
-  // Position classes based on mode
+  // === POSITION CLASSES ===
   const getPositionClasses = () => {
     if (isOpen) {
       return 'inset-0 flex items-center justify-center';
     }
     if (position === 'center') {
-      // Mobile: Position at the horizontal split line (50% from top)
-      // Desktop: Position at bottom center
-      return isMobile
-        ? 'top-1/2 left-1/2'
-        : 'bottom-12 left-1/2';
+      return isMobile ? 'top-1/2 left-1/2' : 'bottom-12 left-1/2';
     }
-    return isMobile
-      ? 'bottom-3 right-3'
-      : 'bottom-6 right-6';
+    return isMobile ? 'bottom-3 right-3' : 'bottom-6 right-6';
   };
 
-  // Transform style for center position (can't use -translate-x-1/2 class with other positions)
-  const getTransformStyle = (): React.CSSProperties => {
-    if (position === 'center' && !isOpen) {
-      // Mobile: Center both horizontally and vertically at the split
-      // Desktop: Only center horizontally
-      return isMobile
-        ? { transform: 'translate(-50%, -50%)' }
-        : { transform: 'translateX(-50%)' };
+  const getTransformStyle = () => {
+    // When open, reset all transforms so flexbox centering works
+    if (isOpen) {
+      return { x: 0, y: 0 };
     }
-    return {};
+    if (position === 'center') {
+      return isMobile
+        ? { x: '-50%', y: '-50%' }
+        : { x: '-50%', y: 0 };
+    }
+    return { x: 0, y: 0 };
   };
 
+  // === HEARTBEAT ANIMATION CONFIG ===
+  // The "breathing" effect when user is idle
+  const heartbeatAnimation = isIdle && !hasInteracted && !isOpen ? {
+    scale: [1, 1.05, 1],
+    boxShadow: [
+      '0 4px 20px rgba(0,0,0,0.1)',
+      '0 8px 40px rgba(197,166,106,0.4)',
+      '0 4px 20px rgba(0,0,0,0.1)',
+    ],
+  } : {};
 
+  const heartbeatTransition = isIdle && !hasInteracted && !isOpen ? {
+    duration: 2,
+    repeat: Infinity,
+    ease: "easeInOut",
+  } : {};
 
   return (
     <>
@@ -263,7 +261,7 @@ export const RealisticCompass: React.FC<Props> = ({
               onClick={handleOverlayClick}
             />
 
-            {/* Absolute Cardinal Labels Layer */}
+            {/* Cardinal Labels */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -271,8 +269,10 @@ export const RealisticCompass: React.FC<Props> = ({
               className="fixed inset-0 z-[2999] pointer-events-none overflow-hidden"
             >
               {/* NORTH - Threshold */}
-              <div className="absolute top-0 left-0 right-0 bottom-1/2 flex items-end justify-center"
-                style={{ paddingBottom: `${compassRadius + labelGap}px` }}>
+              <div
+                className="absolute top-0 left-0 right-0 bottom-1/2 flex items-end justify-center pointer-events-none"
+                style={{ paddingBottom: `${compassRadius + labelGap}px` }}
+              >
                 <motion.button
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -280,16 +280,14 @@ export const RealisticCompass: React.FC<Props> = ({
                   onClick={() => handleNavClick(NAV_ITEMS[0])}
                   onMouseEnter={() => !isMobile && setHoveredDirection('N')}
                   onMouseLeave={() => !isMobile && setHoveredDirection(null)}
-                  onTouchStart={() => setHoveredDirection('N')}
-                  onTouchEnd={() => setTimeout(() => setHoveredDirection(null), 200)}
                   className="pointer-events-auto flex flex-col items-center group touch-manipulation min-h-[48px] min-w-[80px] md:min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
                 >
-                  <span className={`font-mono ${isMobile ? 'text-[10px] tracking-[0.2em] whitespace-normal max-w-[80px] text-center' : 'text-lg tracking-[0.5em] whitespace-nowrap'} uppercase transition-all duration-300 ${hoveredDirection === 'N' ? 'text-theme-gold scale-110' : 'text-white/60'
+                  <span className={`font-mono ${isMobile ? 'text-[10px] tracking-[0.2em]' : 'text-lg tracking-[0.5em]'} uppercase transition-all duration-300 ${hoveredDirection === 'N' ? 'text-theme-gold scale-110' : 'text-white/60'
                     }`}>
                     {NAV_ITEMS[0].label}
                   </span>
                   {!isMobile && (
-                    <span className={`font-serif italic text-sm mt-1 transition-colors ${hoveredDirection === 'N' ? 'text-white/70' : 'text-white/40'
+                    <span className={`font-serif italic text-sm mt-1 transition-colors ${hoveredDirection === 'N' ? 'text-white/70' : 'text-white/30'
                       }`}>
                       {NAV_ITEMS[0].description}
                     </span>
@@ -297,26 +295,26 @@ export const RealisticCompass: React.FC<Props> = ({
                 </motion.button>
               </div>
 
-              {/* EAST - Relic */}
-              <div className="absolute top-0 bottom-0 right-0 left-1/2 flex items-center justify-start"
-                style={{ paddingLeft: `${compassRadius + labelGap}px` }}>
+              {/* EAST - The Relic */}
+              <div
+                className="absolute top-0 left-1/2 bottom-0 right-0 flex items-center justify-start pointer-events-none"
+                style={{ paddingLeft: `${compassRadius + labelGap}px` }}
+              >
                 <motion.button
-                  initial={{ opacity: 0, x: 10 }}
+                  initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
+                  exit={{ opacity: 0, x: -10 }}
                   onClick={() => handleNavClick(NAV_ITEMS[1])}
                   onMouseEnter={() => !isMobile && setHoveredDirection('E')}
                   onMouseLeave={() => !isMobile && setHoveredDirection(null)}
-                  onTouchStart={() => setHoveredDirection('E')}
-                  onTouchEnd={() => setTimeout(() => setHoveredDirection(null), 200)}
-                  className="pointer-events-auto flex flex-col items-start group touch-manipulation min-h-[48px] min-w-[80px] md:min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
+                  className="pointer-events-auto flex flex-col items-center group touch-manipulation min-h-[48px] min-w-[80px] md:min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
                 >
-                  <span className={`font-mono ${isMobile ? 'text-[10px] tracking-[0.2em] whitespace-normal max-w-[80px] text-left' : 'text-lg tracking-[0.5em] whitespace-nowrap'} uppercase transition-all duration-300 ${hoveredDirection === 'E' ? 'text-theme-gold scale-110' : 'text-white/60'
+                  <span className={`font-mono ${isMobile ? 'text-[10px] tracking-[0.2em]' : 'text-lg tracking-[0.5em]'} uppercase transition-all duration-300 ${hoveredDirection === 'E' ? 'text-theme-gold scale-110' : 'text-white/60'
                     }`}>
                     {NAV_ITEMS[1].label}
                   </span>
                   {!isMobile && (
-                    <span className={`font-serif italic text-sm mt-1 transition-colors ${hoveredDirection === 'E' ? 'text-white/70' : 'text-white/40'
+                    <span className={`font-serif italic text-sm mt-1 transition-colors ${hoveredDirection === 'E' ? 'text-white/70' : 'text-white/30'
                       }`}>
                       {NAV_ITEMS[1].description}
                     </span>
@@ -325,8 +323,10 @@ export const RealisticCompass: React.FC<Props> = ({
               </div>
 
               {/* SOUTH - Satchel */}
-              <div className="absolute bottom-0 left-0 right-0 top-1/2 flex items-start justify-center"
-                style={{ paddingTop: `${compassRadius + labelGap}px` }}>
+              <div
+                className="absolute top-1/2 left-0 right-0 bottom-0 flex items-start justify-center pointer-events-none"
+                style={{ paddingTop: `${compassRadius + labelGap}px` }}
+              >
                 <motion.button
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -334,16 +334,14 @@ export const RealisticCompass: React.FC<Props> = ({
                   onClick={() => handleNavClick(NAV_ITEMS[2])}
                   onMouseEnter={() => !isMobile && setHoveredDirection('S')}
                   onMouseLeave={() => !isMobile && setHoveredDirection(null)}
-                  onTouchStart={() => setHoveredDirection('S')}
-                  onTouchEnd={() => setTimeout(() => setHoveredDirection(null), 200)}
                   className="pointer-events-auto flex flex-col items-center group touch-manipulation min-h-[48px] min-w-[80px] md:min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
                 >
-                  <span className={`font-mono ${isMobile ? 'text-[10px] tracking-[0.2em] whitespace-normal max-w-[80px] text-center' : 'text-lg tracking-[0.5em] whitespace-nowrap'} uppercase transition-all duration-300 ${hoveredDirection === 'S' ? 'text-theme-gold scale-110' : 'text-white/60'
+                  <span className={`font-mono ${isMobile ? 'text-[10px] tracking-[0.2em]' : 'text-lg tracking-[0.5em]'} uppercase transition-all duration-300 ${hoveredDirection === 'S' ? 'text-theme-gold scale-110' : 'text-white/60'
                     }`}>
                     {NAV_ITEMS[2].label}
                   </span>
                   {!isMobile && (
-                    <span className={`font-serif italic text-sm mt-1 transition-colors ${hoveredDirection === 'S' ? 'text-white/70' : 'text-white/40'
+                    <span className={`font-serif italic text-sm mt-1 transition-colors ${hoveredDirection === 'S' ? 'text-white/70' : 'text-white/30'
                       }`}>
                       {NAV_ITEMS[2].description}
                     </span>
@@ -351,26 +349,26 @@ export const RealisticCompass: React.FC<Props> = ({
                 </motion.button>
               </div>
 
-              {/* WEST - Atlas */}
-              <div className="absolute top-0 bottom-0 left-0 right-1/2 flex items-center justify-end"
-                style={{ paddingRight: `${compassRadius + labelGap}px` }}>
+              {/* WEST - The Atlas */}
+              <div
+                className="absolute top-0 left-0 bottom-0 right-1/2 flex items-center justify-end pointer-events-none"
+                style={{ paddingRight: `${compassRadius + labelGap}px` }}
+              >
                 <motion.button
-                  initial={{ opacity: 0, x: -10 }}
+                  initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
+                  exit={{ opacity: 0, x: 10 }}
                   onClick={() => handleNavClick(NAV_ITEMS[3])}
                   onMouseEnter={() => !isMobile && setHoveredDirection('W')}
                   onMouseLeave={() => !isMobile && setHoveredDirection(null)}
-                  onTouchStart={() => setHoveredDirection('W')}
-                  onTouchEnd={() => setTimeout(() => setHoveredDirection(null), 200)}
-                  className="pointer-events-auto flex flex-col items-end group touch-manipulation min-h-[48px] min-w-[80px] md:min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
+                  className="pointer-events-auto flex flex-col items-center group touch-manipulation min-h-[48px] min-w-[80px] md:min-w-[120px] px-4 py-3 active:scale-95 transition-transform"
                 >
-                  <span className={`font-mono ${isMobile ? 'text-[10px] tracking-[0.2em] whitespace-normal max-w-[80px] text-right' : 'text-lg tracking-[0.5em] whitespace-nowrap'} uppercase transition-all duration-300 ${hoveredDirection === 'W' ? 'text-theme-gold scale-110' : 'text-white/60'
+                  <span className={`font-mono ${isMobile ? 'text-[10px] tracking-[0.2em]' : 'text-lg tracking-[0.5em]'} uppercase transition-all duration-300 ${hoveredDirection === 'W' ? 'text-theme-gold scale-110' : 'text-white/60'
                     }`}>
                     {NAV_ITEMS[3].label}
                   </span>
                   {!isMobile && (
-                    <span className={`font-serif italic text-sm mt-1 transition-colors ${hoveredDirection === 'W' ? 'text-white/70' : 'text-white/40'
+                    <span className={`font-serif italic text-sm mt-1 transition-colors ${hoveredDirection === 'W' ? 'text-white/70' : 'text-white/30'
                       }`}>
                       {NAV_ITEMS[3].description}
                     </span>
@@ -379,7 +377,10 @@ export const RealisticCompass: React.FC<Props> = ({
               </div>
 
               {/* Close Hint */}
-              <div className={`absolute ${isMobile ? 'bottom-6' : 'bottom-10'} left-0 right-0 flex justify-center`}>
+              <div
+                className={`absolute ${isMobile ? 'bottom-6' : 'bottom-10'} left-0 right-0 flex justify-center pointer-events-auto cursor-pointer`}
+                onClick={handleOverlayClick}
+              >
                 <motion.span
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -398,164 +399,100 @@ export const RealisticCompass: React.FC<Props> = ({
       <motion.div
         data-compass-navigation
         className={`${absolutePosition && !isOpen ? 'absolute' : 'fixed'} z-[3000] ${getPositionClasses()} ${isOpen ? 'pointer-events-none' : 'pointer-events-auto'}`}
-        style={getTransformStyle()}
+        initial={getTransformStyle()}
+        animate={{
+          ...getTransformStyle(),
+          scale: isOpen ? 1 : scrollShrinkScale,
+          opacity: isOpen ? 1 : scrollShrinkOpacity,
+        }}
         transition={{ duration: 0.3, ease: "easeOut" }}
       >
-        {/* Compass Container with Hint */}
+        {/* Compass Container */}
         <div className="flex flex-col items-center">
+          {/* Hover-to-Reveal Label (Desktop Only) */}
+          <AnimatePresence>
+            {isHovered && !isOpen && !isMobile && (
+              <motion.span
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 5 }}
+                className="absolute -top-8 font-mono text-[10px] uppercase tracking-[0.3em] text-theme-charcoal/60 whitespace-nowrap"
+              >
+                Explore
+              </motion.span>
+            )}
+          </AnimatePresence>
+
           <motion.button
             ref={compassRef}
-            className="cursor-pointer relative pointer-events-auto touch-manipulation shadow-2xl rounded-full active:scale-95"
+            onClick={handleCompassClick}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            className={`cursor-pointer relative touch-manipulation shadow-2xl rounded-full active:scale-95 ${isOpen ? 'pointer-events-none' : 'pointer-events-auto'}`}
             style={{
               width: isOpen ? expandedSize : compassSize,
               height: isOpen ? expandedSize : compassSize,
               willChange: isOpen ? 'transform' : 'auto',
             }}
             animate={{
-              scale: isOpen
-                ? 1
-                : (hasInteracted
-                  ? 1
-                  : [1, 1.08, 1]),
-              boxShadow: isOpen
-                ? 'none'
-                : (hasInteracted
-                  ? '0 4px 20px rgba(0,0,0,0.1)'
-                  : [
-                    '0 4px 20px rgba(0,0,0,0.1)',
-                    '0 8px 40px rgba(197,166,106,0.3)',
-                    '0 4px 20px rgba(0,0,0,0.1)',
-                  ])
+              // Heartbeat animation when idle (first-time visitors)
+              ...heartbeatAnimation,
+              // Normal scale animation when not idle
+              ...((!isIdle || hasInteracted) && !isOpen ? {
+                scale: isHovered ? 1.05 : 1,
+              } : {}),
             }}
             transition={{
               width: { type: "spring", stiffness: 200, damping: 25, mass: 0.5 },
               height: { type: "spring", stiffness: 200, damping: 25, mass: 0.5 },
-              scale: {
-                duration: 2.5,
-                repeat: isOpen || hasInteracted ? 0 : Infinity,
-                ease: "easeInOut"
-              },
-              boxShadow: {
-                duration: 2.5,
-                repeat: isOpen || hasInteracted ? 0 : Infinity,
-                ease: "easeInOut"
-              }
+              ...heartbeatTransition,
             }}
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsOpen(!isOpen);
-              if (isOpen) setHoveredDirection(null);
-
-              if (!hasInteracted) {
-                setHasInteracted(true);
-                if (typeof window !== 'undefined') {
-                  localStorage.setItem('compass-interacted', 'true');
-                }
-              }
-            }}
-            onTouchStart={(e) => {
-              e.stopPropagation();
-              if (typeof document !== 'undefined') {
-                document.body.style.overflow = 'hidden';
-              }
-            }}
-            onTouchEnd={() => {
-              if (typeof document !== 'undefined') {
-                document.body.style.overflow = '';
-              }
-            }}
-            onMouseEnter={() => !isMobile && setIsHovered(true)}
-            onMouseLeave={() => !isMobile && setIsHovered(false)}
           >
             {/* Compass Body */}
-            <motion.div
-              animate={{ rotate: isHovered && !isOpen && !isMobile ? [0, 5, -5, 0] : 0 }}
-              transition={{ duration: 0.4 }}
-              className="absolute inset-0"
-              style={{ willChange: 'transform' }}
-            >
+            <div className="w-full h-full rounded-full overflow-hidden relative">
               <Image
                 src="/assets/compass-body.png"
-                alt="Compass"
+                alt="Navigation Compass"
                 fill
-                sizes={isOpen ? `${expandedSize}px` : `${compassSize}px`}
-                className="object-contain"
+                className="object-cover"
                 priority
-                quality={90}
               />
-            </motion.div>
 
-            {/* Needle */}
-            <motion.div
-              className="absolute inset-0"
-              style={{
-                // Magnetic tracking: Use direct rotation when pointer/touch is active
-                // Works on both desktop (mouse) and mobile (touch)
-                rotate: mousePosition
-                  ? getActiveNeedleAngle()
-                  : externalHoveredDirection
-                    ? undefined
-                    : !isOpen
-                      ? needleRotation.get()
-                      : undefined,
-                willChange: 'transform'
-              }}
-              animate={{
-                // Only use spring animation for external hover (Split Entry E/W)
-                rotate: externalHoveredDirection && !mousePosition
-                  ? getActiveNeedleAngle()
-                  : undefined
-              }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            >
+              {/* Needle */}
               <motion.div
-                className="relative w-full h-full"
+                className="absolute inset-0 flex items-center justify-center"
                 style={{
-                  // Remove offset when using magnetic tracking (works on desktop and mobile)
-                  transform: mousePosition
-                    ? 'rotate(0deg)'
-                    : `rotate(-${needleBaseOffset}deg)`,
-                  willChange: 'transform'
+                  rotate: isOpen || mousePosition || externalHoveredDirection
+                    ? getActiveNeedleAngle()
+                    : needleRotation,
                 }}
-                animate={{
-                  rotate: isHovered && !isOpen && !isMobile && !externalHoveredDirection && !mousePosition
-                    ? [0, 15, -15, 0]
-                    : isOpen || externalHoveredDirection || mousePosition
-                      ? 0
-                      : [0, 3, -2, 0]
+                transition={{
+                  type: "spring",
+                  stiffness: 150,
+                  damping: 20,
                 }}
-                transition={
-                  isOpen || externalHoveredDirection || mousePosition
-                    ? { type: 'spring', stiffness: 120, damping: 24 }
-                    : isHovered && !isMobile
-                      ? { duration: 0.5, ease: "easeInOut" }
-                      : { duration: 3, repeat: Infinity, repeatType: "reverse" as const, ease: "easeInOut" }
-                }
               >
                 <Image
                   src="/assets/compass-needle.png"
                   alt="Compass Needle"
                   fill
-                  sizes={isOpen ? `${expandedSize}px` : `${compassSize}px`}
                   className="object-contain"
-                  priority
-                  quality={90}
                 />
               </motion.div>
-            </motion.div>
+
+              {/* Glass Glare Overlay */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,_rgba(255,255,255,0.15)_0%,_transparent_60%)] pointer-events-none" />
+            </div>
           </motion.button>
 
-          {/* Hint text - only in center mode when not open */}
+          {/* Hint Text (Center position only) */}
           {position === 'center' && showHint && !isOpen && (
             <motion.p
-              initial={{ opacity: 0, y: 5 }}
-              animate={{
-                opacity: externalHoveredDirection ? 0 : 0.6,
-                y: 0
-              }}
-              className="font-mono text-[10px] uppercase tracking-[0.3em] text-theme-gold mt-4 whitespace-nowrap"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              className="mt-4 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-theme-charcoal whitespace-nowrap"
             >
-              {isMobile ? 'Tap to navigate' : 'Hover to explore'}
+              Navigate by compass
             </motion.p>
           )}
         </div>

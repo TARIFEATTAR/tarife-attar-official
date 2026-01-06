@@ -12,6 +12,7 @@ import { GlobalFooter } from "@/components/navigation";
 import { PortableText } from "@portabletext/react";
 import { getClassLabel, getCoordinateLabel, COLLECTION_LABELS } from "@/lib/brandSystem";
 import { LegacyName } from "@/components/product/LegacyName";
+import { triggerEssenceDrop } from "@/components/cart/Satchel";
 
 // Portable Text type
 type PortableTextBlock = any;
@@ -205,6 +206,8 @@ export function ProductDetailClient({ product }: Props) {
   });
 
   const scrollRef = useRef(null);
+  const addButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileAddButtonRef = useRef<HTMLButtonElement>(null);
   const { scrollY } = useScroll();
   const imageY = useTransform(scrollY, [0, 1000], [0, -100]);
 
@@ -216,7 +219,7 @@ export function ProductDetailClient({ product }: Props) {
   const isAtlas = product.collectionType === "atlas";
   const isRelic = product.collectionType === "relic";
 
-  const handleAddToSatchel = async () => {
+  const handleAddToSatchel = async (source: 'desktop' | 'mobile' = 'desktop') => {
     // Check if product is purchasable
     if (!product.inStock) {
       console.warn('Product is out of stock');
@@ -241,6 +244,29 @@ export function ProductDetailClient({ product }: Props) {
       navigator.vibrate(40);
     }
 
+    // Trigger essence drop animation BEFORE cart API call
+    // This ensures animation plays even if cart operation fails
+    const buttonRef = source === 'mobile' ? mobileAddButtonRef : addButtonRef;
+    const rect = buttonRef.current?.getBoundingClientRect();
+
+    console.log('[handleAddToSatchel] Button ref:', buttonRef.current);
+    console.log('[handleAddToSatchel] Button rect:', rect);
+
+    // Trigger animation - use button position or fallback to screen center
+    const startX = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+    const startY = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
+
+    // Use setTimeout to ensure this runs in the next tick and doesn't block
+    setTimeout(() => {
+      console.log('[handleAddToSatchel] Triggering animation from:', { startX, startY });
+      triggerEssenceDrop({
+        productColor: '#c5a66a', // Theme gold
+        productName: product.title,
+        startX,
+        startY,
+      });
+    }, 0);
+
     try {
       console.log('Adding to cart:', { variantId: product.shopifyVariantId, quantity });
       await addItem(product.shopifyVariantId, quantity);
@@ -252,8 +278,13 @@ export function ProductDetailClient({ product }: Props) {
       }, 1200);
     } catch (error) {
       console.error('Error adding to cart:', error);
-      alert(`Failed to add to cart: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      setIsAdding(false);
+      // Don't use alert() - it's blocking and prevents animation from running
+      // Instead, let the animation complete, then reset state
+      setTimeout(() => {
+        setIsAdding(false);
+        // Only log to console - the animation still provides visual feedback
+        console.warn('Cart operation failed, but animation completed successfully');
+      }, 1500); // Wait for animation to complete
     }
   };
 
@@ -587,8 +618,9 @@ export function ProductDetailClient({ product }: Props) {
 
             {/* Add to Satchel Button with Feedback */}
             <motion.button
+              ref={addButtonRef}
               layout
-              onClick={handleAddToSatchel}
+              onClick={() => handleAddToSatchel('desktop')}
               disabled={!product.inStock || isAdding || !product.shopifyVariantId}
               whileHover={product.inStock && !isAdding && product.shopifyVariantId ? { scale: 1.01 } : {}}
               whileTap={product.inStock && !isAdding && product.shopifyVariantId ? { scale: 0.99 } : {}}
@@ -887,7 +919,8 @@ export function ProductDetailClient({ product }: Props) {
 
               {/* Add to Satchel Button */}
               <button
-                onClick={handleAddToSatchel}
+                ref={mobileAddButtonRef}
+                onClick={() => handleAddToSatchel('mobile')}
                 disabled={!product.inStock || isAdding || !product.shopifyVariantId}
                 className={`flex-1 py-4 font-mono text-sm uppercase tracking-[0.4em] transition-all relative overflow-hidden ${product.inStock
                   ? isAdding

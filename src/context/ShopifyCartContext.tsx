@@ -1,12 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { 
-  shopifyFetch, 
-  CREATE_CART_MUTATION, 
-  GET_CART_QUERY, 
-  ADD_LINES_MUTATION, 
-  UPDATE_LINES_MUTATION, 
+import {
+  shopifyFetch,
+  CREATE_CART_MUTATION,
+  GET_CART_QUERY,
+  ADD_LINES_MUTATION,
+  UPDATE_LINES_MUTATION,
   REMOVE_LINES_MUTATION,
   formatVariantId
 } from '@/lib/shopify';
@@ -47,13 +47,13 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
       setIsLoading(true);
       try {
         const cartId = localStorage.getItem('shopify_cart_id');
-        
+
         if (cartId) {
           const response = await shopifyFetch({
             query: GET_CART_QUERY,
             variables: { cartId }
           });
-          
+
           if (response.data?.cart) {
             setCart(response.data.cart);
           } else {
@@ -81,26 +81,29 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
         query: CREATE_CART_MUTATION,
         variables: { input: {} }
       });
-      
+
       const newCart = response.data?.cartCreate?.cart;
       if (newCart) {
         setCart(newCart);
         localStorage.setItem('shopify_cart_id', newCart.id);
+        return newCart;
       }
     } catch (err) {
       console.error('Error creating cart:', err);
     }
+    return null;
   };
 
   const addItem = async (variantId: string, quantity: number) => {
     setIsLoading(true);
     setError(null);
-    
+
     let currentCart = cart;
     if (!currentCart) {
       console.log('No cart available. Creating new cart...');
-      await createNewCart();
-      currentCart = cart;
+      // Await the creation and use the RETURNED value, not the state
+      currentCart = await createNewCart();
+
       if (!currentCart) {
         const errorMsg = 'Failed to create cart. Please check your Shopify configuration.';
         setError(errorMsg);
@@ -112,7 +115,7 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
     try {
       const formattedVariantId = formatVariantId(variantId);
       console.log('Adding item to cart:', { variantId, formattedVariantId, quantity, cartId: currentCart.id });
-      
+
       const response = await shopifyFetch({
         query: ADD_LINES_MUTATION,
         variables: {
@@ -123,14 +126,14 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
           }]
         }
       });
-      
+
       console.log('Shopify response:', response);
-      
+
       if (response.errors) {
         console.error('Shopify GraphQL errors:', response.errors);
         throw new Error(response.errors[0]?.message || 'Failed to add item to cart');
       }
-      
+
       if (response.data?.cartLinesAdd?.cart) {
         setCart(response.data.cartLinesAdd.cart);
         console.log('Successfully added item to cart');
@@ -162,7 +165,7 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
           lines: [{ id: lineId, quantity }]
         }
       });
-      
+
       if (response.data?.cartLinesUpdate?.cart) {
         setCart(response.data.cartLinesUpdate.cart);
       }
@@ -183,7 +186,7 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
           lineIds: [lineId]
         }
       });
-      
+
       if (response.data?.cartLinesRemove?.cart) {
         setCart(response.data.cartLinesRemove.cart);
       }
