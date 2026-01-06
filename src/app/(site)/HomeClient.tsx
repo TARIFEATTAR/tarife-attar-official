@@ -88,10 +88,11 @@ export function HomeClient({ featuredProducts }: HomeClientProps) {
                                     <div className="relative w-full aspect-[4/5] bg-[#F8F7F2] overflow-hidden shadow-sm border border-theme-charcoal/5">
                                         {(() => {
                                             const displayImage = product.atlasImage || product.relicImage || product.mainImage;
-                                            if (displayImage) {
+                                            const imageUrl = displayImage ? urlForImage(displayImage)?.width(800)?.height(1000)?.url() : null;
+                                            if (imageUrl) {
                                                 return (
                                                     <Image
-                                                        src={urlForImage(displayImage).width(800).height(1000).url()}
+                                                        src={imageUrl}
                                                         alt={product.title}
                                                         fill
                                                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"

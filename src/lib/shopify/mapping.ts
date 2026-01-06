@@ -23,6 +23,6 @@ export function extractId(gid: string): string {
 /**
  * Type guard for checking if a product is purchasable (has Shopify data)
  */
-export function isPurchasable(product: any): boolean {
+export function isPurchasable(product: { shopifyHandle?: string; shopifyVariantId?: string }): boolean {
   return !!(product.shopifyHandle || product.shopifyVariantId);
 }
