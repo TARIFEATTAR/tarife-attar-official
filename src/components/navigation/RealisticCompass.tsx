@@ -242,7 +242,7 @@ export const RealisticCompass: React.FC<Props> = ({
   const heartbeatTransition = isIdle && !hasInteracted && !isOpen ? {
     duration: 2,
     repeat: Infinity,
-    ease: "easeInOut",
+    ease: "easeInOut" as const,
   } : {};
 
   return (
