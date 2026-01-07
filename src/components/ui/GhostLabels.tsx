@@ -10,31 +10,37 @@ interface GhostLabelsProps {
   compassPosition?: 'corner' | 'center';
   /** Whether to show the satchel label */
   showSatchelLabel?: boolean;
+  /** Whether to show the curator label */
+  showCuratorLabel?: boolean;
   /** Callback when labels are dismissed */
   onDismiss?: () => void;
 }
 
 const STORAGE_KEY = 'tarife-ghost-labels-dismissed';
+const CURATOR_STORAGE_KEY = 'tarife-curator-hint-dismissed';
 
 /**
  * GhostLabels - First-Visit Navigation Hints
  * 
- * Displays semi-transparent labels next to the Compass and Satchel
- * icons to help first-time visitors understand the navigation.
+ * Displays semi-transparent labels next to the Compass, Satchel,
+ * and Curator button to help first-time visitors understand the navigation.
  * 
  * Behavior:
  * - Shows for first 5 seconds OR until user scrolls (whichever comes first)
  * - Never shows again once dismissed (persisted to localStorage)
  * - Fades out gracefully
+ * - "ASK THE CURATOR" label has special idle behavior (pulses after 3s)
  */
 export const GhostLabels: React.FC<GhostLabelsProps> = ({
   show: showProp,
   compassPosition = 'corner',
   showSatchelLabel = true,
+  showCuratorLabel = false,
   onDismiss,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [hasBeenDismissed, setHasBeenDismissed] = useState(true); // Default to true, check localStorage
+  const [showCuratorPulse, setShowCuratorPulse] = useState(false);
 
   // Check if labels have been dismissed before
   useEffect(() => {
@@ -81,6 +87,51 @@ export const GhostLabels: React.FC<GhostLabelsProps> = ({
       window.removeEventListener('scroll', handleScroll);
     };
   }, [isVisible]);
+
+  // Curator pulse after idle (3 seconds of no interaction)
+  useEffect(() => {
+    if (!showCuratorLabel) return;
+    
+    const curatorDismissed = localStorage.getItem(CURATOR_STORAGE_KEY);
+    if (curatorDismissed) return;
+
+    let idleTimer: NodeJS.Timeout;
+    let pulseInterval: NodeJS.Timeout;
+
+    const startIdleTimer = () => {
+      clearTimeout(idleTimer);
+      clearInterval(pulseInterval);
+      setShowCuratorPulse(false);
+      
+      idleTimer = setTimeout(() => {
+        setShowCuratorPulse(true);
+        // Pulse every 8 seconds
+        pulseInterval = setInterval(() => {
+          setShowCuratorPulse(prev => !prev);
+        }, 4000);
+      }, 3000);
+    };
+
+    const resetTimer = () => {
+      startIdleTimer();
+    };
+
+    // Start the idle timer
+    startIdleTimer();
+
+    // Reset on any interaction
+    window.addEventListener('mousemove', resetTimer, { passive: true });
+    window.addEventListener('touchstart', resetTimer, { passive: true });
+    window.addEventListener('scroll', resetTimer, { passive: true });
+
+    return () => {
+      clearTimeout(idleTimer);
+      clearInterval(pulseInterval);
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('touchstart', resetTimer);
+      window.removeEventListener('scroll', resetTimer);
+    };
+  }, [showCuratorLabel]);
 
   const dismissLabels = () => {
     setIsVisible(false);
@@ -161,6 +212,46 @@ export const GhostLabels: React.FC<GhostLabelsProps> = ({
           )}
         </>
       )}
+
+      {/* ASK THE CURATOR Label - Special idle behavior */}
+      {showCuratorLabel && showCuratorPulse && (
+        <motion.div
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 5 }}
+          transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
+          className="fixed z-[2997] pointer-events-none bottom-[120px] right-6 md:bottom-[110px]"
+        >
+          <motion.div
+            animate={{ 
+              opacity: [0.6, 1, 0.6],
+              scale: [1, 1.02, 1],
+            }}
+            transition={{ 
+              duration: 2, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
+            className="flex items-center gap-2 bg-theme-alabaster/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm"
+          >
+            <motion.div
+              animate={{ 
+                scale: [1, 1.3, 1],
+                opacity: [0.5, 1, 0.5],
+              }}
+              transition={{ 
+                duration: 1.5, 
+                repeat: Infinity, 
+                ease: "easeInOut" 
+              }}
+              className="w-1.5 h-1.5 rounded-full bg-theme-gold"
+            />
+            <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-theme-charcoal/60 whitespace-nowrap">
+              Ask the Curator
+            </span>
+          </motion.div>
+        </motion.div>
+      )}
     </AnimatePresence>
   );
 };
@@ -192,6 +283,7 @@ export function useGhostLabels() {
     // For testing purposes - allows re-showing the labels
     if (typeof window !== 'undefined') {
       localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(CURATOR_STORAGE_KEY);
       setShouldShow(true);
     }
   };

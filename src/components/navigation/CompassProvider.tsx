@@ -2,10 +2,11 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { RealisticCompass } from './RealisticCompass';
+import { CompassCurator } from './CompassCurator';
 import { CustomCursor } from '@/components/ui/CustomCursor';
 import { GhostLabels } from '@/components/ui/GhostLabels';
 import { Satchel } from '@/components/cart/Satchel';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 interface CompassProviderProps {
@@ -17,8 +18,9 @@ interface CompassProviderProps {
  * 
  * Manages the compass position across pages and integrates:
  * - RealisticCompass (bottom-right navigation)
+ * - CompassCurator (AI chat interface)
  * - Satchel (bottom-left cart)
- * - GhostLabels (first-visit hints)
+ * - GhostLabels (first-visit hints including "Ask the Curator")
  * - CustomCursor (branded cursor)
  * 
  * Architecture:
@@ -29,6 +31,7 @@ interface CompassProviderProps {
  * - On Homepage: Centered compass scrolls away. Global corner compass FADES IN when scrolling.
  * - On Other Pages: Corner compass always visible
  * - Ghost labels appear on first visit, fade after 5s or on scroll
+ * - Long-press or dedicated button opens The Curator (AI chat)
  */
 export function CompassProvider({ children }: CompassProviderProps) {
   const pathname = usePathname();
@@ -36,6 +39,8 @@ export function CompassProvider({ children }: CompassProviderProps) {
   const [showCornerCompass, setShowCornerCompass] = useState(false);
   const [showGhostLabels, setShowGhostLabels] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<'atlas' | 'relic'>('atlas');
+  const [curatorOpen, setCuratorOpen] = useState(false);
+  const [compassPosition, setCompassPosition] = useState({ x: 0, y: 0 });
 
   // Page detection
   const isSplitEntryPage = pathname === '/';
@@ -43,15 +48,20 @@ export function CompassProvider({ children }: CompassProviderProps) {
   const isRelicPage = pathname?.startsWith('/relic');
   const isCartPage = pathname === '/cart';
 
-  // Check for Studio routes
-  const isStudioPage =
-    typeof window !== 'undefined' && (
-      pathname?.startsWith('/studio') ||
-      pathname?.includes('/studio') ||
-      window.location.pathname?.startsWith('/studio') ||
-      window.location.pathname?.includes('/studio') ||
-      document.querySelector('[data-sanity]') !== null
-    );
+  // Check for Studio routes - must be done carefully to avoid SSR issues
+  const [isStudioPage, setIsStudioPage] = useState(false);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isStudio = 
+        pathname?.startsWith('/studio') ||
+        pathname?.includes('/studio') ||
+        window.location.pathname?.startsWith('/studio') ||
+        window.location.pathname?.includes('/studio') ||
+        document.querySelector('[data-sanity]') !== null;
+      setIsStudioPage(isStudio);
+    }
+  }, [pathname]);
 
   // Update theme based on current page
   useEffect(() => {
@@ -99,7 +109,23 @@ export function CompassProvider({ children }: CompassProviderProps) {
     }
   }, [showCornerCompass, isSplitEntryPage]);
 
-  const handleNavigate = (path: string) => {
+  // Track compass position for Curator morphing
+  useEffect(() => {
+    const updateCompassPosition = () => {
+      if (typeof window !== 'undefined') {
+        // Bottom-right corner position
+        const x = window.innerWidth - 80;
+        const y = window.innerHeight - 80;
+        setCompassPosition({ x, y });
+      }
+    };
+    
+    updateCompassPosition();
+    window.addEventListener('resize', updateCompassPosition);
+    return () => window.removeEventListener('resize', updateCompassPosition);
+  }, []);
+
+  const handleNavigate = useCallback((path: string) => {
     const routes: Record<string, string> = {
       'home': '/',
       'atlas': '/atlas',
@@ -108,7 +134,15 @@ export function CompassProvider({ children }: CompassProviderProps) {
       'threshold': '/',
     };
     router.push(routes[path] || `/${path}`);
-  };
+  }, [router]);
+
+  const handleOpenCurator = useCallback(() => {
+    setCuratorOpen(true);
+  }, []);
+
+  const handleCloseCurator = useCallback(() => {
+    setCuratorOpen(false);
+  }, []);
 
   // Early return for Studio pages
   if (isStudioPage) {
@@ -120,11 +154,12 @@ export function CompassProvider({ children }: CompassProviderProps) {
       <CustomCursor />
       {children}
 
-      {/* Ghost Labels (First-visit navigation hints) */}
+      {/* Ghost Labels (First-visit navigation hints + "Ask the Curator") */}
       <GhostLabels 
         show={showGhostLabels} 
         compassPosition="corner"
         showSatchelLabel={!isCartPage}
+        showCuratorLabel={true}
         onDismiss={() => setShowGhostLabels(false)}
       />
 
@@ -135,7 +170,7 @@ export function CompassProvider({ children }: CompassProviderProps) {
 
       {/* Corner Compass with fade transition */}
       <AnimatePresence>
-        {showCornerCompass && (
+        {showCornerCompass && !curatorOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -151,6 +186,39 @@ export function CompassProvider({ children }: CompassProviderProps) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Curator Trigger Button - Visible when Compass is shown */}
+      <AnimatePresence>
+        {showCornerCompass && !curatorOpen && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+            onClick={handleOpenCurator}
+            className="fixed bottom-28 right-6 md:bottom-24 md:right-6 z-[2998]
+                       bg-theme-alabaster/90 backdrop-blur-sm
+                       px-3 py-1.5 rounded-full
+                       shadow-lg shadow-theme-charcoal/10
+                       border border-theme-charcoal/10
+                       hover:bg-theme-alabaster hover:border-theme-gold/30
+                       transition-all duration-300
+                       group"
+            aria-label="Ask the Curator"
+          >
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-theme-charcoal/60 group-hover:text-theme-gold transition-colors">
+              Ask Tori
+            </span>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* The Curator - AI Chat Interface */}
+      <CompassCurator
+        isOpen={curatorOpen}
+        onClose={handleCloseCurator}
+        compassPosition={compassPosition}
+      />
     </>
   );
 }
