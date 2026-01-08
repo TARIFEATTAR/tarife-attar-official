@@ -187,26 +187,27 @@ export function CompassProvider({ children }: CompassProviderProps) {
         )}
       </AnimatePresence>
 
-      {/* Curator Trigger Button - Visible when Compass is shown */}
+      {/* Curator Trigger Button - Positioned to the LEFT of the compass */}
       <AnimatePresence>
         {showCornerCompass && !curatorOpen && (
           <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 10 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
             onClick={handleOpenCurator}
-            className="fixed bottom-28 right-6 md:bottom-24 md:right-6 z-[2998]
-                       bg-theme-alabaster/90 backdrop-blur-sm
-                       px-3 py-1.5 rounded-full
+            className="fixed bottom-6 right-24 md:right-28 z-[3000]
+                       bg-theme-alabaster/95 backdrop-blur-sm
+                       px-4 py-2 rounded-full
                        shadow-lg shadow-theme-charcoal/10
                        border border-theme-charcoal/10
-                       hover:bg-theme-alabaster hover:border-theme-gold/30
+                       hover:bg-theme-alabaster hover:border-theme-gold/40
+                       hover:shadow-xl
                        transition-all duration-300
-                       group"
+                       group cursor-pointer"
             aria-label="Ask the Curator"
           >
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-theme-charcoal/60 group-hover:text-theme-gold transition-colors">
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-theme-charcoal/70 group-hover:text-theme-gold transition-colors">
               Ask Tori
             </span>
           </motion.button>
