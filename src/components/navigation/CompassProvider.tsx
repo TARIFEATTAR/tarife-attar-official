@@ -205,10 +205,10 @@ export function CompassProvider({ children }: CompassProviderProps) {
                        hover:shadow-xl
                        transition-all duration-300
                        group cursor-pointer"
-            aria-label="Ask the Curator"
+            aria-label="Ask Atlas"
           >
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-theme-charcoal/70 group-hover:text-theme-gold transition-colors">
-              Ask Tori
+              Ask Atlas
             </span>
           </motion.button>
         )}

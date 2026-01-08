@@ -92,7 +92,7 @@ const ChatMessage: React.FC<{ message: UIMessage }> = ({ message }) => {
     >
       {/* Role Label */}
       <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-theme-charcoal/40 mb-1 block">
-        {isUser ? 'You' : 'Tori'}
+        {isUser ? 'You' : 'Atlas'}
       </span>
       
       {/* Message Content */}
@@ -144,7 +144,7 @@ export const CompassCurator: React.FC<CompassCuratorProps> = ({
       setMessages([{
         id: 'welcome',
         role: 'assistant',
-        parts: [{ type: 'text', text: 'Welcome, traveler. I am Tori, curator of this archive. Describe the atmosphere you seek, and I shall guide you to the appropriate territory.' }],
+        parts: [{ type: 'text', text: 'Welcome, traveler. I am your Atlas — a guide through the territories of scent. Describe the atmosphere you seek, and I shall chart your course.' }],
       }]);
     }
   }, [messages.length, setMessages]);
@@ -270,10 +270,10 @@ export const CompassCurator: React.FC<CompassCuratorProps> = ({
             <div className="flex items-center justify-between px-6 py-4 border-b border-theme-charcoal/10">
               <div>
                 <h2 className="font-mono text-xs uppercase tracking-[0.3em] text-theme-charcoal/60">
-                  The Curator
+                  The Atlas
                 </h2>
                 <p className="font-serif italic text-sm text-theme-charcoal/40 mt-0.5">
-                  Tori
+                  Your Fragrance Guide
                 </p>
               </div>
               
@@ -353,7 +353,7 @@ export const CompassCurator: React.FC<CompassCuratorProps> = ({
               {/* Submit Hint */}
               <div className="flex items-center justify-between mt-3">
                 <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-theme-charcoal/30">
-                  Press Enter to ask Tori
+                  Press Enter to explore
                 </span>
                 
                 <motion.button

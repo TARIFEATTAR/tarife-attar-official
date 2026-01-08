@@ -247,7 +247,7 @@ export const GhostLabels: React.FC<GhostLabelsProps> = ({
               className="w-1.5 h-1.5 rounded-full bg-theme-gold"
             />
             <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-theme-charcoal/60 whitespace-nowrap">
-              Ask the Curator
+              Ask Atlas
             </span>
           </motion.div>
         </motion.div>
