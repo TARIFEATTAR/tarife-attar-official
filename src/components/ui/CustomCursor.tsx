@@ -55,11 +55,11 @@ export const CustomCursor = () => {
 
         try {
             mediaQuery.addEventListener("change", handleChange);
-        } catch (e) {
+        } catch (_e) {
             // Safari < 14 support
             try {
                 mediaQuery.addListener(handleChange);
-            } catch (e2) {
+            } catch (_e2) {
                 console.warn("Media query listener not supported");
             }
         }
@@ -67,10 +67,10 @@ export const CustomCursor = () => {
         return () => {
             try {
                 mediaQuery.removeEventListener("change", handleChange);
-            } catch (e) {
+            } catch (_e) {
                 try {
                     mediaQuery.removeListener(handleChange);
-                } catch (e2) { }
+                } catch (_e2) { }
             }
         };
     }, []);

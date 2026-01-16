@@ -57,7 +57,6 @@ export const EssenceDrop: React.FC<EssenceDropProps> = ({
   // Calculate the parabolic path - memoized to prevent recalculation every render
   const path = useMemo(() => {
     const dx = endPosition.x - startPosition.x;
-    const dy = endPosition.y - startPosition.y;
 
     // Control point for the bezier curve (creates the arc)
     // We want it to arc upward first, then down - like a thrown object
@@ -75,7 +74,7 @@ export const EssenceDrop: React.FC<EssenceDropProps> = ({
       control: { x: controlX, y: controlY },
       end: endPosition,
     };
-  }, [startPosition.x, startPosition.y, endPosition.x, endPosition.y]);
+  }, [startPosition, endPosition]);
 
   // Animation duration based on distance (600-800ms as specified)
   const distance = Math.sqrt(

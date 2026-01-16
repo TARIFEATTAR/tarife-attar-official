@@ -169,7 +169,7 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
       if (response.data?.cartLinesUpdate?.cart) {
         setCart(response.data.cartLinesUpdate.cart);
       }
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to update quantity');
     } finally {
       setIsLoading(false);
@@ -190,7 +190,7 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
       if (response.data?.cartLinesRemove?.cart) {
         setCart(response.data.cartLinesRemove.cart);
       }
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to remove item');
     } finally {
       setIsLoading(false);
@@ -208,6 +208,7 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
   };
 
   // Map Shopify response to clean state
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const items: CartItem[] = cart?.lines?.edges?.map(({ node }: any) => ({
     id: node.id,
     variantId: node.merchandise.id,

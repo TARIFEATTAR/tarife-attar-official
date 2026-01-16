@@ -45,18 +45,17 @@ export function useDeviceTier(): DeviceTierResult {
 
     const detectTier = async () => {
       let score = 0;
-      const maxScore = 5;
 
       // 1. Check GPU renderer (most reliable signal)
       try {
         const canvas = document.createElement('canvas');
         const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        
+
         if (gl && gl instanceof WebGLRenderingContext) {
           const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
           if (debugInfo) {
             const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL).toLowerCase();
-            
+
             // High-performance GPUs
             if (
               renderer.includes('nvidia') ||
@@ -85,7 +84,7 @@ export function useDeviceTier(): DeviceTierResult {
             }
           }
         }
-      } catch (e) {
+      } catch (_e) {
         // WebGL not available
         score -= 2;
       }
@@ -113,7 +112,7 @@ export function useDeviceTier(): DeviceTierResult {
             setIsLowPower(true);
           }
         }
-      } catch (e) {
+      } catch (_e) {
         // Battery API not available
       }
 

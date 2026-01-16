@@ -44,16 +44,15 @@ export function CompassProvider({ children }: CompassProviderProps) {
 
   // Page detection
   const isSplitEntryPage = pathname === '/';
-  const isAtlasPage = pathname?.startsWith('/atlas') || pathname?.startsWith('/product');
   const isRelicPage = pathname?.startsWith('/relic');
   const isCartPage = pathname === '/cart';
 
   // Check for Studio routes - must be done carefully to avoid SSR issues
   const [isStudioPage, setIsStudioPage] = useState(false);
-  
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const isStudio = 
+      const isStudio =
         pathname?.startsWith('/studio') ||
         pathname?.includes('/studio') ||
         window.location.pathname?.startsWith('/studio') ||
@@ -119,7 +118,7 @@ export function CompassProvider({ children }: CompassProviderProps) {
         setCompassPosition({ x, y });
       }
     };
-    
+
     updateCompassPosition();
     window.addEventListener('resize', updateCompassPosition);
     return () => window.removeEventListener('resize', updateCompassPosition);
@@ -155,11 +154,11 @@ export function CompassProvider({ children }: CompassProviderProps) {
       {children}
 
       {/* Ghost Labels (First-visit navigation hints + "Ask the Curator") */}
-      <GhostLabels 
-        show={showGhostLabels} 
+      <GhostLabels
+        show={showGhostLabels}
         compassPosition="corner"
         showSatchelLabel={!isCartPage}
-        showCuratorLabel={true}
+        showCuratorLabel={false}
         onDismiss={() => setShowGhostLabels(false)}
       />
 
@@ -188,6 +187,8 @@ export function CompassProvider({ children }: CompassProviderProps) {
       </AnimatePresence>
 
       {/* Curator Trigger Button - Positioned to the LEFT of the compass */}
+      {/* Curator Trigger Button - REMOVED per user request */}
+      {/* 
       <AnimatePresence>
         {showCornerCompass && !curatorOpen && (
           <motion.button
@@ -213,13 +214,16 @@ export function CompassProvider({ children }: CompassProviderProps) {
           </motion.button>
         )}
       </AnimatePresence>
+      */}
 
-      {/* The Curator - AI Chat Interface */}
+      {/* The Curator - AI Chat Interface - HIDDEN */}
+      {/*
       <CompassCurator
         isOpen={curatorOpen}
         onClose={handleCloseCurator}
         compassPosition={compassPosition}
       />
+      */}
     </>
   );
 }

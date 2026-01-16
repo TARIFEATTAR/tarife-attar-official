@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface GhostLabelsProps {
@@ -45,10 +45,10 @@ export const GhostLabels: React.FC<GhostLabelsProps> = ({
   // Check if labels have been dismissed before
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     const dismissed = localStorage.getItem(STORAGE_KEY);
     setHasBeenDismissed(!!dismissed);
-    
+
     // If not dismissed and no external control, show labels
     if (!dismissed && showProp === undefined) {
       setIsVisible(true);
@@ -62,6 +62,18 @@ export const GhostLabels: React.FC<GhostLabelsProps> = ({
     }
   }, [showProp, hasBeenDismissed]);
 
+  // Dismiss labels function - wrapped in useCallback for stable reference
+  const dismissLabels = useCallback(() => {
+    setIsVisible(false);
+    setHasBeenDismissed(true);
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, 'true');
+    }
+
+    onDismiss?.();
+  }, [onDismiss]);
+
   // Auto-dismiss after 5 seconds
   useEffect(() => {
     if (!isVisible) return;
@@ -71,7 +83,7 @@ export const GhostLabels: React.FC<GhostLabelsProps> = ({
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, [isVisible]);
+  }, [isVisible, dismissLabels]);
 
   // Dismiss on scroll
   useEffect(() => {
@@ -82,16 +94,16 @@ export const GhostLabels: React.FC<GhostLabelsProps> = ({
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true, once: true });
-    
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [isVisible]);
+  }, [isVisible, dismissLabels]);
 
   // Curator pulse after idle (3 seconds of no interaction)
   useEffect(() => {
     if (!showCuratorLabel) return;
-    
+
     const curatorDismissed = localStorage.getItem(CURATOR_STORAGE_KEY);
     if (curatorDismissed) return;
 
@@ -102,7 +114,7 @@ export const GhostLabels: React.FC<GhostLabelsProps> = ({
       clearTimeout(idleTimer);
       clearInterval(pulseInterval);
       setShowCuratorPulse(false);
-      
+
       idleTimer = setTimeout(() => {
         setShowCuratorPulse(true);
         // Pulse every 8 seconds
@@ -133,16 +145,7 @@ export const GhostLabels: React.FC<GhostLabelsProps> = ({
     };
   }, [showCuratorLabel]);
 
-  const dismissLabels = () => {
-    setIsVisible(false);
-    setHasBeenDismissed(true);
-    
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, 'true');
-    }
-    
-    onDismiss?.();
-  };
+
 
   // Don't render if already dismissed
   if (hasBeenDismissed && showProp === undefined) {
@@ -159,11 +162,10 @@ export const GhostLabels: React.FC<GhostLabelsProps> = ({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 10 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className={`fixed z-[2997] pointer-events-none ${
-              compassPosition === 'corner'
+            className={`fixed z-[2997] pointer-events-none ${compassPosition === 'corner'
                 ? 'bottom-6 right-24 md:right-28'
                 : 'bottom-20 left-1/2 -translate-x-1/2'
-            }`}
+              }`}
           >
             <div className="flex items-center gap-2">
               <span className="font-mono text-[10px] md:text-xs uppercase tracking-[0.3em] text-theme-charcoal/40 whitespace-nowrap">
@@ -171,10 +173,10 @@ export const GhostLabels: React.FC<GhostLabelsProps> = ({
               </span>
               <motion.div
                 animate={{ x: [0, 4, 0] }}
-                transition={{ 
-                  duration: 1.5, 
-                  repeat: Infinity, 
-                  ease: "easeInOut" 
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut"
                 }}
                 className="text-theme-charcoal/30"
               >
@@ -195,10 +197,10 @@ export const GhostLabels: React.FC<GhostLabelsProps> = ({
               <div className="flex items-center gap-2">
                 <motion.div
                   animate={{ x: [0, -4, 0] }}
-                  transition={{ 
-                    duration: 1.5, 
-                    repeat: Infinity, 
-                    ease: "easeInOut" 
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeInOut"
                   }}
                   className="text-theme-charcoal/30"
                 >
@@ -223,26 +225,26 @@ export const GhostLabels: React.FC<GhostLabelsProps> = ({
           className="fixed z-[2997] pointer-events-none bottom-[120px] right-6 md:bottom-[110px]"
         >
           <motion.div
-            animate={{ 
+            animate={{
               opacity: [0.6, 1, 0.6],
               scale: [1, 1.02, 1],
             }}
-            transition={{ 
-              duration: 2, 
-              repeat: Infinity, 
-              ease: "easeInOut" 
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
             }}
             className="flex items-center gap-2 bg-theme-alabaster/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm"
           >
             <motion.div
-              animate={{ 
+              animate={{
                 scale: [1, 1.3, 1],
                 opacity: [0.5, 1, 0.5],
               }}
-              transition={{ 
-                duration: 1.5, 
-                repeat: Infinity, 
-                ease: "easeInOut" 
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut"
               }}
               className="w-1.5 h-1.5 rounded-full bg-theme-gold"
             />
@@ -265,7 +267,7 @@ export function useGhostLabels() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     const dismissed = localStorage.getItem(STORAGE_KEY);
     if (!dismissed) {
       setShouldShow(true);
