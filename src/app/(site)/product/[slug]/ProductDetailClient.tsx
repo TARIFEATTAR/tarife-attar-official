@@ -31,10 +31,14 @@ interface Product {
   volume?: string;
   productFormat?: string;
   mainImage?: any;
+  shopifyPreviewImageUrl?: string;
+  shopifyImage?: string;
   gallery?: Array<{ _key: string; asset: any }>;
   inStock?: boolean;
   shopifyHandle?: string;
   shopifyVariantId?: string;
+  shopifyVariant6mlId?: string;
+  shopifyVariant12mlId?: string;
   shopifyProductId?: string;
   scarcityNote?: string;
   relatedProducts?: Array<{
@@ -283,11 +287,17 @@ export function ProductDetailClient({ product }: Props) {
   const { scrollY } = useScroll();
   const imageY = useTransform(scrollY, [0, 1000], [0, -100]);
 
+  // Get Shopify image URL as fallback
+  const shopifyImageUrl = product.shopifyPreviewImageUrl || product.shopifyImage;
+  
   const allImages = product.mainImage
     ? [product.mainImage, ...(product.gallery || [])]
     : product.gallery || [];
 
-  const mainImageUrl = urlForImage(allImages[selectedImage] || product.mainImage);
+  // Use Sanity image if available, otherwise fall back to Shopify image
+  const mainImageUrl = allImages.length > 0 
+    ? urlForImage(allImages[selectedImage] || product.mainImage)
+    : null;
   const isAtlas = product.collectionType === "atlas";
   const isRelic = product.collectionType === "relic";
 
@@ -303,9 +313,22 @@ export function ProductDetailClient({ product }: Props) {
       return;
     }
 
-    if (!product.shopifyVariantId) {
-      console.error('Product missing Shopify Variant ID. Please add shopifyVariantId in Sanity Studio.');
-      alert('This product is not yet connected to Shopify. Please contact support or check Sanity Studio.');
+    // Determine which variant ID to use based on selection
+    // For Atlas products with variant selection, use the specific variant ID
+    // For Relic or single-variant products, use the default shopifyVariantId
+    let variantIdToAdd = product.shopifyVariantId;
+    
+    if (isAtlas && selectedVariant) {
+      if (selectedVariant === '6ml' && product.shopifyVariant6mlId) {
+        variantIdToAdd = product.shopifyVariant6mlId;
+      } else if (selectedVariant === '12ml' && product.shopifyVariant12mlId) {
+        variantIdToAdd = product.shopifyVariant12mlId;
+      }
+    }
+
+    if (!variantIdToAdd) {
+      console.error('Product missing Shopify Variant ID. Please add variant IDs in Sanity Studio.');
+      alert('This product is not yet connected to Shopify. Please contact support.');
       return;
     }
 
@@ -333,15 +356,15 @@ export function ProductDetailClient({ product }: Props) {
       console.log('[handleAddToSatchel] Triggering animation from:', { startX, startY });
       triggerEssenceDrop({
         productColor: '#c5a66a', // Theme gold
-        productName: product.title,
+        productName: `${product.title} (${selectedVariant})`,
         startX,
         startY,
       });
     }, 0);
 
     try {
-      console.log('Adding to cart:', { variantId: product.shopifyVariantId, quantity });
-      await addItem(product.shopifyVariantId, quantity);
+      console.log('Adding to cart:', { variantId: variantIdToAdd, selectedVariant, quantity });
+      await addItem(variantIdToAdd, quantity);
       console.log('Successfully added to cart');
 
       // Success state feedback
@@ -423,6 +446,22 @@ export function ProductDetailClient({ product }: Props) {
                   );
                 } catch (error) {
                   console.warn('Failed to generate main image URL:', error);
+                  // Fall back to Shopify image
+                  if (shopifyImageUrl) {
+                    return (
+                      <motion.div className="w-full h-full relative" style={{ y: imageY }}>
+                        <Image
+                          src={shopifyImageUrl}
+                          alt={product.title}
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                          className="object-cover scale-110 group-hover:scale-[1.12] transition-transform duration-[2s] ease-out"
+                          priority
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-theme-charcoal/5 to-transparent pointer-events-none" />
+                      </motion.div>
+                    );
+                  }
                   return (
                     <div className="w-full h-full flex items-center justify-center">
                       <span className="font-mono text-xs uppercase tracking-widest opacity-20">
@@ -431,7 +470,20 @@ export function ProductDetailClient({ product }: Props) {
                     </div>
                   );
                 }
-              })() : (
+              })() : shopifyImageUrl ? (
+                // No Sanity image, use Shopify image
+                <motion.div className="w-full h-full relative" style={{ y: imageY }}>
+                  <Image
+                    src={shopifyImageUrl}
+                    alt={product.title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover scale-110 group-hover:scale-[1.12] transition-transform duration-[2s] ease-out"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-theme-charcoal/5 to-transparent pointer-events-none" />
+                </motion.div>
+              ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <span className="font-mono text-xs uppercase tracking-widest opacity-20">
                     No Image
@@ -832,8 +884,8 @@ export function ProductDetailClient({ product }: Props) {
               </motion.div>
             )}
 
-            {/* Ethical Scarcity Indicator */}
-            {product.inStock && (
+            {/* Ethical Scarcity Indicator - Only for Relic products or explicit scarcity notes */}
+            {product.inStock && (isRelic || product.scarcityNote) && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.5 }}

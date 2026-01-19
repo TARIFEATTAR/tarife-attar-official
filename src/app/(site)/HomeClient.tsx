@@ -164,45 +164,6 @@ export function HomeClient({ featuredProducts }: HomeClientProps) {
                     </div>
                 </section>
 
-                {/* Brand Ethos Section */}
-                <section className="bg-theme-obsidian text-theme-alabaster py-20 md:py-32 px-4 sm:px-6 md:px-24 overflow-hidden relative">
-                    <div className="max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24 items-center">
-                        <div className="space-y-8 md:space-y-12">
-                            <span className="font-mono text-[10px] uppercase tracking-[0.8em] opacity-30">The Philosophy</span>
-                            <h2 className="text-4xl sm:text-5xl md:text-7xl font-serif italic leading-[1.1] md:leading-[0.9] tracking-tighter">
-                                Scent as <br className="hidden sm:block" /> Destination.
-                            </h2>
-                            <p className="font-serif text-lg sm:text-xl md:text-2xl opacity-50 italic leading-relaxed max-w-xl">
-                                Four territories. Twenty-four coordinates. Clean perfume oils crafted for those who travel by instinct — not itinerary.
-                            </p>
-                            <div className="flex flex-wrap gap-6 font-mono text-[9px] uppercase tracking-widest opacity-30">
-                                <span>Tidal</span>
-                                <span>Ember</span>
-                                <span>Petal</span>
-                                <span>Terra</span>
-                            </div>
-                            <div className="pt-4 md:pt-8">
-                                <button
-                                    onClick={() => handleNavigate('atlas')}
-                                    className="w-full sm:w-auto px-12 py-5 border border-white/20 font-mono text-[10px] uppercase tracking-[0.6em] hover:bg-white hover:text-black transition-all"
-                                >
-                                    Explore the Atlas
-                                </button>
-                            </div>
-                        </div>
-                        <div className="relative aspect-square sm:aspect-video lg:aspect-square grayscale opacity-60 rounded-sm overflow-hidden">
-                            <Image
-                                src="https://images.unsplash.com/photo-1615485290382-441e4d0c9cb5?auto=format&fit=crop&q=80&w=1600"
-                                alt="Laboratory Atmosphere"
-                                fill
-                                sizes="(max-width: 1024px) 100vw, 50vw"
-                                className="object-cover"
-                            />
-                            <div className="absolute inset-0 bg-theme-obsidian/40" />
-                        </div>
-                    </div>
-                </section>
-
                 {/* Global Footer */}
                 <GlobalFooter theme="dark" />
             </div>

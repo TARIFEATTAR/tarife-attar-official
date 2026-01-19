@@ -8,7 +8,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { urlForImage } from "@/sanity/lib/image";
 import { getItemLabel } from "@/lib/brandSystem";
-import { LegacyName } from "@/components/product/LegacyName";
 
 interface RelicProduct {
   _id: string;
@@ -120,27 +119,24 @@ export function RelicClient({ categories, totalCount }: Props) {
                 </p>
               </div>
 
-              {/* Product Grid */}
+              {/* Product Grid - Clean layout matching Atlas but dark */}
               {category.products.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
-                  {category.products.map((product) => {
-                    // Debug: Log product details
-                    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-                      console.log('[RelicClient] Rendering product:', product.title, product.slug?.current);
-                    }
-                    return (
-                      <Link
-                        key={product._id}
-                        href={`/product/${product.slug.current}`}
-                        className="group aspect-[4/5] bg-white/[0.02] border border-white/10 flex flex-col overflow-hidden hover:border-white/20 transition-colors"
-                      >
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[1px] bg-white/[0.08]">
+                  {category.products.map((product) => (
+                    <Link
+                      key={product._id}
+                      href={`/product/${product.slug.current}`}
+                      className="group flex flex-col bg-[#1a1a1a] hover:bg-[#222] transition-colors"
+                    >
+                      {/* Product Image */}
+                      <div className="relative aspect-square">
                         {product.museumExhibit?.exhibitImage || product.mainImage ? (() => {
                           const displayImage = product.museumExhibit?.exhibitImage || product.mainImage;
                           const imageUrl = urlForImage(displayImage);
                           if (!imageUrl) {
                             return (
-                              <div className="w-full h-4/5 bg-white/[0.02] flex items-center justify-center">
-                                <span className="font-mono text-xs uppercase tracking-widest opacity-20">
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="font-mono text-[10px] uppercase tracking-widest opacity-20">
                                   No Image
                                 </span>
                               </div>
@@ -148,102 +144,66 @@ export function RelicClient({ categories, totalCount }: Props) {
                           }
 
                           try {
-                            const imageSrc = imageUrl.width(400).height(500).url();
+                            const imageSrc = imageUrl.width(500).height(500).url();
                             return (
-                              <div className="relative w-full h-4/5 bg-white/[0.02]">
-                                <Image
-                                  src={imageSrc}
-                                  alt={product.title || 'Product image'}
-                                  fill
-                                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                                  className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                                  onError={(e) => {
-                                    // Hide broken images
-                                    const target = e.target as HTMLImageElement;
-                                    target.style.display = 'none';
-                                  }}
-                                />
-                              </div>
+                              <Image
+                                src={imageSrc}
+                                alt={product.title || 'Product image'}
+                                fill
+                                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                                className="object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                }}
+                              />
                             );
                           } catch (error) {
-                            console.warn('Failed to generate image URL for product:', product.title, error);
+                            console.warn('Failed to generate image URL:', product.title, error);
                             return (
-                              <div className="w-full h-4/5 bg-white/[0.02] flex items-center justify-center">
-                                <span className="font-mono text-xs uppercase tracking-widest opacity-20">
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="font-mono text-[10px] uppercase tracking-widest opacity-20">
                                   No Image
                                 </span>
                               </div>
                             );
                           }
                         })() : (
-                          <div className="w-full h-3/4 bg-white/[0.02] flex items-center justify-center">
-                            <span className="font-mono text-xs uppercase tracking-widest opacity-20">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="font-mono text-[10px] uppercase tracking-widest opacity-20">
                               No Image
                             </span>
                           </div>
                         )}
-                        <div className="p-3 md:p-4 flex-1 flex flex-col justify-between min-w-0">
-                          <div className="min-w-0">
-                            <h3 className="font-serif italic text-sm md:text-lg mb-1 group-hover:tracking-tighter transition-all line-clamp-2 leading-tight break-words overflow-hidden">
-                              {product.title}
-                            </h3>
-                            <LegacyName
-                              legacyName={product.legacyName}
-                              showLegacyName={product.showLegacyName}
-                              style={product.legacyNameStyle}
-                              className="text-[10px] md:text-xs opacity-60 mb-1"
-                            />
-                            {product.price && (
-                              <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.1em] md:tracking-widest opacity-80 tabular-nums break-words">
-                                ${product.price}
-                              </p>
-                            )}
-                          </div>
-                          {!product.inStock && (
-                            <span className="font-mono text-[8px] md:text-[10px] uppercase tracking-widest opacity-40 mt-1 md:mt-2 break-words">
-                              Out of Stock
-                            </span>
-                          )}
-                        </div>
-                      </Link>
-                    );
-                  })}
+                      </div>
+                      
+                      {/* Product Info - Minimal like Atlas */}
+                      <div className="text-center py-6 md:py-8 space-y-1.5">
+                        <h3 className="font-serif italic text-sm md:text-base tracking-wide">
+                          {product.title}
+                        </h3>
+                        {!product.inStock ? (
+                          <p className="font-mono text-xs md:text-sm tracking-wider opacity-40">
+                            Out of Stock
+                          </p>
+                        ) : product.price ? (
+                          <p className="text-sm md:text-base tracking-wide opacity-70">
+                            ${product.price}
+                          </p>
+                        ) : null}
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               ) : (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  <div className="aspect-square bg-white/[0.02] border border-white/10 flex flex-col items-center justify-center p-6">
-                    <span className="font-mono text-xs uppercase tracking-widest opacity-20 text-center">
-                      No Specimens Yet
-                    </span>
-                  </div>
+                <div className="py-20 text-center bg-[#1a1a1a]">
+                  <span className="font-mono text-xs uppercase tracking-widest opacity-30">
+                    No specimens in this category yet
+                  </span>
                 </div>
               )}
             </motion.div>
           ))}
-        </div>
-      </section>
-
-      {/* Collector Notice */}
-      <section className="bg-white/[0.02] py-12 md:py-20 px-4 md:px-24 border-y border-white/5">
-        <div className="max-w-[1800px] mx-auto">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="max-w-3xl mx-auto text-center space-y-4 md:space-y-6"
-          >
-            <span className="font-mono text-[10px] md:text-sm uppercase tracking-[0.4em] md:tracking-[0.6em] text-theme-gold">
-              Collector Protocol
-            </span>
-            <h3 className="text-xl md:text-4xl font-serif italic leading-tight">
-              For the Devoted Few
-            </h3>
-            <p className="font-serif italic text-sm md:text-base opacity-80 leading-relaxed px-2">
-              Relic specimens are sourced in limited quantities from verified suppliers.
-              Each arrives with documentation of origin, age, and distillation method.
-              Priority access available to registered collectors.
-            </p>
-          </motion.div>
         </div>
       </section>
 
