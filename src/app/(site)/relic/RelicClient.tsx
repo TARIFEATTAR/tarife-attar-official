@@ -67,54 +67,60 @@ export function RelicClient({ categories, totalCount }: Props) {
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="pt-16 md:pt-48 pb-4 md:pb-24 px-4 md:px-24">
+      {/* Hero - Compact layout */}
+      <section className="pt-16 md:pt-28 pb-4 md:pb-12 px-4 md:px-24">
         <div className="max-w-[1800px] mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="max-w-3xl"
+            className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-8"
           >
-            <span className="font-mono text-[10px] md:text-sm uppercase tracking-[0.6em] md:tracking-[0.8em] text-theme-gold mb-2 md:mb-6 block leading-tight break-words">
-              {totalCount} {getItemLabel('relic', totalCount)}{'\u00A0'}·{'\u00A0'}Pure Line
-            </span>
-            <h1 className="text-3xl md:text-8xl font-serif tracking-tighter leading-[0.95] md:leading-[0.9] mb-3 md:mb-8">
-              The Relic
-            </h1>
-            <p className="hidden md:block font-serif italic text-base md:text-2xl opacity-80 leading-relaxed max-w-xl mb-4 md:mb-6 break-words">
-              Pure resins. Rare ouds. Aged materials sourced for the devoted
-              collector. Each specimen arrives with provenance documentation.
-            </p>
-            <p className="hidden md:block font-mono text-[10px] md:text-sm uppercase tracking-[0.3em] md:tracking-widest opacity-70 leading-tight break-words">
-              Limited quantities. Verified authenticity.
-            </p>
+            {/* Left - Title */}
+            <div className="flex-shrink-0">
+              <span className="font-mono text-[10px] md:text-xs uppercase tracking-[0.6em] md:tracking-[0.8em] text-theme-gold mb-2 md:mb-3 block leading-tight">
+                {totalCount} {getItemLabel('relic', totalCount)}{'\u00A0'}·{'\u00A0'}Pure Line
+              </span>
+              <h1 className="text-3xl md:text-6xl font-serif tracking-tighter leading-[0.95] md:leading-[0.9]">
+                The Relic
+              </h1>
+            </div>
+            
+            {/* Right - Description */}
+            <div className="hidden md:block max-w-md text-right">
+              <p className="font-serif italic text-lg opacity-80 leading-relaxed mb-2">
+                Pure resins. Rare ouds. Aged materials sourced for the devoted collector.
+              </p>
+              <p className="font-mono text-[10px] uppercase tracking-widest opacity-60">
+                Limited quantities. Verified authenticity.
+              </p>
+            </div>
           </motion.div>
         </div>
       </section>
 
       {/* Categories */}
-      <section className="pb-20 md:pb-32 px-4 md:px-24">
-        <div className="max-w-[1800px] mx-auto space-y-8 md:space-y-20">
+      <section className="pb-20 md:pb-24 px-4 md:px-24">
+        <div className="max-w-[1800px] mx-auto space-y-8 md:space-y-12">
           {categories.map((category, index) => (
             <motion.div
               key={category.id}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.15 }}
-              className="space-y-3 md:space-y-8"
+              className="space-y-3 md:space-y-6"
             >
-              {/* Category Header */}
-              <div className="flex flex-row md:flex-row md:items-end justify-between gap-2 md:gap-4 border-b border-white/10 pb-2 md:pb-6 min-w-0">
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-xl md:text-5xl font-serif tracking-tighter mb-1 md:mb-2 leading-tight break-words">
+              {/* Category Header - Compact inline layout */}
+              <div className="flex flex-row items-baseline justify-between gap-4 border-b border-white/10 pb-2 md:pb-4 min-w-0">
+                <div className="flex items-baseline gap-4 min-w-0 flex-1">
+                  <h2 className="text-xl md:text-3xl font-serif tracking-tighter leading-tight break-words flex-shrink-0">
                     {category.name}
                   </h2>
-                  <p className="hidden md:block font-serif italic text-base md:text-xl opacity-80 leading-relaxed break-words">
+                  <p className="hidden md:block font-serif italic text-base opacity-60 leading-relaxed truncate">
                     {category.description}
                   </p>
                 </div>
-                <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest opacity-70 flex-shrink-0 whitespace-nowrap">
+                <p className="font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-widest opacity-50 flex-shrink-0 whitespace-nowrap">
                   {category.count} {getItemLabel('relic', category.count)}
                 </p>
               </div>
