@@ -102,6 +102,23 @@ const TERRITORY_NAMES: Record<string, string> = {
   terra: "Terra",
 };
 
+// Territory-based pricing for Atlas Collection
+const TERRITORY_PRICING: Record<string, { '6ml': number; '12ml': number }> = {
+  ember: { '6ml': 28, '12ml': 48 },
+  petal: { '6ml': 30, '12ml': 50 },
+  tidal: { '6ml': 30, '12ml': 50 },
+  terra: { '6ml': 33, '12ml': 55 },
+};
+
+const TERRITORY_TAGLINES: Record<string, string> = {
+  ember: "Spice. Warmth. The intimacy of ancient routes.",
+  petal: "Bloom. Herb. The exhale of living gardens.",
+  tidal: "Salt. Mist. The pull of open water.",
+  terra: "Wood. Oud. The gravity of deep forests.",
+};
+
+type VariantSize = '6ml' | '12ml';
+
 // Scent Pyramid Component
 const ScentPyramid = ({ notes }: { notes: Product["notes"] }) => {
   if (!notes) return null;
@@ -201,10 +218,17 @@ export function ProductDetailClient({ product }: Props) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState<VariantSize>('6ml');
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     description: false,
     notes: false,
   });
+
+  // Get territory-based pricing for Atlas products
+  const territory = product.atlasData?.atmosphere;
+  const territoryPricing = territory ? TERRITORY_PRICING[territory] : null;
+  const territoryTagline = territory ? TERRITORY_TAGLINES[territory] : null;
+  const currentPrice = territoryPricing ? territoryPricing[selectedVariant] : product.price;
 
   const scrollRef = useRef(null);
   const addButtonRef = useRef<HTMLButtonElement>(null);
@@ -452,41 +476,97 @@ export function ProductDetailClient({ product }: Props) {
               </p>
             )}
 
+            {/* Territory Context (Atlas only) */}
+            {isAtlas && territory && territoryTagline && (
+              <div className="py-4 border-y border-theme-charcoal/10">
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-xs uppercase tracking-[0.3em] text-theme-gold">
+                    {TERRITORY_NAMES[territory]} Territory
+                  </span>
+                </div>
+                <p className="font-serif italic text-sm md:text-base opacity-70 mt-2">
+                  {territoryTagline}
+                </p>
+              </div>
+            )}
+
+            {/* Variant Selector (Atlas with territory pricing) */}
+            {isAtlas && territoryPricing ? (
+              <div className="space-y-4">
+                <span className="font-mono text-xs uppercase tracking-widest opacity-60">
+                  Select Size
+                </span>
+                <div className="flex gap-3">
+                  {(['6ml', '12ml'] as VariantSize[]).map((size) => (
+                    <motion.button
+                      key={size}
+                      onClick={() => setSelectedVariant(size)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={`flex-1 py-4 px-6 border-2 transition-all ${
+                        selectedVariant === size
+                          ? 'border-theme-charcoal bg-theme-charcoal text-theme-alabaster'
+                          : 'border-theme-charcoal/20 hover:border-theme-charcoal/40'
+                      }`}
+                    >
+                      <div className="text-center">
+                        <div className="font-mono text-sm uppercase tracking-widest mb-1">
+                          {size}
+                        </div>
+                        <div className={`text-2xl font-serif tracking-tighter ${
+                          selectedVariant === size ? 'text-theme-alabaster' : ''
+                        }`}>
+                          ${territoryPricing[size]}
+                        </div>
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+                {product.productFormat && (
+                  <span className="font-mono text-xs uppercase tracking-widest opacity-60 block">
+                    {product.productFormat}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <>
+                {/* Fallback: Single Price (Relic or no territory) */}
+                {currentPrice && (
+                  <div className="text-4xl md:text-5xl font-serif tracking-tighter">
+                    ${currentPrice}
+                  </div>
+                )}
+
+                {/* Volume & Format */}
+                <div className="flex items-center gap-6">
+                  {product.volume && (
+                    <div className="px-6 py-3 border border-theme-charcoal/20 font-mono text-xs md:text-sm uppercase tracking-widest">
+                      {product.volume}
+                    </div>
+                  )}
+                  {product.productFormat && (
+                    <span className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
+                      {product.productFormat}
+                    </span>
+                  )}
+                </div>
+              </>
+            )}
+
             {/* Product Essence/Notes Preview */}
             {product.notes && (
-              <div className="flex flex-wrap gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
+              <div className="flex flex-wrap gap-2 font-mono text-[10px] md:text-xs uppercase tracking-widest opacity-60 pt-2">
                 {product.notes.top && product.notes.top.length > 0 && (
-                  <span>TOP: {product.notes.top.slice(0, 2).join(", ")}</span>
+                  <span>Top: {product.notes.top.slice(0, 2).join(", ")}</span>
                 )}
                 {product.notes.heart && product.notes.heart.length > 0 && (
-                  <span>HEART: {product.notes.heart.slice(0, 2).join(", ")}</span>
+                  <span>· Heart: {product.notes.heart.slice(0, 2).join(", ")}</span>
                 )}
                 {product.notes.base && product.notes.base.length > 0 && (
-                  <span>BASE: {product.notes.base.slice(0, 2).join(", ")}</span>
+                  <span>· Base: {product.notes.base.slice(0, 2).join(", ")}</span>
                 )}
               </div>
             )}
-
-            {/* Price */}
-            {product.price && (
-              <div className="text-4xl md:text-5xl font-serif tracking-tighter">
-                ${product.price}
-              </div>
-            )}
-
-            {/* Volume & Format */}
-            <div className="flex items-center gap-6">
-              {product.volume && (
-                <div className="px-6 py-3 border border-theme-charcoal/20 font-mono text-xs md:text-sm uppercase tracking-widest">
-                  {product.volume}
-                </div>
-              )}
-              {product.productFormat && (
-                <span className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
-                  {product.productFormat}
-                </span>
-              )}
-            </div>
 
             {/* Atlas-Specific Details */}
             {isAtlas && product.atlasData && (
@@ -889,19 +969,33 @@ export function ProductDetailClient({ product }: Props) {
       <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-theme-alabaster border-t border-theme-charcoal/10 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
         <div className="max-w-[1800px] mx-auto px-6 py-4">
           <div className="flex items-center gap-4">
-            {/* Price Display */}
-            {product.price && (
-              <div className="flex-shrink-0">
-                <div className="text-2xl font-serif tracking-tighter">
-                  ${product.price}
-                </div>
-                {product.volume && (
-                  <div className="font-mono text-[11px] uppercase tracking-widest opacity-80">
-                    {product.volume}
-                  </div>
-                )}
+            {/* Price & Variant Display */}
+            <div className="flex-shrink-0">
+              <div className="text-2xl font-serif tracking-tighter">
+                ${currentPrice || 0}
               </div>
-            )}
+              {isAtlas && territoryPricing ? (
+                <div className="flex gap-2 mt-1">
+                  {(['6ml', '12ml'] as VariantSize[]).map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedVariant(size)}
+                      className={`font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 border transition-all ${
+                        selectedVariant === size
+                          ? 'border-theme-charcoal bg-theme-charcoal text-theme-alabaster'
+                          : 'border-theme-charcoal/20'
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              ) : product.volume ? (
+                <div className="font-mono text-[11px] uppercase tracking-widest opacity-80">
+                  {product.volume}
+                </div>
+              ) : null}
+            </div>
 
             {/* Quantity & Add Button */}
             <div className="flex-1 flex items-center gap-3">
