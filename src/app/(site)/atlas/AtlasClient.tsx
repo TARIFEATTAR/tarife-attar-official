@@ -92,47 +92,47 @@ export function AtlasClient({ territories, totalCount }: Props) {
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="pt-16 md:pt-48 pb-4 md:pb-24 px-4 md:px-24">
+      {/* Hero - Compact on desktop to show products faster */}
+      <section className="pt-16 md:pt-28 pb-4 md:pb-8 px-4 md:px-24">
         <div className="max-w-[1800px] mx-auto">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.6 }}
             className="max-w-3xl"
           >
-            <span className="font-mono text-[10px] md:text-sm uppercase tracking-[0.6em] md:tracking-[0.8em] text-theme-gold mb-2 md:mb-6 block leading-tight break-words">
-              {totalCount} {getItemLabel('atlas', totalCount)}{'\u00A0'}·{'\u00A0'}4 Territories
-            </span>
-            <h1 className="text-3xl md:text-8xl font-serif italic tracking-tighter leading-[0.95] md:leading-[0.9] mb-3 md:mb-8">
-              The Atlas
-            </h1>
-            <p className="hidden md:block font-serif italic text-base md:text-2xl opacity-80 leading-relaxed max-w-xl mb-4 md:mb-6 break-words">
-              Clean, skin-safe perfume oils. Intentional formulations
-              crafted for those who travel by scent.
-            </p>
-            <p className="hidden md:block font-mono text-[10px] md:text-sm uppercase tracking-[0.3em] md:tracking-widest opacity-70 leading-tight break-words">
-              Navigate by territory. Discover by instinct.
-            </p>
-            
-            {/* Quiz CTA */}
-            <Link
-              href="/quiz"
-              className="inline-block mt-6 md:mt-8 font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] text-theme-gold/80 hover:text-theme-gold transition-colors"
-            >
-              Not sure where to start? → Take the Territory Quiz
-            </Link>
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between md:gap-8">
+              <div>
+                <span className="font-mono text-[10px] md:text-xs uppercase tracking-[0.6em] md:tracking-[0.4em] text-theme-gold mb-2 md:mb-3 block leading-tight break-words">
+                  {totalCount} {getItemLabel('atlas', totalCount)}{'\u00A0'}·{'\u00A0'}4 Territories
+                </span>
+                <h1 className="text-3xl md:text-6xl font-serif italic tracking-tighter leading-[0.95] md:leading-[0.9] mb-3 md:mb-0">
+                  The Atlas
+                </h1>
+              </div>
+              <div className="hidden md:block max-w-md text-right">
+                <p className="font-serif italic text-base opacity-60 leading-relaxed mb-2">
+                  Clean, skin-safe perfume oils for those who travel by scent.
+                </p>
+                <Link
+                  href="/quiz"
+                  className="inline-block font-mono text-[10px] uppercase tracking-[0.2em] text-theme-gold/70 hover:text-theme-gold transition-colors"
+                >
+                  Not sure? → Take the Quiz
+                </Link>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
 
       {/* Territory Navigation */}
-      <section className="pb-6 md:pb-8 px-0 md:px-24">
+      <section className="pb-4 md:pb-6 px-0 md:px-24">
         <div className="max-w-[1800px] mx-auto">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
             className="flex flex-wrap gap-2 md:gap-4 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide"
           >
             <button
@@ -162,8 +162,8 @@ export function AtlasClient({ territories, totalCount }: Props) {
       </section>
 
       {/* Territories Grid */}
-      <section className="pb-20 md:pb-32 px-4 md:px-24">
-        <div className="max-w-[1800px] mx-auto space-y-8 md:space-y-16">
+      <section className="pb-20 md:pb-24 px-4 md:px-24">
+        <div className="max-w-[1800px] mx-auto space-y-8 md:space-y-12">
           {territories
             .filter((t) => activeTerritory === null || activeTerritory === t.id)
             .map((territory, index) => (
@@ -172,24 +172,24 @@ export function AtlasClient({ territories, totalCount }: Props) {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="space-y-3 md:space-y-8"
+                className="space-y-3 md:space-y-4"
               >
-                {/* Territory Header */}
-                <div className="flex flex-row md:flex-row md:items-end justify-between gap-2 md:gap-4 border-b border-theme-charcoal/10 pb-2 md:pb-6 min-w-0">
-                  <div className="min-w-0 flex-1">
-                    <h2 className="text-2xl md:text-6xl font-serif italic tracking-tighter mb-1 md:mb-2 leading-tight break-words">
+                {/* Territory Header - Compact */}
+                <div className="flex flex-row items-end justify-between gap-2 md:gap-4 border-b border-theme-charcoal/10 pb-2 md:pb-4 min-w-0">
+                  <div className="min-w-0 flex-1 flex items-baseline gap-3 md:gap-4">
+                    <h2 className="text-2xl md:text-4xl font-serif italic tracking-tighter leading-tight break-words">
                       {territory.name}
                     </h2>
-                    <p className="hidden md:block font-serif italic text-base md:text-xl opacity-80 leading-relaxed break-words">
+                    <p className="hidden md:block font-serif italic text-sm opacity-50 whitespace-nowrap">
                       {territory.tagline}
                     </p>
                   </div>
-                  <div className="flex flex-row md:flex-col items-center md:items-end gap-2 md:gap-1 flex-shrink-0">
-                    <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest opacity-70 whitespace-nowrap">
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <p className="font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] opacity-50 whitespace-nowrap">
                       {territory.count} {getItemLabel('atlas', territory.count)}
                     </p>
                     {getTerritoryPriceRange(territory.id) && (
-                      <p className="font-mono text-[9px] md:text-xs uppercase tracking-wider opacity-50 whitespace-nowrap">
+                      <p className="font-mono text-[9px] md:text-[10px] uppercase tracking-wider opacity-40 whitespace-nowrap">
                         {getTerritoryPriceRange(territory.id)}
                       </p>
                     )}
