@@ -80,9 +80,92 @@ export const structure = (S: StructureBuilder, _context: StructureResolverContex
       // Divider
       S.divider(),
 
+      // Group 5: Journal (Blog/Content)
+      S.listItem()
+        .title('📓 The Journal')
+        .id('journal')
+        .child(
+          S.list()
+            .title('The Journal')
+            .items([
+              // All Journal Entries
+              S.listItem()
+                .title('All Entries')
+                .id('all-journal')
+                .child(
+                  S.documentList()
+                    .title('All Journal Entries')
+                    .filter('_type == "journalEntry"')
+                    .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                ),
+              // Featured
+              S.listItem()
+                .title('⭐ Featured')
+                .id('featured-journal')
+                .child(
+                  S.documentList()
+                    .title('Featured Posts')
+                    .filter('_type == "journalEntry" && featured == true')
+                    .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                ),
+              S.divider(),
+              // By Category
+              S.listItem()
+                .title('📍 Field Notes')
+                .id('field-notes')
+                .child(
+                  S.documentList()
+                    .title('Field Notes')
+                    .filter('_type == "journalEntry" && category == "field-notes"')
+                    .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                ),
+              S.listItem()
+                .title('🧪 Behind the Blend')
+                .id('behind-the-blend')
+                .child(
+                  S.documentList()
+                    .title('Behind the Blend')
+                    .filter('_type == "journalEntry" && category == "behind-the-blend"')
+                    .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                ),
+              S.listItem()
+                .title('🗺️ Territory Spotlight')
+                .id('territory-spotlight')
+                .child(
+                  S.documentList()
+                    .title('Territory Spotlight')
+                    .filter('_type == "journalEntry" && category == "territory-spotlight"')
+                    .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                ),
+              S.listItem()
+                .title('📦 Collector Archives')
+                .id('collector-archives')
+                .child(
+                  S.documentList()
+                    .title('Collector Archives')
+                    .filter('_type == "journalEntry" && category == "collector-archives"')
+                    .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                ),
+              S.divider(),
+              // Madison Studio Submissions
+              S.listItem()
+                .title('✨ From Madison Studio')
+                .id('madison-journal')
+                .child(
+                  S.documentList()
+                    .title('Madison Studio Submissions')
+                    .filter('_type == "journalEntry" && generationSource == "madison-studio"')
+                    .defaultOrdering([{ field: '_createdAt', direction: 'desc' }])
+                ),
+            ])
+        ),
+
+      // Divider
+      S.divider(),
+
       // Other document types (Exhibits, etc.)
       ...S.documentTypeListItems().filter(
-        (listItem) => !['product'].includes(listItem.getId() || '')
+        (listItem) => !['product', 'journalEntry'].includes(listItem.getId() || '')
       ),
     ]);
 };

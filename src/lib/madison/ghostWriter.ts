@@ -213,7 +213,127 @@ export async function pushDraft(data: MadisonPayload): Promise<string> {
   }
 }
 
+// ===== JOURNAL ENTRY SUPPORT =====
+
+interface JournalPayload {
+  title: string;
+  content: string; // Markdown
+  excerpt?: string;
+  coverImageUrl?: string;
+  author?: string;
+  publishedAt?: string; // ISO date string
+  category?: 'field-notes' | 'behind-the-blend' | 'territory-spotlight' | 'collector-archives';
+  territory?: 'ember' | 'petal' | 'tidal' | 'terra';
+  featured?: boolean;
+  seoDescription?: string;
+  relatedProductSlugs?: string[]; // Slugs of related products
+}
+
 /**
- * Type export for external use
+ * Push a journal entry draft to Sanity (from Madison Studio)
  */
-export type { MadisonPayload };
+export async function pushJournalEntry(data: JournalPayload): Promise<string> {
+  // Initialize Sanity client with write token
+  const writeToken = process.env.SANITY_API_WRITE_TOKEN;
+  if (!writeToken) {
+    throw new Error('SANITY_API_WRITE_TOKEN environment variable is required');
+  }
+
+  const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+  const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
+  const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01';
+
+  const client = createClient({
+    projectId,
+    dataset,
+    apiVersion,
+    token: writeToken,
+    useCdn: false,
+  }) as ReturnType<typeof createClient> & {
+    assets: {
+      upload: (type: 'image' | 'file', buffer: Buffer, options?: { filename?: string }) => Promise<{ _id: string }>;
+    };
+  };
+
+  // Generate draft ID
+  const draftId = `drafts.${uuidv4()}`;
+
+  // Handle cover image upload if provided
+  let coverImageAssetId: string | undefined;
+  if (data.coverImageUrl) {
+    coverImageAssetId = await uploadImageFromUrl(client, data.coverImageUrl);
+  }
+
+  // Resolve related products by slug
+  let relatedProductRefs: Array<{ _type: string; _ref: string; _key: string }> = [];
+  if (data.relatedProductSlugs && data.relatedProductSlugs.length > 0) {
+    const productQuery = `*[_type == "product" && slug.current in $slugs && !(_id in path("drafts.**"))]{_id, "slug": slug.current}`;
+    const products = await client.fetch(productQuery, { slugs: data.relatedProductSlugs });
+    relatedProductRefs = products.map((p: { _id: string }, index: number) => ({
+      _type: 'reference',
+      _ref: p._id,
+      _key: `ref-${index}`,
+    }));
+  }
+
+  // Build the document
+  const document: Record<string, unknown> = {
+    _id: draftId,
+    _type: 'journalEntry',
+    generationSource: 'madison-studio',
+    title: data.title,
+    slug: {
+      _type: 'slug',
+      current: data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, ''),
+    },
+    content: markdownToBlocks(data.content),
+    publishedAt: data.publishedAt || new Date().toISOString(),
+    featured: data.featured || false,
+  };
+
+  // Add optional fields
+  if (data.excerpt) {
+    document.excerpt = data.excerpt;
+  }
+  if (data.author) {
+    document.author = data.author;
+  }
+  if (data.category) {
+    document.category = data.category;
+  }
+  if (data.territory) {
+    document.territory = data.territory;
+  }
+  if (data.seoDescription) {
+    document.seoDescription = data.seoDescription;
+  }
+  if (relatedProductRefs.length > 0) {
+    document.relatedProducts = relatedProductRefs;
+  }
+
+  // Add cover image if uploaded
+  if (coverImageAssetId) {
+    document.coverImage = {
+      _type: 'image',
+      asset: {
+        _type: 'reference',
+        _ref: coverImageAssetId,
+      },
+    };
+  }
+
+  // Create the document
+  try {
+    await client.create(document as any);
+    console.log(`✅ Journal draft created: ${draftId}`);
+    return draftId;
+  } catch (error) {
+    console.error('Error creating journal draft:', error);
+    throw new Error(`Failed to create journal draft: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+/**
+ * Type exports for external use
+ */
+export type { MadisonPayload, JournalPayload };

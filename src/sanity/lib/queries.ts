@@ -336,3 +336,85 @@ export const exhibitBySlugQuery = groq`
     }
   }
 `;
+
+// ===== JOURNAL QUERIES =====
+
+/**
+ * Get all published journal entries
+ */
+export const allJournalEntriesQuery = groq`
+  *[_type == "journalEntry" && !(_id in path("drafts.**"))] | order(publishedAt desc) {
+    _id,
+    title,
+    slug,
+    excerpt,
+    coverImage,
+    author,
+    publishedAt,
+    category,
+    territory,
+    featured
+  }
+`;
+
+/**
+ * Get featured journal entries for homepage
+ */
+export const featuredJournalEntriesQuery = groq`
+  *[_type == "journalEntry" && featured == true && !(_id in path("drafts.**"))] | order(publishedAt desc) [0...3] {
+    _id,
+    title,
+    slug,
+    excerpt,
+    coverImage,
+    author,
+    publishedAt,
+    category,
+    territory
+  }
+`;
+
+/**
+ * Get journal entries by category
+ */
+export const journalEntriesByCategoryQuery = groq`
+  *[_type == "journalEntry" && category == $category && !(_id in path("drafts.**"))] | order(publishedAt desc) {
+    _id,
+    title,
+    slug,
+    excerpt,
+    coverImage,
+    author,
+    publishedAt,
+    category,
+    territory,
+    featured
+  }
+`;
+
+/**
+ * Get a single journal entry by slug
+ */
+export const journalEntryBySlugQuery = groq`
+  *[_type == "journalEntry" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
+    _id,
+    title,
+    slug,
+    excerpt,
+    content,
+    coverImage,
+    author,
+    publishedAt,
+    category,
+    territory,
+    seoDescription,
+    relatedProducts[]-> {
+      _id,
+      title,
+      slug,
+      mainImage,
+      "price": coalesce(price, store.priceRange.minVariantPrice),
+      collectionType
+    }
+  }
+`;
