@@ -93,7 +93,7 @@ export function AtlasClient({ territories, totalCount }: Props) {
       </header>
 
       {/* Hero */}
-      <section className="pt-24 md:pt-48 pb-12 md:pb-24 px-4 md:px-24">
+      <section className="pt-16 md:pt-48 pb-4 md:pb-24 px-4 md:px-24">
         <div className="max-w-[1800px] mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -101,17 +101,17 @@ export function AtlasClient({ territories, totalCount }: Props) {
             transition={{ duration: 0.8 }}
             className="max-w-3xl"
           >
-            <span className="font-mono text-[10px] md:text-sm uppercase tracking-[0.6em] md:tracking-[0.8em] text-theme-gold mb-4 md:mb-6 block leading-tight break-words">
+            <span className="font-mono text-[10px] md:text-sm uppercase tracking-[0.6em] md:tracking-[0.8em] text-theme-gold mb-2 md:mb-6 block leading-tight break-words">
               {totalCount} {getItemLabel('atlas', totalCount)}{'\u00A0'}·{'\u00A0'}4 Territories
             </span>
-            <h1 className="text-4xl md:text-8xl font-serif italic tracking-tighter leading-[0.95] md:leading-[0.9] mb-6 md:mb-8">
+            <h1 className="text-3xl md:text-8xl font-serif italic tracking-tighter leading-[0.95] md:leading-[0.9] mb-3 md:mb-8">
               The Atlas
             </h1>
-            <p className="font-serif italic text-base md:text-2xl opacity-80 leading-relaxed max-w-xl mb-4 md:mb-6 break-words">
+            <p className="hidden md:block font-serif italic text-base md:text-2xl opacity-80 leading-relaxed max-w-xl mb-4 md:mb-6 break-words">
               Clean, skin-safe perfume oils. Intentional formulations
               crafted for those who travel by scent.
             </p>
-            <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.3em] md:tracking-widest opacity-70 leading-tight break-words">
+            <p className="hidden md:block font-mono text-[10px] md:text-sm uppercase tracking-[0.3em] md:tracking-widest opacity-70 leading-tight break-words">
               Navigate by territory. Discover by instinct.
             </p>
           </motion.div>
@@ -119,7 +119,7 @@ export function AtlasClient({ territories, totalCount }: Props) {
       </section>
 
       {/* Territory Navigation */}
-      <section className="pb-6 md:pb-8 px-4 md:px-24">
+      <section className="pb-6 md:pb-8 px-0 md:px-24">
         <div className="max-w-[1800px] mx-auto">
           <motion.div
             initial={{ opacity: 0 }}
@@ -134,7 +134,8 @@ export function AtlasClient({ territories, totalCount }: Props) {
                 : "bg-theme-charcoal/5 opacity-80 hover:opacity-100"
                 }`}
             >
-              All Territories
+              <span className="md:hidden">All</span>
+              <span className="hidden md:inline">All Territories</span>
             </button>
             {territories.map((territory) => (
               <button
@@ -154,7 +155,7 @@ export function AtlasClient({ territories, totalCount }: Props) {
 
       {/* Territories Grid */}
       <section className="pb-20 md:pb-32 px-4 md:px-24">
-        <div className="max-w-[1800px] mx-auto space-y-12 md:space-y-16">
+        <div className="max-w-[1800px] mx-auto space-y-8 md:space-y-16">
           {territories
             .filter((t) => activeTerritory === null || activeTerritory === t.id)
             .map((territory, index) => (
@@ -163,19 +164,19 @@ export function AtlasClient({ territories, totalCount }: Props) {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="space-y-6 md:space-y-8"
+                className="space-y-3 md:space-y-8"
               >
                 {/* Territory Header */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-4 border-b border-theme-charcoal/10 pb-4 md:pb-6 min-w-0">
+                <div className="flex flex-row md:flex-row md:items-end justify-between gap-2 md:gap-4 border-b border-theme-charcoal/10 pb-2 md:pb-6 min-w-0">
                   <div className="min-w-0 flex-1">
-                    <h2 className="text-3xl md:text-6xl font-serif italic tracking-tighter mb-1 md:mb-2 leading-tight break-words">
+                    <h2 className="text-2xl md:text-6xl font-serif italic tracking-tighter mb-1 md:mb-2 leading-tight break-words">
                       {territory.name}
                     </h2>
-                    <p className="font-serif italic text-base md:text-xl opacity-80 leading-relaxed break-words">
+                    <p className="hidden md:block font-serif italic text-base md:text-xl opacity-80 leading-relaxed break-words">
                       {territory.tagline}
                     </p>
                   </div>
-                  <div className="flex flex-col items-start md:items-end gap-1 flex-shrink-0">
+                  <div className="flex flex-row md:flex-col items-center md:items-end gap-2 md:gap-1 flex-shrink-0">
                     <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest opacity-70 whitespace-nowrap">
                       {territory.count} {getItemLabel('atlas', territory.count)}
                     </p>
