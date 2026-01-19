@@ -109,16 +109,33 @@ export function AtlasClient({ territories, totalCount }: Props) {
                 <h1 className="text-3xl md:text-6xl font-serif italic tracking-tighter leading-[0.95] md:leading-[0.9] mb-3 md:mb-0">
                   The Atlas
                 </h1>
+                {/* Mobile Quiz CTA */}
+                <Link
+                  href="/quiz"
+                  className="md:hidden inline-flex items-center gap-2 mt-3 py-2.5 px-4 border border-theme-charcoal/15 hover:border-theme-charcoal/40 bg-white/50 transition-all duration-300"
+                >
+                  <span className="font-mono text-[10px] uppercase tracking-[0.1em] opacity-50">
+                    Not sure?
+                  </span>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-theme-gold font-medium">
+                    Take the Quiz →
+                  </span>
+                </Link>
               </div>
               <div className="hidden md:block max-w-md text-right">
-                <p className="font-serif italic text-base opacity-60 leading-relaxed mb-2">
+                <p className="font-serif italic text-base opacity-60 leading-relaxed mb-3">
                   Clean, skin-safe perfume oils for those who travel by scent.
                 </p>
                 <Link
                   href="/quiz"
-                  className="inline-block font-mono text-[10px] uppercase tracking-[0.2em] text-theme-gold/70 hover:text-theme-gold transition-colors"
+                  className="group inline-flex items-center gap-2 py-2.5 px-4 border border-theme-charcoal/15 hover:border-theme-charcoal/40 hover:bg-theme-charcoal/5 transition-all duration-300"
                 >
-                  Not sure? → Take the Quiz
+                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] opacity-50 group-hover:opacity-80">
+                    Not sure?
+                  </span>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-theme-gold font-medium">
+                    Take the Quiz →
+                  </span>
                 </Link>
               </div>
             </div>
