@@ -58,6 +58,7 @@ const SHOPIFY_TO_ATLAS_MAP = {
   'Marrakesh': 'marrakesh',
   'Black Ambergris': 'onyx',  // Renamed from original Black Oudh
   'Black Oudh': 'riyadh',  // RIYADH (formerly Black Oudh) - TERRA
+  'RIYADH': 'riyadh',  // Direct name match
   'Oudh Aura': 'regalia',
   'Sicilian Oudh': 'sicily',
 };
