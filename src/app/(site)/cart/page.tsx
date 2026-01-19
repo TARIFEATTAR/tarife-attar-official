@@ -55,22 +55,35 @@ export default function CartPage() {
 
     // Final check: ensure checkout URL uses Shopify domain, not custom domain
     const shopifyDomain = 'vasana-perfumes.myshopify.com';
+    let finalCheckoutUrl = checkoutUrl;
+    
     if (checkoutUrl.includes('tarifeattar.com')) {
       console.warn('⚠️ Checkout URL still contains tarifeattar.com, transforming...');
       try {
         const url = new URL(checkoutUrl);
         const pathAndQuery = url.pathname + url.search;
-        const transformedUrl = `https://${shopifyDomain}${pathAndQuery}`;
-        console.log('🔄 Transforming checkout URL:', { from: checkoutUrl, to: transformedUrl });
-        window.location.href = transformedUrl;
-        return;
+        finalCheckoutUrl = `https://${shopifyDomain}${pathAndQuery}`;
+        console.log('🔄 Transforming checkout URL:', { from: checkoutUrl, to: finalCheckoutUrl });
       } catch (error) {
         console.error('Error transforming checkout URL:', error);
       }
     }
 
-    console.log('✅ Redirecting to checkout:', checkoutUrl);
-    window.location.href = checkoutUrl;
+    // Add return URL parameter to checkout URL so Shopify knows where to redirect back
+    // This helps with post-checkout and error redirects
+    try {
+      const url = new URL(finalCheckoutUrl);
+      // Add return URL parameter - Shopify may use this for redirects
+      url.searchParams.set('return_to', 'https://www.tarifeattar.com/cart');
+      url.searchParams.set('redirect', 'https://www.tarifeattar.com');
+      finalCheckoutUrl = url.toString();
+      console.log('✅ Added return URL parameters to checkout:', finalCheckoutUrl);
+    } catch (error) {
+      console.warn('Could not add return URL parameters:', error);
+    }
+
+    console.log('✅ Redirecting to checkout:', finalCheckoutUrl);
+    window.location.href = finalCheckoutUrl;
   };
 
   return (
