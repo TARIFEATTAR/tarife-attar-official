@@ -73,7 +73,7 @@ export const GlobalFooter: React.FC<Props> = ({ theme = 'dark' }) => {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="font-serif italic text-base sm:text-lg md:text-xl opacity-40 leading-relaxed max-w-sm"
             >
-              An archival study in the volatility of scent. We stabilize atmospheric memories into liquid specimens.
+              Clean, skin-safe perfume oils for those who travel by scent.
             </motion.p>
             
             <motion.div 
