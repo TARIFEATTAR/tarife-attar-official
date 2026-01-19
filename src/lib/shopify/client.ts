@@ -2,7 +2,8 @@
  * Shopify Storefront API Client
  */
 
-const domain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
+export const SHOPIFY_STORE_DOMAIN = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN || '';
+const domain = SHOPIFY_STORE_DOMAIN;
 const accessToken = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN;
 
 if (!domain || !accessToken) {

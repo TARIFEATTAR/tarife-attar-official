@@ -8,7 +8,8 @@ import {
   ADD_LINES_MUTATION,
   UPDATE_LINES_MUTATION,
   REMOVE_LINES_MUTATION,
-  formatVariantId
+  formatVariantId,
+  SHOPIFY_STORE_DOMAIN
 } from '@/lib/shopify';
 
 interface CartItem {
@@ -224,19 +225,35 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
   
   // Transform checkout URL to use Shopify domain if it's pointing to custom domain
   const rawCheckoutUrl = cart?.checkoutUrl || '';
-  const shopifyDomain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN || '';
   
   let checkoutUrl = rawCheckoutUrl;
-  if (rawCheckoutUrl && shopifyDomain) {
-    // If checkout URL is pointing to tarifeattar.com, replace with Shopify domain
-    const customDomainPattern = /https?:\/\/(www\.)?tarifeattar\.com/;
-    if (customDomainPattern.test(rawCheckoutUrl)) {
-      // Extract the path and query from the checkout URL
-      const url = new URL(rawCheckoutUrl);
-      const pathAndQuery = url.pathname + url.search;
-      // Replace with Shopify store domain
-      checkoutUrl = `https://${shopifyDomain}${pathAndQuery}`;
-      console.log('Transformed checkout URL:', { from: rawCheckoutUrl, to: checkoutUrl });
+  
+  if (rawCheckoutUrl && SHOPIFY_STORE_DOMAIN) {
+    try {
+      // If checkout URL is pointing to tarifeattar.com, replace with Shopify domain
+      const customDomainPattern = /https?:\/\/(www\.)?tarifeattar\.com/i;
+      if (customDomainPattern.test(rawCheckoutUrl)) {
+        // Extract the path and query from the checkout URL
+        const url = new URL(rawCheckoutUrl);
+        const pathAndQuery = url.pathname + url.search;
+        // Replace with Shopify store domain
+        checkoutUrl = `https://${SHOPIFY_STORE_DOMAIN}${pathAndQuery}`;
+        console.log('✅ Transformed checkout URL:', { 
+          from: rawCheckoutUrl, 
+          to: checkoutUrl,
+          shopifyDomain: SHOPIFY_STORE_DOMAIN 
+        });
+      } else {
+        console.log('✓ Checkout URL already uses correct domain:', rawCheckoutUrl);
+      }
+    } catch (error) {
+      console.error('❌ Error transforming checkout URL:', error);
+      // Fall back to original URL if transformation fails
+      checkoutUrl = rawCheckoutUrl;
+    }
+  } else {
+    if (rawCheckoutUrl && !SHOPIFY_STORE_DOMAIN) {
+      console.warn('⚠️ Shopify domain not configured. Checkout URL:', rawCheckoutUrl);
     }
   }
 
