@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDeviceTier } from '@/Hooks/useDeviceTier';
@@ -117,12 +117,21 @@ export const EssenceDrop: React.FC<EssenceDropProps> = ({
     setTrailPositions(newTrail);
   }, [isActive, enableParticles, path]);
 
+  // Store onComplete in a ref to avoid dependency issues
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
   // Show toast after animation completes
   useEffect(() => {
     if (isActive) {
+      console.log('[EssenceDrop] Starting animation timer, duration:', duration);
+      
       const toastTimer = setTimeout(() => {
+        console.log('[EssenceDrop] Animation timer fired, showing toast');
         setShowToast(true);
-        onComplete?.();
+        onCompleteRef.current?.();
       }, duration * 1000);
 
       const hideToastTimer = setTimeout(() => {
@@ -130,11 +139,12 @@ export const EssenceDrop: React.FC<EssenceDropProps> = ({
       }, (duration + 3) * 1000); // Toast visible for 3 seconds
 
       return () => {
+        console.log('[EssenceDrop] Cleaning up timers');
         clearTimeout(toastTimer);
         clearTimeout(hideToastTimer);
       };
     }
-  }, [isActive, duration, onComplete]);
+  }, [isActive, duration]); // Removed onComplete from deps - using ref instead
 
   // Don't render until mounted (for SSR safety)
   if (!isMounted) {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
 import { ShoppingBag } from 'lucide-react';
 import { useShopifyCart } from '@/context/ShopifyCartContext';
@@ -20,6 +20,7 @@ interface EssenceDropEventDetail {
   productName?: string;
   startX: number;
   startY: number;
+  timestamp?: number; // Add timestamp to dedupe events
 }
 
 /**
@@ -48,6 +49,7 @@ export const Satchel: React.FC<SatchelProps> = ({ theme = 'atlas' }) => {
 
   const satchelRef = useRef<HTMLButtonElement>(null);
   const prevItemCount = useRef(itemCount);
+  const lastEventTimestamp = useRef<number>(0); // Track last processed event to prevent duplicates
 
   // Spring animation for the badge
   const badgeScale = useMotionValue(1);
@@ -57,7 +59,7 @@ export const Satchel: React.FC<SatchelProps> = ({ theme = 'atlas' }) => {
   });
 
   // Get satchel position for the essence drop endpoint
-  const getSatchelPosition = () => {
+  const getSatchelPosition = useCallback(() => {
     if (!satchelRef.current) {
       // Default position if ref not available
       return { x: 40, y: window.innerHeight - 40 };
@@ -67,12 +69,26 @@ export const Satchel: React.FC<SatchelProps> = ({ theme = 'atlas' }) => {
       x: rect.left + rect.width / 2,
       y: rect.top + rect.height / 2,
     };
-  };
+  }, []);
 
   // Listen for essence drop events from "Add to Satchel" buttons
   useEffect(() => {
     const handleEssenceDrop = (event: CustomEvent<EssenceDropEventDetail>) => {
-      const { productColor, productName, startX, startY } = event.detail;
+      const { productColor, productName, startX, startY, timestamp } = event.detail;
+      
+      // Prevent duplicate processing - ignore events within 500ms of each other
+      const now = timestamp || Date.now();
+      if (now - lastEventTimestamp.current < 500) {
+        console.log('[Satchel] Ignoring duplicate event, too soon after last one');
+        return;
+      }
+      lastEventTimestamp.current = now;
+
+      // Don't trigger if animation is already active
+      if (essenceDropActive) {
+        console.log('[Satchel] Ignoring event, animation already active');
+        return;
+      }
 
       console.log('[Satchel] Received essence drop event:', { productColor, productName, startX, startY });
 
@@ -88,9 +104,10 @@ export const Satchel: React.FC<SatchelProps> = ({ theme = 'atlas' }) => {
     window.addEventListener(ESSENCE_DROP_EVENT, handleEssenceDrop as EventListener);
 
     return () => {
+      console.log('[Satchel] Cleaning up essence drop event listener');
       window.removeEventListener(ESSENCE_DROP_EVENT, handleEssenceDrop as EventListener);
     };
-  }, []);
+  }, [essenceDropActive]);
 
   // Detect item count changes for impact animation
   useEffect(() => {
@@ -107,11 +124,12 @@ export const Satchel: React.FC<SatchelProps> = ({ theme = 'atlas' }) => {
     prevItemCount.current = itemCount;
   }, [itemCount, badgeScale]);
 
-  // Handle essence drop completion
-  const handleEssenceDropComplete = () => {
+  // Handle essence drop completion - memoized to prevent unnecessary re-renders
+  const handleEssenceDropComplete = useCallback(() => {
+    console.log('[Satchel] Essence drop complete, resetting state');
     setEssenceDropActive(false);
     setDropDetails(null);
-  };
+  }, []);
 
   const handleClick = () => {
     router.push('/cart');
@@ -206,13 +224,18 @@ export const Satchel: React.FC<SatchelProps> = ({ theme = 'atlas' }) => {
  * };
  * ```
  */
-export function triggerEssenceDrop(details: EssenceDropEventDetail) {
+export function triggerEssenceDrop(details: Omit<EssenceDropEventDetail, 'timestamp'>) {
   if (typeof window === 'undefined') return;
 
-  console.log('[triggerEssenceDrop] Dispatching event:', details);
+  const detailsWithTimestamp: EssenceDropEventDetail = {
+    ...details,
+    timestamp: Date.now(),
+  };
+
+  console.log('[triggerEssenceDrop] Dispatching event:', detailsWithTimestamp);
 
   const event = new CustomEvent(ESSENCE_DROP_EVENT, {
-    detail: details,
+    detail: detailsWithTimestamp,
   });
   window.dispatchEvent(event);
 }
