@@ -71,13 +71,13 @@ export function HomeClient({ featuredProducts }: HomeClientProps) {
                 <section className="py-20 md:py-48 px-4 sm:px-6 md:px-24">
                     <header className="mb-12 md:mb-24 flex flex-col md:flex-row justify-between items-baseline border-b border-theme-charcoal/5 pb-8 md:pb-12 gap-4 md:gap-8">
                         <h2 className="text-3xl md:text-6xl font-serif italic tracking-tight text-theme-charcoal leading-none">
-                            Notable formulations
+                            From the collection
                         </h2>
                         <button
                             onClick={() => handleNavigate('atlas')}
                             className="font-mono text-[9px] md:text-[10px] uppercase tracking-[0.4em] opacity-40 hover:opacity-100 transition-opacity whitespace-nowrap"
                         >
-                            View All Specimens →
+                            Explore the Atlas →
                         </button>
                     </header>
 
