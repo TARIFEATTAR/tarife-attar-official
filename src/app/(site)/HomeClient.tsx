@@ -164,6 +164,28 @@ export function HomeClient({ featuredProducts }: HomeClientProps) {
                     </div>
                 </section>
 
+                {/* Territory Quiz CTA */}
+                <section className="py-16 md:py-24 px-4 sm:px-6 md:px-24 bg-theme-charcoal/[0.02]">
+                    <div className="max-w-3xl mx-auto text-center">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-theme-gold block mb-4">
+                            Find Your Signature
+                        </span>
+                        <h2 className="text-3xl md:text-5xl font-serif italic tracking-tight text-theme-charcoal leading-tight mb-4">
+                            Discover Your Territory
+                        </h2>
+                        <p className="font-serif text-lg md:text-xl text-theme-charcoal/60 mb-8 max-w-xl mx-auto">
+                            Four olfactory worlds. Five questions. One path that speaks to your soul.
+                        </p>
+                        <button
+                            onClick={() => handleNavigate('quiz')}
+                            className="inline-flex items-center gap-3 bg-theme-charcoal text-theme-alabaster px-8 py-4 rounded-full font-mono text-xs uppercase tracking-[0.2em] hover:bg-theme-charcoal/90 transition-colors"
+                        >
+                            Take the Quiz
+                            <span>→</span>
+                        </button>
+                    </div>
+                </section>
+
                 {/* Global Footer */}
                 <GlobalFooter theme="dark" />
             </div>

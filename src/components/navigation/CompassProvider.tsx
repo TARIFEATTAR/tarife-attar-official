@@ -46,6 +46,10 @@ export function CompassProvider({ children }: CompassProviderProps) {
   const isSplitEntryPage = pathname === '/';
   const isRelicPage = pathname?.startsWith('/relic');
   const isCartPage = pathname === '/cart';
+  const isProductPage = pathname?.startsWith('/product');
+
+  // Proactive "Need guidance?" state
+  const [showGuidanceHint, setShowGuidanceHint] = useState(false);
 
   // Check for Studio routes - must be done carefully to avoid SSR issues
   const [isStudioPage, setIsStudioPage] = useState(false);
@@ -124,6 +128,26 @@ export function CompassProvider({ children }: CompassProviderProps) {
     return () => window.removeEventListener('resize', updateCompassPosition);
   }, []);
 
+  // Proactive "Need guidance?" prompt on product pages after 30 seconds
+  useEffect(() => {
+    if (!isProductPage || curatorOpen) {
+      setShowGuidanceHint(false);
+      return;
+    }
+
+    // Check if user has already interacted with Atlas
+    const hasUsedAtlas = typeof window !== 'undefined' && localStorage.getItem('atlas-used');
+    if (hasUsedAtlas) return;
+
+    const timer = setTimeout(() => {
+      setShowGuidanceHint(true);
+      // Auto-hide after 10 seconds if not clicked
+      setTimeout(() => setShowGuidanceHint(false), 10000);
+    }, 30000); // 30 seconds
+
+    return () => clearTimeout(timer);
+  }, [isProductPage, curatorOpen, pathname]);
+
   const handleNavigate = useCallback((path: string) => {
     const routes: Record<string, string> = {
       'home': '/',
@@ -137,6 +161,11 @@ export function CompassProvider({ children }: CompassProviderProps) {
 
   const handleOpenCurator = useCallback(() => {
     setCuratorOpen(true);
+    setShowGuidanceHint(false);
+    // Mark that user has interacted with Atlas
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('atlas-used', 'true');
+    }
   }, []);
 
   const handleCloseCurator = useCallback(() => {
@@ -153,12 +182,12 @@ export function CompassProvider({ children }: CompassProviderProps) {
       <CustomCursor />
       {children}
 
-      {/* Ghost Labels (First-visit navigation hints + "Ask the Curator") */}
+      {/* Ghost Labels (First-visit navigation hints + "Ask Atlas") */}
       <GhostLabels
         show={showGhostLabels}
         compassPosition="corner"
         showSatchelLabel={!isCartPage}
-        showCuratorLabel={false}
+        showCuratorLabel={true}
         onDismiss={() => setShowGhostLabels(false)}
       />
 
@@ -186,44 +215,54 @@ export function CompassProvider({ children }: CompassProviderProps) {
         )}
       </AnimatePresence>
 
-      {/* Curator Trigger Button - Positioned to the LEFT of the compass */}
-      {/* Curator Trigger Button - REMOVED per user request */}
-      {/* 
+      {/* Curator Trigger Button - Subtle pill to the LEFT of the compass */}
       <AnimatePresence>
         {showCornerCompass && !curatorOpen && (
           <motion.button
             initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
+            animate={{ 
+              opacity: 1, 
+              x: 0,
+              // Pulse animation when guidance hint is active
+              scale: showGuidanceHint ? [1, 1.05, 1] : 1,
+              boxShadow: showGuidanceHint 
+                ? ['0 4px 15px rgba(0,0,0,0.1)', '0 6px 25px rgba(197,166,106,0.4)', '0 4px 15px rgba(0,0,0,0.1)']
+                : '0 4px 15px rgba(0,0,0,0.1)',
+            }}
             exit={{ opacity: 0, x: 10 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
+            transition={{ 
+              duration: 0.4, 
+              delay: 0.5,
+              scale: showGuidanceHint ? { duration: 1.5, repeat: Infinity, ease: "easeInOut" } : {},
+              boxShadow: showGuidanceHint ? { duration: 1.5, repeat: Infinity, ease: "easeInOut" } : {},
+            }}
             onClick={handleOpenCurator}
-            className="fixed bottom-6 right-24 md:right-28 z-[3000]
+            className={`fixed bottom-6 right-20 md:right-28 z-[2998]
                        bg-theme-alabaster/95 backdrop-blur-sm
-                       px-4 py-2 rounded-full
+                       px-3 md:px-4 py-2 rounded-full
                        shadow-lg shadow-theme-charcoal/10
-                       border border-theme-charcoal/10
-                       hover:bg-theme-alabaster hover:border-theme-gold/40
-                       hover:shadow-xl
-                       transition-all duration-300
-                       group cursor-pointer"
+                       border transition-all duration-300
+                       group cursor-pointer
+                       ${showGuidanceHint 
+                         ? 'border-theme-gold/60' 
+                         : 'border-theme-charcoal/10 hover:bg-theme-alabaster hover:border-theme-gold/40 hover:shadow-xl'
+                       }`}
             aria-label="Ask Atlas"
           >
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-theme-charcoal/70 group-hover:text-theme-gold transition-colors">
-              Ask Atlas
+            <span className={`font-mono text-[9px] md:text-[10px] uppercase tracking-[0.15em] md:tracking-[0.2em] transition-colors
+              ${showGuidanceHint ? 'text-theme-gold' : 'text-theme-charcoal/60 group-hover:text-theme-gold'}`}>
+              {showGuidanceHint ? 'Need guidance?' : 'Ask Atlas'}
             </span>
           </motion.button>
         )}
       </AnimatePresence>
-      */}
 
-      {/* The Curator - AI Chat Interface - HIDDEN */}
-      {/*
+      {/* The Curator - AI Chat Interface */}
       <CompassCurator
         isOpen={curatorOpen}
         onClose={handleCloseCurator}
         compassPosition={compassPosition}
       />
-      */}
     </>
   );
 }

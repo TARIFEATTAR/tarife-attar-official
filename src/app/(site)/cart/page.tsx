@@ -3,13 +3,17 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ShoppingBag, Trash2, ExternalLink } from "lucide-react";
+import { ArrowLeft, ShoppingBag, Trash2, ExternalLink, Bookmark, Check } from "lucide-react";
 import { useShopifyCart } from "@/context";
 import { GlobalFooter } from "@/components/navigation";
 
 export default function CartPage() {
   const router = useRouter();
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [showSaveCart, setShowSaveCart] = useState(false);
+  const [saveCartEmail, setSaveCartEmail] = useState('');
+  const [saveCartSubmitted, setSaveCartSubmitted] = useState(false);
+  const [isSavingCart, setIsSavingCart] = useState(false);
   const { 
     items, 
     itemCount, 
@@ -21,6 +25,52 @@ export default function CartPage() {
     removeItem, 
     clearCart 
   } = useShopifyCart();
+
+  // Show "Save your satchel" prompt after 15 seconds on cart page with items
+  useEffect(() => {
+    if (items.length === 0) return;
+    
+    const hasSaved = localStorage.getItem('satchel-saved');
+    if (hasSaved) return;
+
+    const timer = setTimeout(() => {
+      setShowSaveCart(true);
+    }, 15000);
+
+    return () => clearTimeout(timer);
+  }, [items.length]);
+
+  const handleSaveCart = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!saveCartEmail) return;
+
+    setIsSavingCart(true);
+
+    try {
+      // Store in localStorage (would connect to email service in production)
+      const savedCarts = JSON.parse(localStorage.getItem('saved-carts') || '[]');
+      savedCarts.push({
+        email: saveCartEmail,
+        items: items.map(item => ({ title: item.title, price: item.price, quantity: item.quantity })),
+        total: cartTotal,
+        timestamp: new Date().toISOString(),
+      });
+      localStorage.setItem('saved-carts', JSON.stringify(savedCarts));
+      localStorage.setItem('satchel-saved', 'true');
+
+      // TODO: Connect to email service (Klaviyo, ConvertKit, etc.)
+      // await fetch('/api/save-cart', {
+      //   method: 'POST',
+      //   body: JSON.stringify({ email: saveCartEmail, items, total: cartTotal }),
+      // });
+
+      setSaveCartSubmitted(true);
+    } catch (error) {
+      console.error('Error saving cart:', error);
+    } finally {
+      setIsSavingCart(false);
+    }
+  };
 
   // Log checkout URL for debugging
   useEffect(() => {
@@ -264,6 +314,67 @@ export default function CartPage() {
                         <div className="font-mono text-[8px] uppercase border border-theme-charcoal px-2 py-1">Apple Pay</div>
                       </div>
                     </div>
+
+                    {/* Save Your Satchel - Email Capture */}
+                    <AnimatePresence>
+                      {showSaveCart && !saveCartSubmitted && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="mt-6 p-4 bg-theme-gold/5 border border-theme-gold/20 rounded-lg"
+                        >
+                          <div className="flex items-center gap-2 mb-3">
+                            <Bookmark className="w-4 h-4 text-theme-gold" />
+                            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-theme-gold">
+                              Save for Later
+                            </span>
+                          </div>
+                          <p className="font-serif italic text-sm text-theme-charcoal/70 mb-4">
+                            Not ready? Save your satchel and we'll remind you.
+                          </p>
+                          <form onSubmit={handleSaveCart} className="space-y-3">
+                            <input
+                              type="email"
+                              value={saveCartEmail}
+                              onChange={(e) => setSaveCartEmail(e.target.value)}
+                              placeholder="your@email.com"
+                              required
+                              className="w-full px-4 py-3 rounded-lg border border-theme-charcoal/10 bg-white/80 font-serif text-sm focus:outline-none focus:border-theme-gold/50"
+                              style={{ fontSize: '16px' }}
+                            />
+                            <button
+                              type="submit"
+                              disabled={isSavingCart}
+                              className="w-full py-3 bg-theme-gold/90 text-white font-mono text-[10px] uppercase tracking-[0.2em] hover:bg-theme-gold transition-colors rounded-lg disabled:opacity-50"
+                            >
+                              {isSavingCart ? 'Saving...' : 'Save My Satchel'}
+                            </button>
+                          </form>
+                          <button
+                            onClick={() => setShowSaveCart(false)}
+                            className="w-full mt-2 py-2 font-mono text-[9px] uppercase tracking-[0.15em] text-theme-charcoal/40 hover:text-theme-charcoal/60 transition-colors"
+                          >
+                            No thanks
+                          </button>
+                        </motion.div>
+                      )}
+
+                      {saveCartSubmitted && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg text-center"
+                        >
+                          <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-green-100 flex items-center justify-center">
+                            <Check className="w-5 h-5 text-green-600" />
+                          </div>
+                          <p className="font-serif italic text-sm text-green-800">
+                            Satchel saved! We'll send you a reminder.
+                          </p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               </div>
