@@ -53,7 +53,8 @@ const PRODUCT_TERRITORIES = {
   // TERRA
   'Oud & Tobacco': 'terra',
   'Marrakesh': 'terra',
-  'Black Ambergris': 'terra',  // Renamed from Black Oudh
+  'Black Ambergris': 'terra',  // Renamed from original Black Oudh
+  'Black Oudh': 'terra',  // New Black Oudh product
   'Oudh Aura': 'terra',
   'Sicilian Oudh': 'terra',
 };

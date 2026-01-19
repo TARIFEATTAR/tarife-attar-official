@@ -35,6 +35,10 @@ const SHOPIFY_TO_ATLAS_MAP = {
   'Black Musk': 'obsidian',
   'Oudh Fire': 'rogue',
   
+  // Additional mappings for renamed products
+  'DUBAI': 'dubai',  // Renamed from Dubai Musk
+  'Dubai Musk': 'dubai',  // Legacy name
+  
   // PETAL Territory
   'Peach Memoir': 'cherish',
   'Turkish Rose': 'damascus',
@@ -52,7 +56,8 @@ const SHOPIFY_TO_ATLAS_MAP = {
   // TERRA Territory
   'Oud & Tobacco': 'havana',
   'Marrakesh': 'marrakesh',
-  'Black Ambergris': 'onyx',  // Renamed from Black Oudh
+  'Black Ambergris': 'onyx',  // Renamed from original Black Oudh
+  'Black Oudh': 'black-oudh',  // New Black Oudh product (TERRA)
   'Oudh Aura': 'regalia',
   'Sicilian Oudh': 'sicily',
 };
