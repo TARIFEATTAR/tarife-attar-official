@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { ArrowLeft, Plus, Minus, Gift, MapPin, Calendar, Droplets, Check, AlertCircle, Map as MapIcon, Info } from "lucide-react";
+import { ArrowLeft, Plus, Minus, Gift, MapPin, Calendar, Droplets, Check, AlertCircle, Map as MapIcon, Info, Flame, Flower2, Waves, TreePine } from "lucide-react";
 import { urlForImage } from "@/sanity/lib/image";
 import { useShopifyCart } from "@/context";
 import { GlobalFooter } from "@/components/navigation";
@@ -120,22 +120,48 @@ const TERRITORY_TAGLINES: Record<string, string> = {
 
 type VariantSize = '6ml' | '12ml';
 
-// Territory Badge Component
+// Territory Badge Component with elegant icons
 const TerritoryBadge = ({ territory }: { territory: string }) => {
-  const colors: Record<string, { bg: string; border: string; icon: string }> = {
-    ember: { bg: 'bg-amber-50', border: 'border-amber-200', icon: '🔥' },
-    petal: { bg: 'bg-rose-50', border: 'border-rose-200', icon: '🌸' },
-    tidal: { bg: 'bg-cyan-50', border: 'border-cyan-200', icon: '🌊' },
-    terra: { bg: 'bg-emerald-50', border: 'border-emerald-200', icon: '🌲' },
+  const territories: Record<string, { 
+    bg: string; 
+    border: string; 
+    iconColor: string;
+    Icon: React.ComponentType<{ className?: string }>;
+  }> = {
+    ember: { 
+      bg: 'bg-amber-50/80', 
+      border: 'border-amber-200/60', 
+      iconColor: 'text-amber-600',
+      Icon: Flame 
+    },
+    petal: { 
+      bg: 'bg-rose-50/80', 
+      border: 'border-rose-200/60', 
+      iconColor: 'text-rose-500',
+      Icon: Flower2 
+    },
+    tidal: { 
+      bg: 'bg-cyan-50/80', 
+      border: 'border-cyan-200/60', 
+      iconColor: 'text-cyan-600',
+      Icon: Waves 
+    },
+    terra: { 
+      bg: 'bg-emerald-50/80', 
+      border: 'border-emerald-200/60', 
+      iconColor: 'text-emerald-600',
+      Icon: TreePine 
+    },
   };
   
-  const style = colors[territory] || colors.ember;
+  const style = territories[territory] || territories.ember;
   const name = TERRITORY_NAMES[territory] || territory;
+  const IconComponent = style.Icon;
   
   return (
-    <div className={`inline-flex items-center gap-2 px-3 py-1.5 ${style.bg} ${style.border} border rounded-full`}>
-      <span className="text-sm">{style.icon}</span>
-      <span className="font-mono text-[10px] uppercase tracking-widest">{name}</span>
+    <div className={`inline-flex items-center gap-2.5 px-4 py-2 ${style.bg} ${style.border} border backdrop-blur-sm`}>
+      <IconComponent className={`w-4 h-4 ${style.iconColor}`} />
+      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-theme-charcoal/80">{name}</span>
     </div>
   );
 };
@@ -599,26 +625,25 @@ export function ProductDetailClient({ product }: Props) {
                 <div className="group flex flex-col gap-3">
                   <button
                     onClick={() => setShowMap(!showMap)}
-                    className="flex items-center gap-3 text-left"
+                    className="flex items-center gap-4 text-left hover:opacity-80 transition-opacity"
                   >
-                    {/* Visual Territory Indicator */}
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-transform ${showMap ? 'scale-110' : ''} ${
-                      territory === 'ember' ? 'bg-amber-100' :
-                      territory === 'petal' ? 'bg-rose-100' :
-                      territory === 'tidal' ? 'bg-cyan-100' :
-                      territory === 'terra' ? 'bg-emerald-100' : 'bg-theme-charcoal/5'
+                    {/* Elegant circular indicator */}
+                    <div className={`w-10 h-10 border flex items-center justify-center transition-all ${
+                      showMap 
+                        ? 'border-theme-gold bg-theme-gold/5' 
+                        : 'border-theme-charcoal/20 bg-theme-charcoal/[0.02]'
                     }`}>
-                      <MapPin className={`w-5 h-5 transition-colors ${showMap ? 'text-theme-gold' : 'text-theme-charcoal/60'}`} />
+                      <MapPin className={`w-4 h-4 transition-colors ${showMap ? 'text-theme-gold' : 'text-theme-charcoal/50'}`} />
                     </div>
                     <div className="flex-1">
-                      <span className="font-mono text-[10px] uppercase tracking-widest text-theme-gold block">
+                      <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-theme-gold/80 block mb-0.5">
                         {getCoordinateLabel('atlas')}
                       </span>
-                      <span className="font-mono text-xs uppercase tracking-wider opacity-80">
+                      <span className="font-mono text-[11px] uppercase tracking-wider opacity-70">
                         {product.atlasData.gpsCoordinates}
                       </span>
                     </div>
-                    <Info className="w-4 h-4 opacity-30" />
+                    <Plus className={`w-4 h-4 opacity-40 transition-transform ${showMap ? 'rotate-45' : ''}`} />
                   </button>
 
                   <AnimatePresence>
@@ -629,21 +654,17 @@ export function ProductDetailClient({ product }: Props) {
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden"
                       >
-                        <div className="aspect-video bg-gradient-to-br from-theme-charcoal/5 to-theme-charcoal/10 border border-theme-charcoal/10 flex items-center justify-center relative group/map rounded-lg overflow-hidden">
-                          {/* Territory-colored accent */}
-                          <div className={`absolute inset-0 opacity-20 ${
-                            territory === 'ember' ? 'bg-gradient-to-br from-amber-200 to-orange-100' :
-                            territory === 'petal' ? 'bg-gradient-to-br from-rose-200 to-pink-100' :
-                            territory === 'tidal' ? 'bg-gradient-to-br from-cyan-200 to-blue-100' :
-                            territory === 'terra' ? 'bg-gradient-to-br from-emerald-200 to-green-100' : ''
-                          }`} />
-                          <MapIcon className="w-12 h-12 opacity-10 group-hover/map:scale-110 transition-transform duration-700" />
-                          <div className="absolute bottom-4 left-4 right-4">
-                            <div className="bg-theme-alabaster/90 backdrop-blur-sm px-4 py-3 rounded">
-                              <span className="font-mono text-[9px] uppercase tracking-[0.2em] opacity-60 block">
-                                Origin Point — {TERRITORY_NAMES[territory || ''] || 'Unknown'} Territory
-                              </span>
-                            </div>
+                        <div className="aspect-[16/9] bg-theme-charcoal/[0.03] border border-theme-charcoal/10 flex items-center justify-center relative group/map">
+                          {/* Subtle grid pattern */}
+                          <div className="absolute inset-0 opacity-[0.03]" style={{
+                            backgroundImage: 'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
+                            backgroundSize: '40px 40px'
+                          }} />
+                          <MapIcon className="w-16 h-16 opacity-[0.06] group-hover/map:scale-105 transition-transform duration-1000" />
+                          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-theme-alabaster/80 to-transparent">
+                            <span className="font-mono text-[9px] uppercase tracking-[0.25em] opacity-50 block">
+                              Origin · {TERRITORY_NAMES[territory || ''] || 'Unknown'} Territory
+                            </span>
                           </div>
                         </div>
                       </motion.div>
