@@ -138,7 +138,9 @@ async function main() {
       legacyName,
       "slug": slug.current,
       shopifyProductId,
-      shopifyVariantId
+      shopifyVariantId,
+      shopifyVariant6mlId,
+      shopifyVariant12mlId
     }
   `);
   console.log(`   Found ${atlasProducts.length} Atlas products\n`);
@@ -184,8 +186,8 @@ async function main() {
         continue;
       }
       
-      // Check if already linked
-      if (atlasProduct.shopifyProductId) {
+      // Check if already fully linked (has product ID AND both variant IDs)
+      if (atlasProduct.shopifyProductId && atlasProduct.shopifyVariant6mlId && atlasProduct.shopifyVariant12mlId) {
         alreadyLinked.push({ shopify, atlas: atlasProduct });
         continue;
       }
@@ -261,20 +263,31 @@ async function main() {
     
     for (const item of linked) {
       try {
+        const updateData = {
+          shopifyProductId: item.updates.shopifyProductId,
+          shopifyVariantId: item.updates.shopifyVariantId,
+        };
+        
+        // Add 6ml and 12ml variant IDs if available
+        if (item.updates.shopifyVariantId6ml) {
+          updateData.shopifyVariant6mlId = item.updates.shopifyVariantId6ml;
+        }
+        if (item.updates.shopifyVariantId12ml) {
+          updateData.shopifyVariant12mlId = item.updates.shopifyVariantId12ml;
+        }
+        
         await client
           .patch(item.atlas._id)
-          .set({
-            shopifyProductId: item.updates.shopifyProductId,
-            shopifyVariantId: item.updates.shopifyVariantId,
-            'shopifyData': {
-              productGid: item.updates.shopifyProductId,
-              variant6mlGid: item.updates.shopifyVariantId6ml,
-              variant12mlGid: item.updates.shopifyVariantId12ml,
-            }
-          })
+          .set(updateData)
           .commit();
         
         console.log(`   ✅ Updated: ${item.atlas.title}`);
+        if (updateData.shopifyVariant6mlId) {
+          console.log(`      6ml: ${updateData.shopifyVariant6mlId}`);
+        }
+        if (updateData.shopifyVariant12mlId) {
+          console.log(`      12ml: ${updateData.shopifyVariant12mlId}`);
+        }
       } catch (error) {
         console.log(`   ❌ Failed: ${item.atlas.title} - ${error.message}`);
       }
