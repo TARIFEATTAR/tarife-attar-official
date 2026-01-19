@@ -163,7 +163,7 @@ export const GlobalFooter: React.FC<Props> = ({ theme = 'dark' }) => {
             </ul>
           </motion.div>
 
-          {/* Newsletter / Lab Notes */}
+          {/* Newsletter */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -172,11 +172,11 @@ export const GlobalFooter: React.FC<Props> = ({ theme = 'dark' }) => {
             className="lg:col-span-4 space-y-6 md:space-y-8 w-full"
           >
             <h3 className="font-mono text-[9px] md:text-[10px] uppercase tracking-[0.4em] opacity-20">
-              Lab Notes
+              Stay Connected
             </h3>
             <div className="space-y-6">
               <p className="font-serif italic text-sm sm:text-base opacity-40">
-                Join the ledger for private distillation alerts.
+                New territories, limited releases, and scent journeys — delivered to your inbox.
               </p>
               
               {isSubscribed ? (
@@ -185,24 +185,24 @@ export const GlobalFooter: React.FC<Props> = ({ theme = 'dark' }) => {
                   animate={{ opacity: 1, y: 0 }}
                   className="py-4 font-mono text-[10px] uppercase tracking-widest text-theme-gold"
                 >
-                  ✓ Specimen Logged — Welcome to the Archive
+                  ✓ Welcome to the Atlas — Check your inbox
                 </motion.div>
               ) : (
-                <form onSubmit={handleSubscribe} className="relative w-full">
+                <form onSubmit={handleSubscribe} className="w-full space-y-4">
                   <input 
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="ARCHIVIST_EMAIL"
+                    placeholder="Your email address"
                     required
-                    className={`w-full bg-transparent border-b ${isDark ? 'border-white/20 focus:border-white' : 'border-theme-charcoal/20 focus:border-theme-charcoal'} py-4 font-mono text-[10px] uppercase tracking-widest outline-none transition-colors placeholder:opacity-30`}
+                    className={`w-full bg-transparent border-b ${isDark ? 'border-white/20 focus:border-white' : 'border-theme-charcoal/20 focus:border-theme-charcoal'} py-4 font-mono text-[11px] uppercase tracking-widest outline-none transition-colors placeholder:opacity-30 placeholder:normal-case placeholder:tracking-normal`}
                   />
                   <button 
                     type="submit"
                     disabled={isSubmitting}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 font-mono text-[10px] uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity disabled:opacity-20"
+                    className={`w-full py-3 font-mono text-[10px] uppercase tracking-[0.2em] transition-all ${isDark ? 'bg-theme-gold/90 text-theme-obsidian hover:bg-theme-gold' : 'bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90'} disabled:opacity-50`}
                   >
-                    {isSubmitting ? 'Processing...' : 'Subscribe'}
+                    {isSubmitting ? 'Joining...' : 'Join the Journey'}
                   </button>
                 </form>
               )}
