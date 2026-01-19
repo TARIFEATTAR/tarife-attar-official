@@ -75,7 +75,7 @@ const SHOPIFY_TO_SANITY = {
 };
 
 async function shopifyFetch(query) {
-  const res = await fetch(`https://${shopifyDomain}/api/2026-01/graphql.json`, {
+  const res = await fetch(`https://${shopifyDomain}/api/2024-01/graphql.json`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
