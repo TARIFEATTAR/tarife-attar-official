@@ -216,6 +216,15 @@ export const productSchema = {
     // Shopify Specific Fields
     ...shopifyFields,
 
+    // Shopify Preview Image URL (synced from Shopify products for display)
+    {
+      name: 'shopifyPreviewImageUrl',
+      title: 'Shopify Preview Image URL',
+      type: 'url',
+      group: 'media',
+      description: 'Image URL from linked Shopify product. Used as fallback when no mainImage is set.',
+    },
+
     // Shopify Store Data (read-only, synced from Shopify Connect)
     {
       name: 'store',

@@ -47,6 +47,8 @@ interface Territory {
     volume?: string;
     productFormat?: string;
     mainImage?: any;
+    shopifyPreviewImageUrl?: string;
+    shopifyImage?: string;
     fieldReport?: {
       image?: any;
     };
@@ -195,54 +197,65 @@ export function AtlasClient({ territories, totalCount }: Props) {
                         href={`/product/${product.slug.current}`}
                         className="group aspect-[4/5] bg-gradient-to-b bg-theme-charcoal/[0.03] border border-theme-charcoal/10 flex flex-col overflow-hidden hover:border-theme-charcoal/20 transition-colors"
                       >
-                        {product.mainImage || product.fieldReport?.image ? (() => {
-                          const displayImage = product.mainImage || product.fieldReport?.image;
-                          const imageUrl = urlForImage(displayImage);
-                          if (!imageUrl) {
-                            return (
-                              <div className="w-full h-4/5 bg-theme-charcoal/5 flex items-center justify-center">
-                                <span className="font-mono text-[8px] uppercase tracking-widest opacity-20">
-                                  No Image
-                                </span>
-                              </div>
-                            );
+                        {(() => {
+                          // Check for Sanity image first
+                          const sanityImage = product.mainImage || product.fieldReport?.image;
+                          const imageUrl = sanityImage ? urlForImage(sanityImage) : null;
+                          
+                          // Fallback to Shopify image URL
+                          const shopifyImageUrl = product.shopifyPreviewImageUrl || product.shopifyImage;
+                          
+                          if (imageUrl) {
+                            try {
+                              const imageSrc = imageUrl.width(400).height(500).url();
+                              return (
+                                <div className="relative w-full h-4/5 bg-theme-charcoal/5">
+                                  <Image
+                                    src={imageSrc}
+                                    alt={product.title || 'Product image'}
+                                    fill
+                                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 16vw"
+                                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      target.style.display = 'none';
+                                    }}
+                                  />
+                                </div>
+                              );
+                            } catch (error) {
+                              console.warn('Failed to generate image URL for product:', product.title, error);
+                            }
                           }
-
-                          try {
-                            const imageSrc = imageUrl.width(400).height(500).url();
+                          
+                          // Use Shopify image as fallback
+                          if (shopifyImageUrl) {
                             return (
                               <div className="relative w-full h-4/5 bg-theme-charcoal/5">
                                 <Image
-                                  src={imageSrc}
+                                  src={shopifyImageUrl}
                                   alt={product.title || 'Product image'}
                                   fill
                                   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 16vw"
                                   className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                                   onError={(e) => {
-                                    // Hide broken images
                                     const target = e.target as HTMLImageElement;
                                     target.style.display = 'none';
                                   }}
                                 />
                               </div>
                             );
-                          } catch (error) {
-                            console.warn('Failed to generate image URL for product:', product.title, error);
-                            return (
-                              <div className="w-full h-4/5 bg-theme-charcoal/5 flex items-center justify-center">
-                                <span className="font-mono text-[8px] uppercase tracking-widest opacity-20">
-                                  No Image
-                                </span>
-                              </div>
-                            );
                           }
-                        })() : (
-                          <div className="w-full h-3/4 bg-theme-charcoal/5 flex items-center justify-center">
-                            <span className="font-mono text-[8px] uppercase tracking-widest opacity-20">
-                              No Image
-                            </span>
-                          </div>
-                        )}
+                          
+                          // No image available
+                          return (
+                            <div className="w-full h-4/5 bg-theme-charcoal/5 flex items-center justify-center">
+                              <span className="font-mono text-[8px] uppercase tracking-widest opacity-20">
+                                No Image
+                              </span>
+                            </div>
+                          );
+                        })()}
                         <div className="p-3 md:p-4 flex-1 flex flex-col justify-between min-w-0">
                           <div className="min-w-0">
                             <h3 className="font-serif italic text-sm md:text-lg mb-1 group-hover:tracking-tighter transition-all line-clamp-2 leading-tight break-words overflow-hidden">
