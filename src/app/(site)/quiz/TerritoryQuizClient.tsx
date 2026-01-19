@@ -508,7 +508,7 @@ export function TerritoryQuizClient() {
                     className="flex flex-col sm:flex-row gap-3 mt-8 justify-center"
                   >
                     <button
-                      onClick={() => router.push('/atlas')}
+                      onClick={() => router.push(`/atlas?territory=${resultTerritory.id.toLowerCase()}`)}
                       className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-theme-charcoal/20 font-mono text-sm uppercase tracking-[0.15em] hover:bg-theme-charcoal hover:text-theme-alabaster transition-colors"
                     >
                       Explore {resultTerritory.name}

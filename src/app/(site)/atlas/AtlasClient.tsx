@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { GlobalFooter } from "@/components/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -66,11 +66,52 @@ interface Props {
 
 export function AtlasClient({ territories, totalCount }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [activeTerritory, setActiveTerritory] = useState<string | null>(null);
+  const territoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Read territory from URL parameter on mount
+  useEffect(() => {
+    const territoryParam = searchParams.get('territory');
+    if (territoryParam) {
+      const validTerritory = territories.find(
+        (t) => t.id.toLowerCase() === territoryParam.toLowerCase()
+      );
+      if (validTerritory) {
+        setActiveTerritory(validTerritory.id);
+        // Scroll to territory section after a brief delay for DOM to render
+        setTimeout(() => {
+          const element = territoryRefs.current[validTerritory.id];
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 300);
+      }
+    }
+  }, [searchParams, territories]);
 
   const handleNavigate = (path: string) => {
     if (path === "home") router.push("/");
     else router.push(`/${path}`);
+  };
+  
+  // Handle territory selection with URL update
+  const handleTerritorySelect = (territoryId: string | null) => {
+    setActiveTerritory(territoryId);
+    
+    // Update URL without full navigation
+    if (territoryId) {
+      window.history.replaceState({}, '', `/atlas?territory=${territoryId.toLowerCase()}`);
+      // Scroll to territory section
+      setTimeout(() => {
+        const element = territoryRefs.current[territoryId];
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    } else {
+      window.history.replaceState({}, '', '/atlas');
+    }
   };
 
   return (
@@ -153,7 +194,7 @@ export function AtlasClient({ territories, totalCount }: Props) {
             className="flex flex-wrap gap-2 md:gap-4 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide"
           >
             <button
-              onClick={() => setActiveTerritory(null)}
+              onClick={() => handleTerritorySelect(null)}
               className={`px-3 md:px-6 py-2 md:py-3 font-mono text-[9px] md:text-sm uppercase tracking-[0.15em] md:tracking-widest transition-all whitespace-nowrap flex-shrink-0 ${activeTerritory === null
                 ? "bg-theme-charcoal text-theme-alabaster"
                 : "bg-theme-charcoal/5 opacity-80 hover:opacity-100"
@@ -165,7 +206,7 @@ export function AtlasClient({ territories, totalCount }: Props) {
             {territories.map((territory) => (
               <button
                 key={territory.id}
-                onClick={() => setActiveTerritory(territory.id)}
+                onClick={() => handleTerritorySelect(territory.id)}
                 className={`px-3 md:px-6 py-2 md:py-3 font-mono text-[9px] md:text-sm uppercase tracking-[0.15em] md:tracking-widest transition-all whitespace-nowrap flex-shrink-0 ${activeTerritory === territory.id
                   ? "bg-theme-charcoal text-theme-alabaster"
                   : "bg-theme-charcoal/5 opacity-80 hover:opacity-100"
@@ -186,10 +227,11 @@ export function AtlasClient({ territories, totalCount }: Props) {
             .map((territory, index) => (
               <motion.div
                 key={territory.id}
+                ref={(el) => { territoryRefs.current[territory.id] = el; }}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="space-y-3 md:space-y-4"
+                className="space-y-3 md:space-y-4 scroll-mt-24"
               >
                 {/* Territory Header - Compact */}
                 <div className="flex flex-row items-end justify-between gap-2 md:gap-4 border-b border-theme-charcoal/10 pb-2 md:pb-4 min-w-0">

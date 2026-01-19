@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { sanityFetch } from "@/sanity/lib/client";
 import {
   atlasProductsByTerritoryQuery,
@@ -86,5 +87,9 @@ export default async function AtlasPage() {
 
   const totalCount = products.length;
 
-  return <AtlasClient territories={productsByTerritory} totalCount={totalCount} />;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-theme-alabaster" />}>
+      <AtlasClient territories={productsByTerritory} totalCount={totalCount} />
+    </Suspense>
+  );
 }
