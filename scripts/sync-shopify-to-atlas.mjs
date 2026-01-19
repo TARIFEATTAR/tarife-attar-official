@@ -33,7 +33,7 @@ const SHOPIFY_TO_ATLAS_MAP = {
   'Frankincense & Myrrh': 'devotion',
   'Vanilla Sands': 'dune',
   'Black Musk': 'obsidian',
-  'Oudh Fire': 'rogue',
+  'Oudh Fire': 'aden',  // ADEN (formerly ROGUE)
   
   // Additional mappings for renamed products
   'DUBAI': 'dubai',  // Renamed from Dubai Musk
