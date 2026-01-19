@@ -584,12 +584,6 @@ export function ProductDetailClient({ product }: Props) {
                 <p className="font-serif italic text-sm md:text-base opacity-70">
                   {territoryTagline}
                 </p>
-                {/* Inspired By */}
-                {product.inspiredBy && (
-                  <p className="font-mono text-[10px] uppercase tracking-widest opacity-50">
-                    Inspired by {product.inspiredBy}
-                  </p>
-                )}
               </div>
             )}
 
