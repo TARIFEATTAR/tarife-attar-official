@@ -175,6 +175,16 @@ export const productSchema = {
       description: 'e.g., "9ml", "3ml", "15ml"',
     },
 
+    // Scent Profile (Short summary for Atlas Collection)
+    {
+      name: 'scentProfile',
+      title: 'Scent Profile',
+      type: 'string',
+      group: 'general',
+      description: 'Brief scent summary (e.g., "Amber, warmth" or "Ocean, marine"). Displays on product cards.',
+      placeholder: 'e.g., Honey, oudh',
+    },
+
     // Product Format
     {
       name: 'productFormat',

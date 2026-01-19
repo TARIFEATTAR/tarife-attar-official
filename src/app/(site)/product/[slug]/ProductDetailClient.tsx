@@ -24,6 +24,7 @@ interface Product {
   legacyName?: string;
   showLegacyName?: boolean;
   legacyNameStyle?: 'formerly' | 'once-known' | 'previously';
+  scentProfile?: string;
   collectionType: "atlas" | "relic";
   price?: number;
   volume?: string;
@@ -443,6 +444,13 @@ export function ProductDetailClient({ product }: Props) {
               style={product.legacyNameStyle}
               className="text-sm md:text-base opacity-60 mt-2"
             />
+
+            {/* Scent Profile Summary */}
+            {product.scentProfile && (
+              <p className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-60 mt-3">
+                {product.scentProfile}
+              </p>
+            )}
 
             {/* Product Essence/Notes Preview */}
             {product.notes && (

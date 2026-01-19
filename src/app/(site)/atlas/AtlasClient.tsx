@@ -33,6 +33,7 @@ interface Territory {
     legacyName?: string;
     showLegacyName?: boolean;
     legacyNameStyle?: 'formerly' | 'once-known' | 'previously';
+    scentProfile?: string;
   }>;
 }
 
@@ -225,6 +226,11 @@ export function AtlasClient({ territories, totalCount }: Props) {
                               style={product.legacyNameStyle}
                               className="text-[10px] md:text-xs opacity-60 mb-1"
                             />
+                            {product.scentProfile && (
+                              <p className="font-mono text-[8px] md:text-[10px] uppercase tracking-wider opacity-50 mb-1 line-clamp-1">
+                                {product.scentProfile}
+                              </p>
+                            )}
                             {product.price && (
                               <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.1em] md:tracking-widest opacity-80 tabular-nums break-words">
                                 ${product.price}

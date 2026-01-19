@@ -15,6 +15,7 @@ export const atlasProductsByTerritoryQuery = groq`
     legacyName,
     showLegacyName,
     legacyNameStyle,
+    scentProfile,
     internalName,
     "price": coalesce(price, store.priceRange.minVariantPrice),
     volume,
@@ -171,6 +172,7 @@ export const productBySlugQuery = groq`
     legacyName,
     showLegacyName,
     legacyNameStyle,
+    scentProfile,
     internalName,
     collectionType,
     "price": coalesce(price, store.priceRange.minVariantPrice),
@@ -190,6 +192,7 @@ export const productBySlugQuery = groq`
       legacyName,
       showLegacyName,
       legacyNameStyle,
+      scentProfile,
       "price": coalesce(price, store.priceRange.minVariantPrice),
       mainImage
     },
