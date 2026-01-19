@@ -25,6 +25,7 @@ interface Product {
   showLegacyName?: boolean;
   legacyNameStyle?: 'formerly' | 'once-known' | 'previously';
   scentProfile?: string;
+  inspiredBy?: string;
   collectionType: "atlas" | "relic";
   price?: number;
   volume?: string;
@@ -118,6 +119,26 @@ const TERRITORY_TAGLINES: Record<string, string> = {
 };
 
 type VariantSize = '6ml' | '12ml';
+
+// Territory Badge Component
+const TerritoryBadge = ({ territory }: { territory: string }) => {
+  const colors: Record<string, { bg: string; border: string; icon: string }> = {
+    ember: { bg: 'bg-amber-50', border: 'border-amber-200', icon: '🔥' },
+    petal: { bg: 'bg-rose-50', border: 'border-rose-200', icon: '🌸' },
+    tidal: { bg: 'bg-cyan-50', border: 'border-cyan-200', icon: '🌊' },
+    terra: { bg: 'bg-emerald-50', border: 'border-emerald-200', icon: '🌲' },
+  };
+  
+  const style = colors[territory] || colors.ember;
+  const name = TERRITORY_NAMES[territory] || territory;
+  
+  return (
+    <div className={`inline-flex items-center gap-2 px-3 py-1.5 ${style.bg} ${style.border} border rounded-full`}>
+      <span className="text-sm">{style.icon}</span>
+      <span className="font-mono text-[10px] uppercase tracking-widest">{name}</span>
+    </div>
+  );
+};
 
 // Scent Pyramid Component
 const ScentPyramid = ({ notes }: { notes: Product["notes"] }) => {
@@ -478,15 +499,19 @@ export function ProductDetailClient({ product }: Props) {
 
             {/* Territory Context (Atlas only) */}
             {isAtlas && territory && territoryTagline && (
-              <div className="py-4 border-y border-theme-charcoal/10">
+              <div className="py-4 border-y border-theme-charcoal/10 space-y-3">
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-xs uppercase tracking-[0.3em] text-theme-gold">
-                    {TERRITORY_NAMES[territory]} Territory
-                  </span>
+                  <TerritoryBadge territory={territory} />
                 </div>
-                <p className="font-serif italic text-sm md:text-base opacity-70 mt-2">
+                <p className="font-serif italic text-sm md:text-base opacity-70">
                   {territoryTagline}
                 </p>
+                {/* Inspired By */}
+                {product.inspiredBy && (
+                  <p className="font-mono text-[10px] uppercase tracking-widest opacity-50">
+                    Inspired by {product.inspiredBy}
+                  </p>
+                )}
               </div>
             )}
 
@@ -568,43 +593,63 @@ export function ProductDetailClient({ product }: Props) {
               </div>
             )}
 
-            {/* Atlas-Specific Details */}
-            {isAtlas && product.atlasData && (
-              <div className="space-y-3 pt-4 border-t border-theme-charcoal/10">
-                {product.atlasData.gpsCoordinates && (
-                  <div className="group flex flex-col gap-3">
-                    <button
-                      onClick={() => setShowMap(!showMap)}
-                      className="flex items-center gap-2 font-mono text-xs md:text-sm uppercase tracking-widest opacity-80 hover:opacity-100 hover:text-theme-gold transition-all"
-                    >
-                      <MapPin className={`w-4 h-4 transition-transform ${showMap ? 'scale-110 text-theme-gold' : ''}`} />
-                      <span className="border-b border-transparent group-hover:border-theme-gold/30">
-                        <span className="text-theme-gold">{getCoordinateLabel('atlas')}:</span> {product.atlasData.gpsCoordinates}
+            {/* Atlas-Specific Details - GPS / Origin Point */}
+            {isAtlas && product.atlasData?.gpsCoordinates && (
+              <div className="pt-4 border-t border-theme-charcoal/10">
+                <div className="group flex flex-col gap-3">
+                  <button
+                    onClick={() => setShowMap(!showMap)}
+                    className="flex items-center gap-3 text-left"
+                  >
+                    {/* Visual Territory Indicator */}
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-transform ${showMap ? 'scale-110' : ''} ${
+                      territory === 'ember' ? 'bg-amber-100' :
+                      territory === 'petal' ? 'bg-rose-100' :
+                      territory === 'tidal' ? 'bg-cyan-100' :
+                      territory === 'terra' ? 'bg-emerald-100' : 'bg-theme-charcoal/5'
+                    }`}>
+                      <MapPin className={`w-5 h-5 transition-colors ${showMap ? 'text-theme-gold' : 'text-theme-charcoal/60'}`} />
+                    </div>
+                    <div className="flex-1">
+                      <span className="font-mono text-[10px] uppercase tracking-widest text-theme-gold block">
+                        {getCoordinateLabel('atlas')}
                       </span>
-                      <Info className="w-3 h-3 opacity-30" />
-                    </button>
+                      <span className="font-mono text-xs uppercase tracking-wider opacity-80">
+                        {product.atlasData.gpsCoordinates}
+                      </span>
+                    </div>
+                    <Info className="w-4 h-4 opacity-30" />
+                  </button>
 
-                    <AnimatePresence>
-                      {showMap && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="aspect-video bg-theme-charcoal/5 border border-theme-charcoal/10 flex items-center justify-center relative group/map">
-                            <MapIcon className="w-8 h-8 opacity-10 group-hover/map:scale-110 transition-transform duration-700" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="font-mono text-[9px] uppercase tracking-[0.3em] opacity-40">
-                                [ Interactive Territory Map Integration Pending ]
+                  <AnimatePresence>
+                    {showMap && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="aspect-video bg-gradient-to-br from-theme-charcoal/5 to-theme-charcoal/10 border border-theme-charcoal/10 flex items-center justify-center relative group/map rounded-lg overflow-hidden">
+                          {/* Territory-colored accent */}
+                          <div className={`absolute inset-0 opacity-20 ${
+                            territory === 'ember' ? 'bg-gradient-to-br from-amber-200 to-orange-100' :
+                            territory === 'petal' ? 'bg-gradient-to-br from-rose-200 to-pink-100' :
+                            territory === 'tidal' ? 'bg-gradient-to-br from-cyan-200 to-blue-100' :
+                            territory === 'terra' ? 'bg-gradient-to-br from-emerald-200 to-green-100' : ''
+                          }`} />
+                          <MapIcon className="w-12 h-12 opacity-10 group-hover/map:scale-110 transition-transform duration-700" />
+                          <div className="absolute bottom-4 left-4 right-4">
+                            <div className="bg-theme-alabaster/90 backdrop-blur-sm px-4 py-3 rounded">
+                              <span className="font-mono text-[9px] uppercase tracking-[0.2em] opacity-60 block">
+                                Origin Point — {TERRITORY_NAMES[territory || ''] || 'Unknown'} Territory
                               </span>
                             </div>
                           </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             )}
 
@@ -792,39 +837,30 @@ export function ProductDetailClient({ product }: Props) {
               Make it a gift
             </motion.button>
 
+            {/* The Journey / Travel Log - VISIBLE BY DEFAULT */}
+            {(isAtlas && product.atlasData?.travelLog) || (isRelic && product.relicData?.museumDescription) ? (
+              <div className="pt-8 border-t border-theme-charcoal/10">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-theme-gold block mb-4">
+                    {isAtlas ? "The Journey" : "Curator's Notes"}
+                  </span>
+                  <div className="font-serif italic text-base md:text-lg leading-relaxed opacity-90">
+                    {isAtlas && product.atlasData?.travelLog ? (
+                      <PortableText value={product.atlasData.travelLog} />
+                    ) : isRelic && product.relicData?.museumDescription ? (
+                      <PortableText value={product.relicData.museumDescription} />
+                    ) : null}
+                  </div>
+                </motion.div>
+              </div>
+            ) : null}
+
             {/* Collapsible Sections */}
             <div className="space-y-2 pt-8 border-t border-theme-charcoal/10">
-              {/* Product Description */}
-              <button
-                onClick={() => toggleSection("description")}
-                className="w-full flex items-center justify-between py-4 font-mono text-xs md:text-sm uppercase tracking-widest opacity-90 hover:opacity-100 transition-opacity"
-              >
-                <span>Product Description</span>
-                <Plus
-                  className={`w-4 h-4 transition-transform ${expandedSections.description ? "rotate-45" : ""
-                    }`}
-                />
-              </button>
-              <AnimatePresence>
-                {expandedSections.description && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="pb-4 font-serif italic text-base md:text-lg leading-relaxed opacity-90">
-                      {isAtlas && product.atlasData?.travelLog ? (
-                        <PortableText value={product.atlasData.travelLog} />
-                      ) : isRelic && product.relicData?.museumDescription ? (
-                        <PortableText value={product.relicData.museumDescription} />
-                      ) : (
-                        <p>No description available.</p>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
 
               {/* Notes & Ingredients */}
               <button

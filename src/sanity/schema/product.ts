@@ -185,6 +185,16 @@ export const productSchema = {
       placeholder: 'e.g., Honey, oudh',
     },
 
+    // Inspired By (Reference to famous fragrances)
+    {
+      name: 'inspiredBy',
+      title: 'Inspired By',
+      type: 'string',
+      group: 'general',
+      description: 'Optional: Reference fragrance or concept (e.g., "Halfeti Leather by Penhaligon\'s"). Displays on product page.',
+      placeholder: 'e.g., Megamare by Orto Parisi',
+    },
+
     // Product Format
     {
       name: 'productFormat',

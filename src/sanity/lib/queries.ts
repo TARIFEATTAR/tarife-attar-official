@@ -173,6 +173,7 @@ export const productBySlugQuery = groq`
     showLegacyName,
     legacyNameStyle,
     scentProfile,
+    inspiredBy,
     internalName,
     collectionType,
     "price": coalesce(price, store.priceRange.minVariantPrice),
