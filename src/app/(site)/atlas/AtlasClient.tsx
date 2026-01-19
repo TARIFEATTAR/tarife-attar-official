@@ -114,6 +114,14 @@ export function AtlasClient({ territories, totalCount }: Props) {
             <p className="hidden md:block font-mono text-[10px] md:text-sm uppercase tracking-[0.3em] md:tracking-widest opacity-70 leading-tight break-words">
               Navigate by territory. Discover by instinct.
             </p>
+            
+            {/* Quiz CTA */}
+            <Link
+              href="/quiz"
+              className="inline-block mt-6 md:mt-8 font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] text-theme-gold/80 hover:text-theme-gold transition-colors"
+            >
+              Not sure where to start? → Take the Territory Quiz
+            </Link>
           </motion.div>
         </div>
       </section>

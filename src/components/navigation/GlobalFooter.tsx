@@ -34,7 +34,7 @@ export const GlobalFooter: React.FC<Props> = ({ theme = 'dark' }) => {
     { label: 'Threshold', href: '/' },
     { label: 'Atlas Collection', href: '/atlas' },
     { label: 'Relic Vault', href: '/relic' },
-    { label: 'Private Consult', href: '/consult' },
+    { label: 'Territory Quiz', href: '/quiz' },
   ];
 
   const utilityLinks = [
