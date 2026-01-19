@@ -11,6 +11,27 @@ import { urlForImage } from "@/sanity/lib/image";
 import { getItemLabel } from "@/lib/brandSystem";
 import { LegacyName } from "@/components/product/LegacyName";
 
+// Territory-based pricing for Atlas Collection (same as ProductDetailClient)
+const TERRITORY_PRICING: Record<string, { '6ml': number; '12ml': number }> = {
+  ember: { '6ml': 28, '12ml': 48 },
+  petal: { '6ml': 30, '12ml': 50 },
+  tidal: { '6ml': 30, '12ml': 50 },
+  terra: { '6ml': 33, '12ml': 55 },
+};
+
+// Helper to format price range for display
+const getTerritoryPriceRange = (territoryId: string): string => {
+  const pricing = TERRITORY_PRICING[territoryId];
+  if (!pricing) return '';
+  return `$${pricing['6ml']} – $${pricing['12ml']}`;
+};
+
+// Helper to get starting price for a territory
+const getTerritoryStartingPrice = (territoryId: string): number | null => {
+  const pricing = TERRITORY_PRICING[territoryId];
+  return pricing ? pricing['6ml'] : null;
+};
+
 interface Territory {
   id: string;
   name: string;
@@ -153,9 +174,16 @@ export function AtlasClient({ territories, totalCount }: Props) {
                       {territory.tagline}
                     </p>
                   </div>
-                  <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest opacity-70 flex-shrink-0 whitespace-nowrap">
-                    {territory.count} {getItemLabel('atlas', territory.count)}
-                  </p>
+                  <div className="flex flex-col items-start md:items-end gap-1 flex-shrink-0">
+                    <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest opacity-70 whitespace-nowrap">
+                      {territory.count} {getItemLabel('atlas', territory.count)}
+                    </p>
+                    {getTerritoryPriceRange(territory.id) && (
+                      <p className="font-mono text-[9px] md:text-xs uppercase tracking-wider opacity-50 whitespace-nowrap">
+                        {getTerritoryPriceRange(territory.id)}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
                 {/* Product Grid */}
@@ -231,7 +259,12 @@ export function AtlasClient({ territories, totalCount }: Props) {
                                 {product.scentProfile}
                               </p>
                             )}
-                            {product.price && (
+                            {/* Territory-based pricing */}
+                            {getTerritoryStartingPrice(territory.id) ? (
+                              <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.1em] md:tracking-widest opacity-80 tabular-nums break-words">
+                                From ${getTerritoryStartingPrice(territory.id)}
+                              </p>
+                            ) : product.price && (
                               <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.1em] md:tracking-widest opacity-80 tabular-nums break-words">
                                 ${product.price}
                               </p>
