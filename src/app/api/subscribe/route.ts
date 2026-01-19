@@ -14,6 +14,7 @@ const OMNISEND_API_URL = 'https://api.omnisend.com/v3/contacts';
 
 interface SubscribeRequest {
   email: string;
+  firstName?: string;
   source: 'quiz' | 'satchel' | 'newsletter';
   territory?: 'ember' | 'petal' | 'tidal' | 'terra';
   cartItems?: Array<{
@@ -25,7 +26,7 @@ interface SubscribeRequest {
 export async function POST(request: NextRequest) {
   try {
     const body: SubscribeRequest = await request.json();
-    const { email, source, territory, cartItems } = body;
+    const { email, firstName, source, territory, cartItems } = body;
 
     // Validate email
     if (!email || !email.includes('@')) {
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create/update contact in Omnisend
-    const omnisendPayload = {
+    const omnisendPayload: Record<string, unknown> = {
       identifiers: [
         {
           type: 'email',
@@ -105,6 +106,11 @@ export async function POST(request: NextRequest) {
       tags,
       customProperties,
     };
+
+    // Add first name if provided
+    if (firstName) {
+      omnisendPayload.firstName = firstName;
+    }
 
     const response = await fetch(OMNISEND_API_URL, {
       method: 'POST',

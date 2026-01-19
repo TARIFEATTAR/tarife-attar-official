@@ -141,10 +141,12 @@ export function TerritoryQuizClient() {
   const [answers, setAnswers] = useState<Record<number, ('EMBER' | 'PETAL' | 'TIDAL' | 'TERRA')[]>>({});
   const [showResult, setShowResult] = useState(false);
   const [resultTerritory, setResultTerritory] = useState<Territory | null>(null);
+  const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
+  const [showNameCapture, setShowNameCapture] = useState(false);
 
   // Calculate result when quiz is complete
   const calculateResult = () => {
@@ -200,6 +202,7 @@ export function TerritoryQuizClient() {
         },
         body: JSON.stringify({
           email,
+          firstName: firstName.trim() || undefined,
           source: 'quiz',
           territory: resultTerritory.id.toLowerCase(),
         }),
@@ -327,7 +330,10 @@ export function TerritoryQuizClient() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.7 }}
-                  onClick={() => setShowIntro(false)}
+                  onClick={() => {
+                    setShowIntro(false);
+                    setShowNameCapture(true);
+                  }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="inline-flex items-center gap-3 bg-theme-charcoal text-theme-alabaster px-8 py-4 rounded-full font-mono text-sm uppercase tracking-[0.2em] hover:bg-theme-charcoal/90 transition-colors"
@@ -339,8 +345,80 @@ export function TerritoryQuizClient() {
             </motion.div>
           )}
 
+          {/* Name Capture Screen */}
+          {showNameCapture && (
+            <motion.div
+              key="name-capture"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="flex-1 flex items-center justify-center px-4"
+            >
+              <div className="max-w-md w-full text-center">
+                <motion.span
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="font-mono text-[10px] uppercase tracking-[0.4em] text-theme-gold block mb-4"
+                >
+                  Before We Begin
+                </motion.span>
+
+                <motion.h2
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-3xl md:text-4xl font-serif italic tracking-tight leading-tight mb-3"
+                >
+                  What should we call you?
+                </motion.h2>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="font-serif text-theme-charcoal/60 mb-8"
+                >
+                  So we can personalize your journey.
+                </motion.p>
+
+                <motion.form
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (firstName.trim()) {
+                      setShowNameCapture(false);
+                    }
+                  }}
+                  className="space-y-6"
+                >
+                  <input
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Your first name"
+                    autoFocus
+                    className="w-full px-6 py-4 text-center text-xl font-serif border-b-2 border-theme-charcoal/20 bg-transparent focus:outline-none focus:border-theme-gold transition-colors placeholder:text-theme-charcoal/30"
+                    style={{ fontSize: '20px' }}
+                  />
+
+                  <button
+                    type="submit"
+                    disabled={!firstName.trim()}
+                    className="inline-flex items-center gap-3 bg-theme-charcoal text-theme-alabaster px-8 py-4 rounded-full font-mono text-sm uppercase tracking-[0.2em] hover:bg-theme-charcoal/90 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    Continue
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </motion.form>
+              </div>
+            </motion.div>
+          )}
+
           {/* Questions */}
-          {!showIntro && !showResult && (
+          {!showIntro && !showNameCapture && !showResult && (
             <motion.div
               key={`question-${currentQuestion}`}
               initial={{ opacity: 0, x: 20 }}
@@ -355,7 +433,9 @@ export function TerritoryQuizClient() {
                     {currentQ.subtext}
                   </span>
                   <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif tracking-tight leading-tight text-theme-charcoal">
-                    {currentQ.question}
+                    {currentQuestion === 0 && firstName
+                      ? `${firstName}, ${currentQ.question.charAt(0).toLowerCase()}${currentQ.question.slice(1)}`
+                      : currentQ.question}
                   </h2>
                 </div>
 
@@ -412,7 +492,7 @@ export function TerritoryQuizClient() {
                     transition={{ delay: 0.4 }}
                     className="font-mono text-[11px] uppercase tracking-[0.4em] text-white/70 block mb-3"
                   >
-                    Your Territory
+                    {firstName ? `${firstName}, you're` : 'Your Territory'}
                   </motion.span>
 
                   <motion.h1
@@ -421,7 +501,7 @@ export function TerritoryQuizClient() {
                     transition={{ delay: 0.5 }}
                     className="text-5xl md:text-7xl font-serif tracking-tighter mb-4"
                   >
-                    {resultTerritory.name}
+                    {firstName ? `An ${resultTerritory.name} Soul` : resultTerritory.name}
                   </motion.h1>
 
                   <motion.p
@@ -533,10 +613,12 @@ export function TerritoryQuizClient() {
                       onClick={() => {
                         setShowResult(false);
                         setShowIntro(true);
+                        setShowNameCapture(false);
                         setCurrentQuestion(0);
                         setAnswers({});
                         setEmailSubmitted(false);
                         setEmail('');
+                        setFirstName('');
                       }}
                       className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-mono text-sm uppercase tracking-[0.15em] text-theme-charcoal/60 hover:text-theme-charcoal transition-colors"
                     >
