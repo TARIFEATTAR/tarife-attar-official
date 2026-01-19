@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ShoppingBag, Trash2, ExternalLink } from "lucide-react";
@@ -8,6 +9,7 @@ import { GlobalFooter } from "@/components/navigation";
 
 export default function CartPage() {
   const router = useRouter();
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const { 
     items, 
     itemCount, 
@@ -20,10 +22,39 @@ export default function CartPage() {
     clearCart 
   } = useShopifyCart();
 
-  const handleCheckout = () => {
+  // Log checkout URL for debugging
+  useEffect(() => {
     if (checkoutUrl) {
-      window.location.href = checkoutUrl;
+      console.log('Checkout URL available:', checkoutUrl);
+      setCheckoutError(null); // Clear error when URL becomes available
+    } else {
+      console.warn('Checkout URL is missing. Cart state:', { items, itemCount, cartTotal });
     }
+  }, [checkoutUrl, items, itemCount, cartTotal]);
+
+  const handleCheckout = () => {
+    setCheckoutError(null); // Clear previous errors
+
+    if (items.length === 0) {
+      setCheckoutError('Your cart is empty. Please add items before checking out.');
+      return;
+    }
+
+    if (!checkoutUrl) {
+      setCheckoutError('Checkout URL not available. Please try refreshing the page or adding items again.');
+      console.error('Checkout URL is missing:', { checkoutUrl, items, itemCount });
+      return;
+    }
+
+    // Validate checkout URL format
+    if (!checkoutUrl.startsWith('http://') && !checkoutUrl.startsWith('https://')) {
+      setCheckoutError('Invalid checkout URL. Please refresh the page and try again.');
+      console.error('Invalid checkout URL format:', checkoutUrl);
+      return;
+    }
+
+    console.log('Redirecting to checkout:', checkoutUrl);
+    window.location.href = checkoutUrl;
   };
 
   return (
@@ -56,13 +87,15 @@ export default function CartPage() {
               Your Satchel
             </h1>
 
-            {error && (
+            {(error || checkoutError) && (
               <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded">
                 <p className="font-mono text-xs uppercase tracking-widest text-red-800">
-                  Error: {error}
+                  Error: {error || checkoutError}
                 </p>
                 <p className="font-mono text-[10px] uppercase tracking-widest text-red-600 mt-2 opacity-80">
-                  Please check your Shopify configuration or try refreshing the page.
+                  {error 
+                    ? 'Please check your Shopify configuration or try refreshing the page.'
+                    : 'Please try refreshing the page or adding items to your cart again.'}
                 </p>
               </div>
             )}
@@ -182,10 +215,11 @@ export default function CartPage() {
                       </div>
                       <button 
                         onClick={handleCheckout}
-                        disabled={isLoading || !checkoutUrl}
+                        disabled={isLoading || !checkoutUrl || items.length === 0}
                         className="w-full py-5 bg-theme-charcoal text-theme-alabaster font-mono text-[10px] uppercase tracking-[0.4em] hover:bg-theme-obsidian transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group"
+                        title={!checkoutUrl ? 'Checkout URL not available. Please refresh the page.' : items.length === 0 ? 'Your cart is empty' : 'Proceed to secure checkout'}
                       >
-                        {isLoading ? "Syncing..." : (
+                        {isLoading ? "Syncing..." : !checkoutUrl ? "Preparing Checkout..." : (
                           <>
                             Secure Checkout
                             <ExternalLink className="w-3 h-3 opacity-40 group-hover:opacity-100 transition-opacity" />
