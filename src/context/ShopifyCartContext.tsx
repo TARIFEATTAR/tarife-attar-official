@@ -221,7 +221,24 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
 
   const itemCount = cart?.totalQuantity || 0;
   const cartTotal = String(cart?.cost?.totalAmount?.amount || '0.00');
-  const checkoutUrl = cart?.checkoutUrl || '';
+  
+  // Transform checkout URL to use Shopify domain if it's pointing to custom domain
+  const rawCheckoutUrl = cart?.checkoutUrl || '';
+  const shopifyDomain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN || '';
+  
+  let checkoutUrl = rawCheckoutUrl;
+  if (rawCheckoutUrl && shopifyDomain) {
+    // If checkout URL is pointing to tarifeattar.com, replace with Shopify domain
+    const customDomainPattern = /https?:\/\/(www\.)?tarifeattar\.com/;
+    if (customDomainPattern.test(rawCheckoutUrl)) {
+      // Extract the path and query from the checkout URL
+      const url = new URL(rawCheckoutUrl);
+      const pathAndQuery = url.pathname + url.search;
+      // Replace with Shopify store domain
+      checkoutUrl = `https://${shopifyDomain}${pathAndQuery}`;
+      console.log('Transformed checkout URL:', { from: rawCheckoutUrl, to: checkoutUrl });
+    }
+  }
 
   return (
     <ShopifyCartContext.Provider
