@@ -249,10 +249,10 @@ export const productBySlugQuery = groq`
 
 /**
  * Get featured products for homepage
- * Note: Only returns PUBLISHED products
+ * Note: Only returns PUBLISHED Atlas products with images
  */
 export const featuredProductsQuery = groq`
-  *[_type == "product" && inStock == true && !(_id in path("drafts.**"))] | order(_createdAt desc) [0...3] {
+  *[_type == "product" && collectionType == "atlas" && inStock == true && !(_id in path("drafts.**")) && (defined(mainImage) || defined(shopifyPreviewImageUrl) || defined(store.previewImageUrl))] | order(_createdAt desc) [0...3] {
     _id,
     title,
     slug,
@@ -267,9 +267,7 @@ export const featuredProductsQuery = groq`
     shopifyPreviewImageUrl,
     "shopifyImage": store.previewImageUrl,
     "atmosphere": atlasData.atmosphere,
-    "viscosity": relicData.viscosity,
-    "atlasImage": atlasData.fieldReport.image,
-    "relicImage": relicData.museumExhibit.exhibitImage
+    "atlasImage": atlasData.fieldReport.image
   }
 `;
 
