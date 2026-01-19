@@ -26,7 +26,7 @@ const isDryRun = process.argv.includes('--dry-run');
 const SHOPIFY_TO_ATLAS_MAP = {
   // EMBER Territory
   'Cairo Musk': 'cairo',  // CAIRO (formerly ANCIENT)
-  'Granada Amber': 'beloved',
+  'Granada Amber': 'granada',  // GRANADA (formerly BELOVED)
   'Honey Oudh': 'caravan',
   'Himalayan Musk': 'clarity',
   'Teeb Musk': 'close',

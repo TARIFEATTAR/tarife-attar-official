@@ -31,7 +31,8 @@ const nextConfig = {
   async redirects() {
     return [
       // EMBER TERRITORY
-      { source: '/product/granada-amber', destination: '/product/beloved', permanent: true },
+      { source: '/product/granada-amber', destination: '/product/granada', permanent: true },
+      { source: '/product/beloved', destination: '/product/granada', permanent: true },
       { source: '/product/honey-oudh', destination: '/product/caravan', permanent: true },
       { source: '/product/vanilla-sands', destination: '/product/dune', permanent: true },
       { source: '/product/teeb-musk', destination: '/product/close', permanent: true },
@@ -65,7 +66,7 @@ const nextConfig = {
       { source: '/product/coconut-jasmine', destination: '/product/bahia', permanent: true },
       
       // Also handle /products/ path (Shopify-style URLs)
-      { source: '/products/granada-amber', destination: '/product/beloved', permanent: true },
+      { source: '/products/granada-amber', destination: '/product/granada', permanent: true },
       { source: '/products/honey-oudh', destination: '/product/caravan', permanent: true },
       { source: '/products/vanilla-sands', destination: '/product/dune', permanent: true },
       { source: '/products/teeb-musk', destination: '/product/close', permanent: true },
