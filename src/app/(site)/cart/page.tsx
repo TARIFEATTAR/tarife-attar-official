@@ -53,7 +53,23 @@ export default function CartPage() {
       return;
     }
 
-    console.log('Redirecting to checkout:', checkoutUrl);
+    // Final check: ensure checkout URL uses Shopify domain, not custom domain
+    const shopifyDomain = 'vasana-perfumes.myshopify.com';
+    if (checkoutUrl.includes('tarifeattar.com')) {
+      console.warn('⚠️ Checkout URL still contains tarifeattar.com, transforming...');
+      try {
+        const url = new URL(checkoutUrl);
+        const pathAndQuery = url.pathname + url.search;
+        const transformedUrl = `https://${shopifyDomain}${pathAndQuery}`;
+        console.log('🔄 Transforming checkout URL:', { from: checkoutUrl, to: transformedUrl });
+        window.location.href = transformedUrl;
+        return;
+      } catch (error) {
+        console.error('Error transforming checkout URL:', error);
+      }
+    }
+
+    console.log('✅ Redirecting to checkout:', checkoutUrl);
     window.location.href = checkoutUrl;
   };
 
