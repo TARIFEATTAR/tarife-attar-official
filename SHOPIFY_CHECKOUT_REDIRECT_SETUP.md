@@ -3,7 +3,54 @@
 ## Problem
 When users encounter an out-of-stock product in Shopify checkout, the modal redirects them back to the old Shopify storefront instead of your new Next.js site at `tarifeattar.com`.
 
-## Solution: Configure Checkout Redirect URLs
+## ✅ RECOMMENDED SOLUTION: Hydrogen Redirect Theme
+
+**This is the best solution for regular Shopify plans (not Plus).**
+
+### Step-by-Step Setup
+
+1. **Download the theme**
+   - Go to: https://github.com/Shopify/hydrogen-redirect-theme
+   - Click "Code" → "Download ZIP"
+
+2. **Upload to Shopify Admin**
+   - Go to: **Online Store** → **Themes**
+   - Click **Add theme** → **Upload zip file**
+   - Select the downloaded ZIP file
+
+3. **Configure the redirect**
+   - Click **Customize** on the uploaded theme
+   - Go to **Theme settings** → **Storefront**
+   - Set `storefront_hostname` to: `www.tarifeattar.com`
+
+4. **Add custom path redirects (optional)**
+   - `/cart` → `/cart`
+   - `/collections` → `/collections`
+   - `/products` → `/products`
+
+5. **Publish the theme**
+   - Click **Publish** to make it active
+
+### What This Fixes
+
+| Scenario | Result |
+|----------|--------|
+| "Back to cart" from out-of-stock modal | → `tarifeattar.com/cart` |
+| "Continue Shopping" after checkout | → `tarifeattar.com` |
+| Logo click during checkout | → `tarifeattar.com` |
+| Any `vasana-perfumes.myshopify.com` link | → `tarifeattar.com` |
+
+### Why This Works
+
+The theme contains JavaScript in `theme.liquid` that:
+- Detects traffic to `.myshopify.com`
+- Preserves the path
+- Redirects to your configured domain
+- Excludes `/checkout` paths (so payment still works)
+
+---
+
+## Alternative Solutions (If Theme Doesn't Work)
 
 ### Option 1: Shopify Admin Settings (Recommended)
 
