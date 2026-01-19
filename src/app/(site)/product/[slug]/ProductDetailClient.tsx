@@ -1068,22 +1068,22 @@ export function ProductDetailClient({ product }: Props) {
 
       <GlobalFooter theme="light" />
 
-      {/* Mobile Sticky Add to Satchel Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-theme-alabaster border-t border-theme-charcoal/10 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
-        <div className="max-w-[1800px] mx-auto px-6 py-4">
-          <div className="flex items-center gap-4">
-            {/* Price & Variant Display */}
-            <div className="flex-shrink-0">
-              <div className="text-2xl font-serif tracking-tighter">
+      {/* Mobile Sticky Add to Satchel Bar - Raised above compass/satchel */}
+      <div className="fixed bottom-20 left-0 right-0 z-50 md:hidden bg-theme-alabaster border-y border-theme-charcoal/10 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <div className="max-w-[1800px] mx-auto px-4 py-3">
+          <div className="flex items-center gap-3">
+            {/* Price & Variant Display - More compact */}
+            <div className="flex-shrink-0 min-w-[70px]">
+              <div className="text-xl font-serif tracking-tighter">
                 ${currentPrice || 0}
               </div>
               {isAtlas && territoryPricing ? (
-                <div className="flex gap-2 mt-1">
+                <div className="flex gap-1 mt-0.5">
                   {(['6ml', '12ml'] as VariantSize[]).map((size) => (
                     <button
                       key={size}
                       onClick={() => setSelectedVariant(size)}
-                      className={`font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 border transition-all ${
+                      className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border transition-all ${
                         selectedVariant === size
                           ? 'border-theme-charcoal bg-theme-charcoal text-theme-alabaster'
                           : 'border-theme-charcoal/20'
@@ -1094,29 +1094,29 @@ export function ProductDetailClient({ product }: Props) {
                   ))}
                 </div>
               ) : product.volume ? (
-                <div className="font-mono text-[11px] uppercase tracking-widest opacity-80">
+                <div className="font-mono text-[10px] uppercase tracking-widest opacity-80">
                   {product.volume}
                 </div>
               ) : null}
             </div>
 
-            {/* Quantity & Add Button */}
-            <div className="flex-1 flex items-center gap-3">
+            {/* Quantity & Add Button - More compact */}
+            <div className="flex-1 flex items-center gap-2">
               {/* Quantity Selector - Compact */}
               <div className="flex items-center border border-theme-charcoal/20">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3 py-2 hover:bg-theme-charcoal/5 transition-colors"
+                  className="px-2 py-1.5 hover:bg-theme-charcoal/5 transition-colors"
                   disabled={quantity <= 1}
                 >
                   <Minus className="w-3 h-3" />
                 </button>
-                <span className="px-4 py-2 font-mono text-xs tabular-nums min-w-[2rem] text-center">
+                <span className="px-2 py-1.5 font-mono text-xs tabular-nums min-w-[1.5rem] text-center">
                   {quantity}
                 </span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="px-3 py-2 hover:bg-theme-charcoal/5 transition-colors"
+                  className="px-2 py-1.5 hover:bg-theme-charcoal/5 transition-colors"
                 >
                   <Plus className="w-3 h-3" />
                 </button>
@@ -1127,7 +1127,7 @@ export function ProductDetailClient({ product }: Props) {
                 ref={mobileAddButtonRef}
                 onClick={() => handleAddToSatchel('mobile')}
                 disabled={!product.inStock || isAdding || !product.shopifyVariantId}
-                className={`flex-1 py-4 font-mono text-sm uppercase tracking-[0.4em] transition-all relative overflow-hidden ${product.inStock
+                className={`flex-1 py-3 font-mono text-xs uppercase tracking-[0.3em] transition-all relative overflow-hidden ${product.inStock
                   ? isAdding
                     ? "bg-theme-gold text-theme-alabaster"
                     : product.shopifyVariantId
