@@ -125,11 +125,11 @@ export function AtlasClient({ territories, totalCount }: Props) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex flex-wrap gap-2 md:gap-4"
+            className="flex flex-wrap gap-2 md:gap-4 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide"
           >
             <button
               onClick={() => setActiveTerritory(null)}
-              className={`px-4 md:px-6 py-2 md:py-3 font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest transition-all ${activeTerritory === null
+              className={`px-3 md:px-6 py-2 md:py-3 font-mono text-[9px] md:text-sm uppercase tracking-[0.15em] md:tracking-widest transition-all whitespace-nowrap flex-shrink-0 ${activeTerritory === null
                 ? "bg-theme-charcoal text-theme-alabaster"
                 : "bg-theme-charcoal/5 opacity-80 hover:opacity-100"
                 }`}
@@ -140,7 +140,7 @@ export function AtlasClient({ territories, totalCount }: Props) {
               <button
                 key={territory.id}
                 onClick={() => setActiveTerritory(territory.id)}
-                className={`px-4 md:px-6 py-2 md:py-3 font-mono text-[10px] md:text-sm uppercase tracking-[0.2em] md:tracking-widest transition-all ${activeTerritory === territory.id
+                className={`px-3 md:px-6 py-2 md:py-3 font-mono text-[9px] md:text-sm uppercase tracking-[0.15em] md:tracking-widest transition-all whitespace-nowrap flex-shrink-0 ${activeTerritory === territory.id
                   ? "bg-theme-charcoal text-theme-alabaster"
                   : "bg-theme-charcoal/5 opacity-80 hover:opacity-100"
                   }`}
@@ -189,7 +189,7 @@ export function AtlasClient({ territories, totalCount }: Props) {
 
                 {/* Product Grid - Amouage-style clean layout */}
                 {territory.products.length > 0 ? (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-theme-charcoal/[0.08]">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[1px] md:gap-[1px] bg-theme-charcoal/[0.08] -mx-4 md:mx-0">
                     {territory.products.map((product) => (
                       <Link
                         key={product._id}
@@ -251,16 +251,16 @@ export function AtlasClient({ territories, totalCount }: Props) {
                         </div>
                         
                         {/* Product Info - Centered in text area */}
-                        <div className="text-center py-6 md:py-8 space-y-1.5">
-                          <h3 className="font-sans text-sm md:text-base font-medium tracking-[0.15em] uppercase">
+                        <div className="text-center py-4 md:py-8 space-y-1.5 px-2">
+                          <h3 className="font-sans text-xs md:text-base font-medium tracking-[0.15em] uppercase break-words line-clamp-2">
                             {product.title}
                           </h3>
                           {!product.inStock ? (
-                            <p className="text-xs md:text-sm tracking-wider opacity-50">
+                            <p className="text-[10px] md:text-sm tracking-wider opacity-50">
                               Coming Soon
                             </p>
                           ) : (
-                            <p className="text-sm md:text-base tracking-wide">
+                            <p className="text-xs md:text-base tracking-wide">
                               ${getTerritoryStartingPrice(territory.id) || product.price || '—'}
                             </p>
                           )}

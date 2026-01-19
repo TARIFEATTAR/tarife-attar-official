@@ -32,3 +32,13 @@ body {
 ::-webkit-scrollbar-thumb {
   @apply bg-theme-charcoal/20 rounded-full hover:bg-theme-charcoal/40 transition-colors;
 }
+
+/* Hide scrollbar for horizontal scrolling elements */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
