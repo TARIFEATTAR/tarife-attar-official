@@ -57,7 +57,7 @@ const SHOPIFY_TO_ATLAS_MAP = {
   'Oud & Tobacco': 'havana',
   'Marrakesh': 'marrakesh',
   'Black Ambergris': 'onyx',  // Renamed from original Black Oudh
-  'Black Oudh': 'black-oudh',  // New Black Oudh product (TERRA)
+  'Black Oudh': 'riyadh',  // RIYADH (formerly Black Oudh) - TERRA
   'Oudh Aura': 'regalia',
   'Sicilian Oudh': 'sicily',
 };
