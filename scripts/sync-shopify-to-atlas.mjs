@@ -52,7 +52,7 @@ const SHOPIFY_TO_ATLAS_MAP = {
   // TERRA Territory
   'Oud & Tobacco': 'havana',
   'Marrakesh': 'marrakesh',
-  'Black Oudh': 'onyx',  // Black Oudh = Black Ambergris = ONYX
+  'Black Ambergris': 'onyx',  // Renamed from Black Oudh
   'Oudh Aura': 'regalia',
   'Sicilian Oudh': 'sicily',
 };
