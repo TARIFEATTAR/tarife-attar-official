@@ -301,6 +301,21 @@ export function ProductDetailClient({ product }: Props) {
   const isAtlas = product.collectionType === "atlas";
   const isRelic = product.collectionType === "relic";
 
+  // Theme colors - Relic always dark, Atlas light
+  const theme = {
+    bg: isRelic ? 'bg-theme-obsidian' : 'bg-theme-alabaster',
+    bgTransparent: isRelic ? 'bg-theme-obsidian/80' : 'bg-theme-alabaster/80',
+    text: isRelic ? 'text-theme-alabaster' : 'text-theme-charcoal',
+    textMuted: isRelic ? 'text-theme-alabaster/80' : 'text-theme-charcoal/80',
+    border: isRelic ? 'border-white/10' : 'border-theme-charcoal/10',
+    borderSubtle: isRelic ? 'border-white/5' : 'border-theme-charcoal/5',
+    imageBg: isRelic ? 'bg-white/5' : 'bg-theme-charcoal/5',
+    hoverBg: isRelic ? 'hover:bg-white/5' : 'hover:bg-theme-charcoal/5',
+    selectedBg: isRelic ? 'bg-theme-alabaster text-theme-obsidian' : 'bg-theme-charcoal text-theme-alabaster',
+    shadow: isRelic ? 'shadow-[0_-4px_20px_rgba(255,255,255,0.05)]' : 'shadow-[0_-4px_20px_rgba(0,0,0,0.08)]',
+    footerTheme: isRelic ? 'dark' : 'light' as 'dark' | 'light',
+  };
+
   const handleAddToSatchel = async (source: 'desktop' | 'mobile' = 'desktop') => {
     // Check if product is purchasable
     if (!product.inStock) {
@@ -396,9 +411,9 @@ export function ProductDetailClient({ product }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-theme-alabaster text-theme-charcoal">
+    <div className={`min-h-screen ${theme.bg} ${theme.text}`}>
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-theme-alabaster/80 backdrop-blur-md border-b border-theme-charcoal/5">
+      <header className={`fixed top-0 left-0 right-0 z-50 ${theme.bgTransparent} backdrop-blur-md border-b ${theme.borderSubtle}`}>
         <div className="max-w-[1800px] mx-auto px-6 md:px-24 py-6 flex items-center justify-between">
           <Link
             href={isAtlas ? "/atlas" : "/relic"}
@@ -419,7 +434,7 @@ export function ProductDetailClient({ product }: Props) {
           {/* Left: Product Images */}
           <div className="space-y-4">
             {/* Main Image with Parallax */}
-            <div className="relative aspect-[4/5] bg-theme-charcoal/5 overflow-hidden border border-theme-charcoal/10 group">
+            <div className={`relative aspect-[4/5] ${theme.imageBg} overflow-hidden border ${theme.border} group`}>
               {mainImageUrl ? (() => {
                 try {
                   const imageSrc = mainImageUrl.width(800).height(1000).url();
@@ -602,8 +617,8 @@ export function ProductDetailClient({ product }: Props) {
                       whileTap={{ scale: 0.98 }}
                       className={`flex-1 py-4 px-6 border-2 transition-all ${
                         selectedVariant === size
-                          ? 'border-theme-charcoal bg-theme-charcoal text-theme-alabaster'
-                          : 'border-theme-charcoal/20 hover:border-theme-charcoal/40'
+                          ? isRelic ? 'border-theme-alabaster bg-theme-alabaster text-theme-obsidian' : 'border-theme-charcoal bg-theme-charcoal text-theme-alabaster'
+                          : isRelic ? 'border-white/20 hover:border-white/40' : 'border-theme-charcoal/20 hover:border-theme-charcoal/40'
                       }`}
                     >
                       <div className="text-center">
@@ -792,9 +807,9 @@ export function ProductDetailClient({ product }: Props) {
               <span className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-80">
                 Quantity
               </span>
-              <div className="flex items-center border border-theme-charcoal/20">
+              <div className={`flex items-center border ${isRelic ? 'border-white/20' : 'border-theme-charcoal/20'}`}>
                 <motion.button
-                  whileHover={{ backgroundColor: "rgba(0,0,0,0.05)" }}
+                  whileHover={{ backgroundColor: isRelic ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)" }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   className="px-4 py-3 transition-colors"
@@ -806,7 +821,7 @@ export function ProductDetailClient({ product }: Props) {
                   {quantity}
                 </span>
                 <motion.button
-                  whileHover={{ backgroundColor: "rgba(0,0,0,0.05)" }}
+                  whileHover={{ backgroundColor: isRelic ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)" }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setQuantity(quantity + 1)}
                   className="px-4 py-3 transition-colors"
@@ -826,11 +841,11 @@ export function ProductDetailClient({ product }: Props) {
               whileTap={product.inStock && !isAdding && product.shopifyVariantId ? { scale: 0.99 } : {}}
               className={`hidden md:flex items-center justify-center gap-3 w-full py-5 font-mono text-sm md:text-base uppercase tracking-[0.4em] transition-all relative overflow-hidden ${product.inStock
                 ? isAdding
-                  ? "bg-theme-gold text-theme-alabaster"
+                  ? "bg-theme-gold text-theme-obsidian"
                   : product.shopifyVariantId
-                    ? "bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90"
-                    : "bg-theme-charcoal/40 text-theme-alabaster/60 cursor-not-allowed"
-                : "bg-theme-charcoal/20 text-theme-charcoal/40 cursor-not-allowed"
+                    ? isRelic ? "bg-theme-alabaster text-theme-obsidian hover:bg-theme-alabaster/90" : "bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90"
+                    : isRelic ? "bg-white/40 text-white/60 cursor-not-allowed" : "bg-theme-charcoal/40 text-theme-alabaster/60 cursor-not-allowed"
+                : isRelic ? "bg-white/20 text-white/40 cursor-not-allowed" : "bg-theme-charcoal/20 text-theme-charcoal/40 cursor-not-allowed"
                 }`}
             >
               <AnimatePresence mode="wait">
@@ -1066,10 +1081,10 @@ export function ProductDetailClient({ product }: Props) {
         )}
       </div>
 
-      <GlobalFooter theme="light" />
+      <GlobalFooter theme={theme.footerTheme} hideQuiz={isRelic} />
 
       {/* Mobile Sticky Add to Satchel Bar - Full bottom dock with background for compass/satchel */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-theme-alabaster border-t border-theme-charcoal/10 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+      <div className={`fixed bottom-0 left-0 right-0 z-40 md:hidden ${theme.bg} border-t ${theme.border} ${theme.shadow}`}>
         {/* Main content area */}
         <div className="max-w-[1800px] mx-auto px-4 py-3 pb-20">
           <div className="flex items-center gap-3">
@@ -1086,8 +1101,8 @@ export function ProductDetailClient({ product }: Props) {
                       onClick={() => setSelectedVariant(size)}
                       className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border transition-all ${
                         selectedVariant === size
-                          ? 'border-theme-charcoal bg-theme-charcoal text-theme-alabaster'
-                          : 'border-theme-charcoal/20'
+                          ? isRelic ? 'border-theme-alabaster bg-theme-alabaster text-theme-obsidian' : 'border-theme-charcoal bg-theme-charcoal text-theme-alabaster'
+                          : isRelic ? 'border-white/20' : 'border-theme-charcoal/20'
                       }`}
                     >
                       {size}
@@ -1104,10 +1119,10 @@ export function ProductDetailClient({ product }: Props) {
             {/* Quantity & Add Button - More compact */}
             <div className="flex-1 flex items-center gap-2">
               {/* Quantity Selector - Compact */}
-              <div className="flex items-center border border-theme-charcoal/20">
+              <div className={`flex items-center border ${isRelic ? 'border-white/20' : 'border-theme-charcoal/20'}`}>
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-2 py-1.5 hover:bg-theme-charcoal/5 transition-colors"
+                  className={`px-2 py-1.5 ${isRelic ? 'hover:bg-white/5' : 'hover:bg-theme-charcoal/5'} transition-colors`}
                   disabled={quantity <= 1}
                 >
                   <Minus className="w-3 h-3" />
@@ -1117,7 +1132,7 @@ export function ProductDetailClient({ product }: Props) {
                 </span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="px-2 py-1.5 hover:bg-theme-charcoal/5 transition-colors"
+                  className={`px-2 py-1.5 ${isRelic ? 'hover:bg-white/5' : 'hover:bg-theme-charcoal/5'} transition-colors`}
                 >
                   <Plus className="w-3 h-3" />
                 </button>
@@ -1130,11 +1145,11 @@ export function ProductDetailClient({ product }: Props) {
                 disabled={!product.inStock || isAdding || !product.shopifyVariantId}
                 className={`flex-1 py-3 font-mono text-xs uppercase tracking-[0.3em] transition-all relative overflow-hidden ${product.inStock
                   ? isAdding
-                    ? "bg-theme-gold text-theme-alabaster"
+                    ? "bg-theme-gold text-theme-obsidian"
                     : product.shopifyVariantId
-                      ? "bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90 active:bg-theme-charcoal/80"
-                      : "bg-theme-charcoal/40 text-theme-alabaster/60 cursor-not-allowed"
-                  : "bg-theme-charcoal/20 text-theme-charcoal/40 cursor-not-allowed"
+                      ? isRelic ? "bg-theme-alabaster text-theme-obsidian hover:bg-theme-alabaster/90 active:bg-theme-alabaster/80" : "bg-theme-charcoal text-theme-alabaster hover:bg-theme-charcoal/90 active:bg-theme-charcoal/80"
+                      : isRelic ? "bg-white/40 text-white/60 cursor-not-allowed" : "bg-theme-charcoal/40 text-theme-alabaster/60 cursor-not-allowed"
+                  : isRelic ? "bg-white/20 text-white/40 cursor-not-allowed" : "bg-theme-charcoal/20 text-theme-charcoal/40 cursor-not-allowed"
                   }`}
               >
                 <AnimatePresence mode="wait">

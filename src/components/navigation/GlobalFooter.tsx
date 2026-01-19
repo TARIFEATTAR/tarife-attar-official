@@ -6,9 +6,10 @@ import { motion } from 'framer-motion';
 
 interface Props {
   theme?: 'light' | 'dark';
+  hideQuiz?: boolean;
 }
 
-export const GlobalFooter: React.FC<Props> = ({ theme = 'dark' }) => {
+export const GlobalFooter: React.FC<Props> = ({ theme = 'dark', hideQuiz = false }) => {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -57,7 +58,7 @@ export const GlobalFooter: React.FC<Props> = ({ theme = 'dark' }) => {
     { label: 'Threshold', href: '/' },
     { label: 'Atlas Collection', href: '/atlas' },
     { label: 'Relic Vault', href: '/relic' },
-    { label: 'Territory Quiz', href: '/quiz' },
+    ...(!hideQuiz ? [{ label: 'Territory Quiz', href: '/quiz' }] : []),
   ];
 
   const utilityLinks = [
@@ -99,25 +100,27 @@ export const GlobalFooter: React.FC<Props> = ({ theme = 'dark' }) => {
               Clean, skin-safe perfume oils for those who travel by scent.
             </motion.p>
             
-            {/* Quiz CTA - Clear and prominent */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.15 }}
-            >
-              <Link 
-                href="/quiz"
-                className={`group inline-flex items-center gap-3 py-3 px-5 border ${isDark ? 'border-theme-gold/30 hover:border-theme-gold hover:bg-theme-gold/10' : 'border-theme-charcoal/20 hover:border-theme-charcoal hover:bg-theme-charcoal/5'} transition-all duration-300`}
+            {/* Quiz CTA - Only for Atlas pages */}
+            {!hideQuiz && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.15 }}
               >
-                <span className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.15em] opacity-60 group-hover:opacity-100">
-                  Not sure where to start?
-                </span>
-                <span className={`font-mono text-[10px] sm:text-xs uppercase tracking-[0.15em] ${isDark ? 'text-theme-gold' : 'text-theme-charcoal'} font-medium`}>
-                  Take the Quiz →
-                </span>
-              </Link>
-            </motion.div>
+                <Link 
+                  href="/quiz"
+                  className={`group inline-flex items-center gap-3 py-3 px-5 border ${isDark ? 'border-theme-gold/30 hover:border-theme-gold hover:bg-theme-gold/10' : 'border-theme-charcoal/20 hover:border-theme-charcoal hover:bg-theme-charcoal/5'} transition-all duration-300`}
+                >
+                  <span className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.15em] opacity-60 group-hover:opacity-100">
+                    Not sure where to start?
+                  </span>
+                  <span className={`font-mono text-[10px] sm:text-xs uppercase tracking-[0.15em] ${isDark ? 'text-theme-gold' : 'text-theme-charcoal'} font-medium`}>
+                    Take the Quiz →
+                  </span>
+                </Link>
+              </motion.div>
+            )}
             
             <motion.div 
               initial={{ opacity: 0, y: 20 }}

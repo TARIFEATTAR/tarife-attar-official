@@ -213,7 +213,7 @@ export function RelicClient({ categories, totalCount }: Props) {
         </div>
       </section>
 
-      <GlobalFooter theme="dark" />
+      <GlobalFooter theme="dark" hideQuiz />
     </div>
   );
 }
