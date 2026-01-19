@@ -1068,9 +1068,10 @@ export function ProductDetailClient({ product }: Props) {
 
       <GlobalFooter theme="light" />
 
-      {/* Mobile Sticky Add to Satchel Bar - Raised above compass/satchel */}
-      <div className="fixed bottom-20 left-0 right-0 z-50 md:hidden bg-theme-alabaster border-y border-theme-charcoal/10 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
-        <div className="max-w-[1800px] mx-auto px-4 py-3">
+      {/* Mobile Sticky Add to Satchel Bar - Full bottom dock with background for compass/satchel */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-theme-alabaster border-t border-theme-charcoal/10 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        {/* Main content area */}
+        <div className="max-w-[1800px] mx-auto px-4 py-3 pb-20">
           <div className="flex items-center gap-3">
             {/* Price & Variant Display - More compact */}
             <div className="flex-shrink-0 min-w-[70px]">
