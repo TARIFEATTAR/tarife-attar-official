@@ -38,4 +38,26 @@ export const shopifyFields = [
     description: 'The GID for the 12ml variant. Required for Atlas products with size variants.',
     group: 'commerce',
   },
+  // SKU Fields - Format: TERRITORY-PRODUCTNAME-SIZE (e.g., TERRA-ONYX-6ML)
+  {
+    name: 'sku',
+    title: 'SKU (Default)',
+    type: 'string',
+    description: 'Primary SKU for Relic products. Format: RELIC-PRODUCTNAME-SIZE',
+    group: 'commerce',
+  },
+  {
+    name: 'sku6ml',
+    title: 'SKU (6ml)',
+    type: 'string',
+    description: 'SKU for 6ml variant. Format: TERRITORY-PRODUCTNAME-6ML',
+    group: 'commerce',
+  },
+  {
+    name: 'sku12ml',
+    title: 'SKU (12ml)',
+    type: 'string',
+    description: 'SKU for 12ml variant. Format: TERRITORY-PRODUCTNAME-12ML',
+    group: 'commerce',
+  },
 ];
