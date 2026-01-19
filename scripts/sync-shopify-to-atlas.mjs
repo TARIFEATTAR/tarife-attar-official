@@ -25,7 +25,7 @@ const isDryRun = process.argv.includes('--dry-run');
 // Based on the legacy names in Atlas Collection
 const SHOPIFY_TO_ATLAS_MAP = {
   // EMBER Territory
-  'Cairo Musk': 'ancient',
+  'Cairo Musk': 'cairo',  // CAIRO (formerly ANCIENT)
   'Granada Amber': 'beloved',
   'Honey Oudh': 'caravan',
   'Himalayan Musk': 'clarity',

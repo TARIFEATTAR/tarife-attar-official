@@ -41,7 +41,8 @@ const nextConfig = {
       { source: '/product/frankincense-myrrh', destination: '/product/devotion', permanent: true },
       { source: '/product/frankincense-and-myrrh', destination: '/product/devotion', permanent: true },
       { source: '/product/black-musk', destination: '/product/obsidian', permanent: true },
-      { source: '/product/cairo-musk', destination: '/product/ancient', permanent: true },
+      { source: '/product/cairo-musk', destination: '/product/cairo', permanent: true },
+      { source: '/product/ancient', destination: '/product/cairo', permanent: true },
       
       // TERRA TERRITORY
       { source: '/product/sicilian-oudh', destination: '/product/sicily', permanent: true },
