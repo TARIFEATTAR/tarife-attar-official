@@ -8,21 +8,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { AtlasClient } from "./AtlasClient";
 
-// Territory metadata (static)
+// Territory metadata (static) - Order: Ember, Tidal, Petal, Terra
 const TERRITORIES = [
-  {
-    id: "tidal",
-    name: "Tidal",
-    tagline: "Salt. Mist. The pull of open water.",
-    description: "Aquatic, fresh, and marine compositions that capture coastal atmospheres and oceanic depths.",
-    color: "from-blue-900/20 to-transparent",
-  },
   {
     id: "ember",
     name: "Ember",
     tagline: "Spice. Warmth. The intimacy of ancient routes.",
     description: "Warm, gourmand, and spiced oils inspired by the heat of distant markets and caravan trails.",
     color: "from-amber-900/20 to-transparent",
+  },
+  {
+    id: "tidal",
+    name: "Tidal",
+    tagline: "Salt. Mist. The pull of open water.",
+    description: "Aquatic, fresh, and marine compositions that capture coastal atmospheres and oceanic depths.",
+    color: "from-blue-900/20 to-transparent",
   },
   {
     id: "petal",
