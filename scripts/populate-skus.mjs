@@ -1,8 +1,13 @@
 /**
  * Populate SKUs in Sanity
  * 
- * Format: TERRITORY-PRODUCTNAME-SIZE
- * Example: TERRA-ONYX-6ML, EMBER-CAIRO-12ML
+ * SKU Architecture:
+ * - Primary SKU (sku): TERRITORY-PRODUCTNAME (no size) - Product identifier
+ * - Variant SKUs: TERRITORY-PRODUCTNAME-SIZE - For specific variants
+ * 
+ * Examples:
+ *   Primary: TERRA-ONYX, EMBER-CAIRO, RELIC-MAJMUA
+ *   Variants: TERRA-ONYX-6ML, TERRA-ONYX-12ML, RELIC-MAJMUA-3ML
  * 
  * Usage:
  *   node scripts/populate-skus.mjs --dry-run    # Preview changes
@@ -79,23 +84,28 @@ async function main() {
     
     const territoryCode = TERRITORY_MAP[product.territory];
     const productName = cleanProductName(product.title);
+    
+    // Primary SKU (no size) - Product identifier
+    const skuPrimary = `${territoryCode}-${productName}`;
+    // Variant SKUs (with size)
     const sku6ml = `${territoryCode}-${productName}-6ML`;
     const sku12ml = `${territoryCode}-${productName}-12ML`;
     
     // Check if already set correctly
-    if (product.sku6ml === sku6ml && product.sku12ml === sku12ml) {
+    if (product.sku === skuPrimary && product.sku6ml === sku6ml && product.sku12ml === sku12ml) {
       console.log(`  ✓ ${product.title} - Already set`);
       continue;
     }
     
     console.log(`  → ${product.title}`);
-    console.log(`      6ml:  ${sku6ml}`);
-    console.log(`      12ml: ${sku12ml}`);
+    console.log(`      Primary: ${skuPrimary}`);
+    console.log(`      6ml:     ${sku6ml}`);
+    console.log(`      12ml:    ${sku12ml}`);
     
     updates.push({
       id: product._id,
       title: product.title,
-      data: { sku6ml, sku12ml }
+      data: { sku: skuPrimary, sku6ml, sku12ml }
     });
   }
 
@@ -110,21 +120,23 @@ async function main() {
     
     const productName = cleanProductName(product.title);
     const size = product.volume ? product.volume.replace(/[^0-9]/g, '') : '3';
-    const sku = `RELIC-${productName}-${size}ML`;
+    
+    // Primary SKU (no size) - Product identifier
+    const skuPrimary = `RELIC-${productName}`;
     
     // Check if already set correctly
-    if (product.sku === sku) {
+    if (product.sku === skuPrimary) {
       console.log(`  ✓ ${product.title} - Already set`);
       continue;
     }
     
     console.log(`  → ${product.title}`);
-    console.log(`      SKU: ${sku}`);
+    console.log(`      Primary: ${skuPrimary}`);
     
     updates.push({
       id: product._id,
       title: product.title,
-      data: { sku }
+      data: { sku: skuPrimary }
     });
   }
 
