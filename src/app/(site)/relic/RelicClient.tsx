@@ -68,7 +68,7 @@ export function RelicClient({ categories, totalCount }: Props) {
       </header>
 
       {/* Hero */}
-      <section className="pt-24 md:pt-48 pb-12 md:pb-24 px-4 md:px-24">
+      <section className="pt-16 md:pt-48 pb-4 md:pb-24 px-4 md:px-24">
         <div className="max-w-[1800px] mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -76,17 +76,17 @@ export function RelicClient({ categories, totalCount }: Props) {
             transition={{ duration: 0.8 }}
             className="max-w-3xl"
           >
-            <span className="font-mono text-[10px] md:text-sm uppercase tracking-[0.6em] md:tracking-[0.8em] text-theme-gold mb-4 md:mb-6 block leading-tight break-words">
+            <span className="font-mono text-[10px] md:text-sm uppercase tracking-[0.6em] md:tracking-[0.8em] text-theme-gold mb-2 md:mb-6 block leading-tight break-words">
               {totalCount} {getItemLabel('relic', totalCount)}{'\u00A0'}·{'\u00A0'}Pure Line
             </span>
-            <h1 className="text-4xl md:text-8xl font-serif tracking-tighter leading-[0.95] md:leading-[0.9] mb-6 md:mb-8">
+            <h1 className="text-3xl md:text-8xl font-serif tracking-tighter leading-[0.95] md:leading-[0.9] mb-3 md:mb-8">
               The Relic
             </h1>
-            <p className="font-serif italic text-base md:text-2xl opacity-80 leading-relaxed max-w-xl mb-4 md:mb-6 break-words">
+            <p className="hidden md:block font-serif italic text-base md:text-2xl opacity-80 leading-relaxed max-w-xl mb-4 md:mb-6 break-words">
               Pure resins. Rare ouds. Aged materials sourced for the devoted
               collector. Each specimen arrives with provenance documentation.
             </p>
-            <p className="font-mono text-[10px] md:text-sm uppercase tracking-[0.3em] md:tracking-widest opacity-70 leading-tight break-words">
+            <p className="hidden md:block font-mono text-[10px] md:text-sm uppercase tracking-[0.3em] md:tracking-widest opacity-70 leading-tight break-words">
               Limited quantities. Verified authenticity.
             </p>
           </motion.div>
@@ -95,22 +95,22 @@ export function RelicClient({ categories, totalCount }: Props) {
 
       {/* Categories */}
       <section className="pb-20 md:pb-32 px-4 md:px-24">
-        <div className="max-w-[1800px] mx-auto space-y-12 md:space-y-20">
+        <div className="max-w-[1800px] mx-auto space-y-8 md:space-y-20">
           {categories.map((category, index) => (
             <motion.div
               key={category.id}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.15 }}
-              className="space-y-6 md:space-y-8"
+              className="space-y-3 md:space-y-8"
             >
               {/* Category Header */}
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-4 border-b border-white/10 pb-4 md:pb-6 min-w-0">
+              <div className="flex flex-row md:flex-row md:items-end justify-between gap-2 md:gap-4 border-b border-white/10 pb-2 md:pb-6 min-w-0">
                 <div className="min-w-0 flex-1">
-                  <h2 className="text-2xl md:text-5xl font-serif tracking-tighter mb-1 md:mb-2 leading-tight break-words">
+                  <h2 className="text-xl md:text-5xl font-serif tracking-tighter mb-1 md:mb-2 leading-tight break-words">
                     {category.name}
                   </h2>
-                  <p className="font-serif italic text-base md:text-xl opacity-80 leading-relaxed break-words">
+                  <p className="hidden md:block font-serif italic text-base md:text-xl opacity-80 leading-relaxed break-words">
                     {category.description}
                   </p>
                 </div>
@@ -178,16 +178,16 @@ export function RelicClient({ categories, totalCount }: Props) {
                       </div>
                       
                       {/* Product Info - Minimal like Atlas */}
-                      <div className="text-center py-6 md:py-8 space-y-1.5">
-                        <h3 className="font-serif italic text-sm md:text-base tracking-wide">
+                      <div className="text-center py-4 md:py-8 space-y-1.5 px-2">
+                        <h3 className="font-serif italic text-xs md:text-base tracking-wide break-words line-clamp-2">
                           {product.title}
                         </h3>
                         {!product.inStock ? (
-                          <p className="font-mono text-xs md:text-sm tracking-wider opacity-40">
+                          <p className="font-mono text-[10px] md:text-sm tracking-wider opacity-40">
                             Out of Stock
                           </p>
                         ) : product.price ? (
-                          <p className="text-sm md:text-base tracking-wide opacity-70">
+                          <p className="text-xs md:text-base tracking-wide opacity-70">
                             ${product.price}
                           </p>
                         ) : null}
