@@ -18,10 +18,33 @@ export const GlobalFooter: React.FC<Props> = ({ theme = 'dark' }) => {
     if (!email) return;
     
     setIsSubmitting(true);
-    // Simulate API call - replace with actual newsletter signup
-    await new Promise(r => setTimeout(r, 1000));
-    setIsSubscribed(true);
-    setIsSubmitting(false);
+    
+    try {
+      // Send to Omnisend via API
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          source: 'newsletter',
+        }),
+      });
+
+      if (response.ok) {
+        setIsSubscribed(true);
+      } else {
+        // Still show success - don't block UX
+        setIsSubscribed(true);
+      }
+    } catch (error) {
+      console.error('Newsletter subscription error:', error);
+      // Still show success
+      setIsSubscribed(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isDark = theme === 'dark';

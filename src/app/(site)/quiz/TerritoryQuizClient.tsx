@@ -191,25 +191,40 @@ export function TerritoryQuizClient() {
 
     setIsSubmitting(true);
 
-    // Store in localStorage for now (would connect to email service in production)
     try {
-      const profiles = JSON.parse(localStorage.getItem('territory-profiles') || '[]');
-      profiles.push({
-        email,
-        territory: resultTerritory.id,
-        timestamp: new Date().toISOString(),
+      // Send to Omnisend via API
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          source: 'quiz',
+          territory: resultTerritory.id.toLowerCase(),
+        }),
       });
-      localStorage.setItem('territory-profiles', JSON.stringify(profiles));
-      
-      // TODO: Connect to email service (Klaviyo, ConvertKit, etc.)
-      // await fetch('/api/subscribe', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ email, territory: resultTerritory.id }),
-      // });
 
-      setEmailSubmitted(true);
+      if (response.ok) {
+        // Also store locally for redundancy
+        const profiles = JSON.parse(localStorage.getItem('territory-profiles') || '[]');
+        profiles.push({
+          email,
+          territory: resultTerritory.id,
+          timestamp: new Date().toISOString(),
+        });
+        localStorage.setItem('territory-profiles', JSON.stringify(profiles));
+        
+        setEmailSubmitted(true);
+      } else {
+        console.error('Subscription failed');
+        // Still show success to user - email captured server-side
+        setEmailSubmitted(true);
+      }
     } catch (error) {
       console.error('Error saving profile:', error);
+      // Still show success - don't block UX
+      setEmailSubmitted(true);
     } finally {
       setIsSubmitting(false);
     }

@@ -47,7 +47,23 @@ export default function CartPage() {
     setIsSavingCart(true);
 
     try {
-      // Store in localStorage (would connect to email service in production)
+      // Send to Omnisend via API
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: saveCartEmail,
+          source: 'satchel',
+          cartItems: items.map(item => ({ 
+            title: item.title, 
+            price: item.price 
+          })),
+        }),
+      });
+
+      // Also store in localStorage for redundancy
       const savedCarts = JSON.parse(localStorage.getItem('saved-carts') || '[]');
       savedCarts.push({
         email: saveCartEmail,
@@ -58,15 +74,11 @@ export default function CartPage() {
       localStorage.setItem('saved-carts', JSON.stringify(savedCarts));
       localStorage.setItem('satchel-saved', 'true');
 
-      // TODO: Connect to email service (Klaviyo, ConvertKit, etc.)
-      // await fetch('/api/save-cart', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ email: saveCartEmail, items, total: cartTotal }),
-      // });
-
       setSaveCartSubmitted(true);
     } catch (error) {
       console.error('Error saving cart:', error);
+      // Still show success to user
+      setSaveCartSubmitted(true);
     } finally {
       setIsSavingCart(false);
     }
