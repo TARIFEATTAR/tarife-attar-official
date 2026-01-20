@@ -275,6 +275,61 @@ const AudioNarrative = ({
   );
 };
 
+const FieldReportImage = ({
+  fieldReport
+}: {
+  fieldReport: NonNullable<NonNullable<Product['atlasData']>['fieldReport']>
+}) => {
+  if (!fieldReport?.image) return null;
+
+  const imageUrl = urlForImage(fieldReport.image);
+
+  return (
+    <div className="mt-8 mb-6 group relative w-full aspect-[4/5] md:aspect-video bg-theme-charcoal/5 overflow-hidden border border-theme-charcoal/5">
+      {imageUrl && (
+        <Image
+          src={imageUrl.width(1600).url()}
+          alt="Field Report"
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+        />
+      )}
+
+      {/* Hotspots */}
+      {fieldReport.hotspots?.map((hotspot, i) => {
+        // Sanity uses percentages for X/Y
+        // Ensure they are within 0-100 range rendering
+        return (
+          <Link
+            key={i}
+            href={hotspot.product?.slug?.current ? `/product/${hotspot.product.slug.current}` : '#'}
+            className="absolute w-4 h-4 transform -translate-x-1/2 -translate-y-1/2 z-10 group/hotspot"
+            style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%` }}
+          >
+            <span className="sr-only">{hotspot.note || hotspot.product?.title || 'Product'}</span>
+
+            {/* Pulse ring */}
+            <span className="absolute inset-0 rounded-full bg-blue-300/40 animate-ping opacity-0 group-hover/hotspot:opacity-100 transition-opacity" />
+
+            {/* The Dot */}
+            <span className="absolute inset-0 rounded-full bg-[#6ba5d6] border border-white/60 shadow-sm transition-transform group-hover/hotspot:scale-125" />
+
+            {/* Tooltip */}
+            <div className="absolute left-1/2 bottom-full mb-3 -translate-x-1/2 whitespace-nowrap opacity-0 group-hover/hotspot:opacity-100 transition-all transform translate-y-2 group-hover/hotspot:translate-y-0 pointer-events-none">
+              <div className="bg-theme-charcoal text-theme-alabaster px-3 py-1.5 text-[10px] uppercase tracking-widest font-mono shadow-md flex items-center gap-2">
+                <span>{hotspot.note || hotspot.product?.title}</span>
+                {hotspot.product ? <ArrowLeft className="w-2 h-2 rotate-180" /> : null}
+              </div>
+              {/* Arrow tip */}
+              <div className="w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[4px] border-t-theme-charcoal absolute left-1/2 -translate-x-1/2 top-full" />
+            </div>
+          </Link>
+        );
+      })}
+    </div>
+  )
+};
+
 const TERRITORY_NAMES: Record<string, string> = {
   tidal: "Tidal",
   ember: "Ember",
@@ -1103,12 +1158,22 @@ export function ProductDetailClient({ product }: Props) {
               <EvocationSection title="Evocation" story={product.atlasData.evocationStory} />
             )}
 
-            {/* Field Report Concept - Conditional Display */}
-            {isAtlas && product.atlasData?.displayFieldReportConcept && product.atlasData?.fieldReportConcept && (
-              <FieldReportConcept
-                concept={product.atlasData.fieldReportConcept.concept}
-                hotspots={product.atlasData.fieldReportConcept.hotspots}
-              />
+            {/* Field Report Image & Concept - Conditional Display */}
+            {isAtlas && product.atlasData?.displayFieldReportConcept && (
+              <>
+                {/* Field Report Image with Hotspots */}
+                {product.atlasData.fieldReport && (
+                  <FieldReportImage fieldReport={product.atlasData.fieldReport} />
+                )}
+
+                {/* Field Report Concept Text */}
+                {product.atlasData.fieldReportConcept && (
+                  <FieldReportConcept
+                    concept={product.atlasData.fieldReportConcept.concept}
+                    hotspots={product.atlasData.fieldReportConcept.hotspots}
+                  />
+                )}
+              </>
             )}
 
             {/* On Skin Story */}
