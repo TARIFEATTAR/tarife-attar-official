@@ -89,28 +89,44 @@ function markdownToBlocks(text: string): any[] {
  * Fetches an image from a URL and uploads it to Sanity
  */
 async function uploadImageFromUrl(
-  client: ReturnType<typeof createClient>,
+  client: any,
   imageUrl: string
 ): Promise<string | undefined> {
+  if (!imageUrl || !imageUrl.startsWith('http')) return undefined;
+
   try {
-    // Fetch the image
-    const response = await fetch(imageUrl);
+    console.log(`[Madison] Fetching image from: ${imageUrl}`);
+
+    // Add a 10-second timeout to the fetch
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    const response = await fetch(imageUrl, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
-      console.error(`Failed to fetch image: ${response.statusText}`);
+      console.error(`[Madison] Failed to fetch image: ${response.status} ${response.statusText}`);
       return undefined;
     }
 
     const blob = await response.blob();
     const buffer = await blob.arrayBuffer();
 
+    console.log(`[Madison] Uploading asset to Sanity...`);
+
     // Upload to Sanity
     const asset = await client.assets.upload('image', Buffer.from(buffer), {
-      filename: imageUrl.split('/').pop() || 'image.jpg',
+      filename: imageUrl.split('/').pop()?.split('?')[0] || 'image.jpg',
     });
 
+    console.log(`[Madison] Asset uploaded successfully: ${asset._id}`);
     return asset._id;
   } catch (error) {
-    console.error('Error uploading image:', error);
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.error('[Madison] Image fetch timed out');
+    } else {
+      console.error('[Madison] Error in image upload pipeline:', error);
+    }
     return undefined;
   }
 }
@@ -120,14 +136,16 @@ async function uploadImageFromUrl(
  */
 export async function pushDraft(data: MadisonPayload): Promise<string> {
   // Initialize Sanity client with write token
-  const writeToken = process.env.SANITY_API_WRITE_TOKEN;
+  const writeToken = process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_WRITE_TOKEN;
   if (!writeToken) {
-    throw new Error('SANITY_API_WRITE_TOKEN environment variable is required');
+    throw new Error('SANITY_API_WRITE_TOKEN or SANITY_WRITE_TOKEN environment variable is required');
   }
 
   const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
   const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
   const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01';
+
+  console.log(`[Madison] Initializing client for project: ${projectId}`);
 
   const client = createClient({
     projectId,
@@ -135,11 +153,7 @@ export async function pushDraft(data: MadisonPayload): Promise<string> {
     apiVersion,
     token: writeToken,
     useCdn: false, // Always use the API for writes
-  }) as ReturnType<typeof createClient> & {
-    assets: {
-      upload: (type: 'image' | 'file', buffer: Buffer, options?: { filename?: string }) => Promise<{ _id: string }>;
-    };
-  };
+  }) as any; // Simplified cast
 
   // Generate draft ID
   const draftId = `drafts.${uuidv4()}`;
@@ -225,12 +239,16 @@ export async function pushDraft(data: MadisonPayload): Promise<string> {
 
   // Create the document
   try {
-    await client.create(document as any); // Type assertion for document creation
-    console.log(`✅ Draft created: ${draftId}`);
-    return draftId;
+    console.log(`[Madison] Creating product draft in Sanity...`);
+    const result = await client.create(document as any);
+    console.log(`✅ [Madison] Draft created: ${result._id}`);
+    return result._id;
   } catch (error) {
-    console.error('Error creating draft:', error);
-    throw new Error(`Failed to create draft: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    console.error('[Madison] Sanity creation failed:', error);
+    if (typeof error === 'object' && error !== null && 'details' in error) {
+      console.error('[Madison] Failure details:', JSON.stringify((error as any).details, null, 2));
+    }
+    throw new Error(`Sanity creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -238,13 +256,14 @@ export async function pushDraft(data: MadisonPayload): Promise<string> {
 
 interface JournalPayload {
   title: string;
-  content: string; // Markdown
+  content?: string; // Markdown
+  body?: string;    // Fallback if Madison Studio sends 'body'
   excerpt?: string;
   coverImageUrl?: string;
   author?: string;
   publishedAt?: string; // ISO date string
-  category?: 'field-notes' | 'behind-the-blend' | 'territory-spotlight' | 'collector-archives';
-  territory?: 'ember' | 'petal' | 'tidal' | 'terra';
+  category?: 'field-notes' | 'behind-the-blend' | 'territory-spotlight' | 'collector-archives' | string;
+  territory?: 'ember' | 'petal' | 'tidal' | 'terra' | string;
   featured?: boolean;
   seoDescription?: string;
   relatedProductSlugs?: string[]; // Slugs of related products
@@ -255,14 +274,16 @@ interface JournalPayload {
  */
 export async function pushJournalEntry(data: JournalPayload): Promise<string> {
   // Initialize Sanity client with write token
-  const writeToken = process.env.SANITY_API_WRITE_TOKEN;
+  const writeToken = process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_WRITE_TOKEN;
   if (!writeToken) {
-    throw new Error('SANITY_API_WRITE_TOKEN environment variable is required');
+    throw new Error('SANITY_API_WRITE_TOKEN or SANITY_WRITE_TOKEN environment variable is required');
   }
 
   const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
   const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
   const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01';
+
+  console.log(`[Madison] Initializing journal client for project: ${projectId}`);
 
   const client = createClient({
     projectId,
@@ -270,11 +291,7 @@ export async function pushJournalEntry(data: JournalPayload): Promise<string> {
     apiVersion,
     token: writeToken,
     useCdn: false,
-  }) as ReturnType<typeof createClient> & {
-    assets: {
-      upload: (type: 'image' | 'file', buffer: Buffer, options?: { filename?: string }) => Promise<{ _id: string }>;
-    };
-  };
+  }) as any;
 
   // Generate draft ID
   const draftId = `drafts.${uuidv4()}`;
@@ -307,7 +324,7 @@ export async function pushJournalEntry(data: JournalPayload): Promise<string> {
       _type: 'slug',
       current: data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, ''),
     },
-    content: markdownToBlocks(data.content),
+    content: markdownToBlocks((data.content || data.body || '') as string),
     publishedAt: data.publishedAt || new Date().toISOString(),
     featured: data.featured || false,
   };
@@ -345,12 +362,16 @@ export async function pushJournalEntry(data: JournalPayload): Promise<string> {
 
   // Create the document
   try {
-    await client.create(document as any);
-    console.log(`✅ Journal draft created: ${draftId}`);
-    return draftId;
+    console.log(`[Madison] Creating journal draft in Sanity...`);
+    const result = await client.create(document as any);
+    console.log(`✅ [Madison] Journal draft created: ${result._id}`);
+    return result._id;
   } catch (error) {
-    console.error('Error creating journal draft:', error);
-    throw new Error(`Failed to create journal draft: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    console.error('[Madison] Sanity journal creation failed:', error);
+    if (typeof error === 'object' && error !== null && 'details' in error) {
+      console.error('[Madison] Failure details:', JSON.stringify((error as any).details, null, 2));
+    }
+    throw new Error(`Sanity journal creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -359,7 +380,8 @@ export async function pushJournalEntry(data: JournalPayload): Promise<string> {
 interface FieldJournalPayload {
   title: string;
   subtitle?: string;
-  content: string; // Markdown
+  content?: string; // Markdown
+  body?: string;    // Fallback
   excerpt?: string;
   coverImageUrl?: string;
   author?: 'archivist' | 'quartermaster' | 'navigator' | 'correspondent';
@@ -442,7 +464,7 @@ export async function pushFieldJournal(data: FieldJournalPayload): Promise<strin
       _type: 'slug',
       current: data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, ''),
     },
-    body: markdownToBlocks(data.content),
+    body: markdownToBlocks((data.content || data.body || '') as string),
     publishedAt: data.publishedAt || new Date().toISOString(),
   };
 
@@ -498,12 +520,16 @@ export async function pushFieldJournal(data: FieldJournalPayload): Promise<strin
 
   // Create the document
   try {
-    await client.create(document as any);
-    console.log(`✅ Field Journal draft created: ${draftId}`);
-    return draftId;
+    console.log(`[Madison] Creating Field Journal draft in Sanity...`);
+    const result = await client.create(document as any);
+    console.log(`✅ [Madison] Field Journal draft created: ${result._id}`);
+    return result._id;
   } catch (error) {
-    console.error('Error creating Field Journal draft:', error);
-    throw new Error(`Failed to create Field Journal draft: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    console.error('[Madison] Sanity Field Journal creation failed:', error);
+    if (typeof error === 'object' && error !== null && 'details' in error) {
+      console.error('[Madison] Failure details:', JSON.stringify((error as any).details, null, 2));
+    }
+    throw new Error(`Sanity Field Journal creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 

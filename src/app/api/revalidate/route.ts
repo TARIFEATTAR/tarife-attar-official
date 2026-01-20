@@ -40,8 +40,12 @@ export async function POST(request: NextRequest) {
     // Track what needs revalidation
     let hasProducts = false;
     let hasExhibits = false;
+    let hasJournal = false;
+    let hasFieldJournal = false;
     const productSlugs: string[] = [];
     const exhibitSlugs: string[] = [];
+    const journalSlugs: string[] = [];
+    const fieldJournalSlugs: string[] = [];
 
     // Process each mutation
     for (const mutation of mutations) {
@@ -55,6 +59,12 @@ export async function POST(request: NextRequest) {
       } else if (_type === 'exhibit') {
         hasExhibits = true;
         if (slug) exhibitSlugs.push(slug);
+      } else if (_type === 'journalEntry') {
+        hasJournal = true;
+        if (slug) journalSlugs.push(slug);
+      } else if (_type === 'fieldJournal') {
+        hasFieldJournal = true;
+        if (slug) fieldJournalSlugs.push(slug);
       }
     }
 
@@ -93,6 +103,34 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         revalidated: true,
         message: `Exhibits revalidated: ${exhibitSlugs.length > 0 ? exhibitSlugs.join(', ') : 'all exhibits'}`,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    if (hasJournal) {
+      revalidateTag('journal');
+      for (const slug of journalSlugs) {
+        revalidatePath(`/journal/${slug}`);
+      }
+      revalidatePath('/journal');
+
+      return NextResponse.json({
+        revalidated: true,
+        message: `Journal entries revalidated: ${journalSlugs.length > 0 ? journalSlugs.join(', ') : 'all journal entries'}`,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    if (hasFieldJournal) {
+      revalidateTag('fieldJournal');
+      for (const slug of fieldJournalSlugs) {
+        revalidatePath(`/field-journal/${slug}`);
+      }
+      revalidatePath('/field-journal');
+
+      return NextResponse.json({
+        revalidated: true,
+        message: `Field Journal entries revalidated: ${fieldJournalSlugs.length > 0 ? fieldJournalSlugs.join(', ') : 'all field journal entries'}`,
         timestamp: new Date().toISOString(),
       });
     }
