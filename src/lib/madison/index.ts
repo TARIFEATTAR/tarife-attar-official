@@ -6,9 +6,11 @@
  * - pushJournalEntry: Push journal/blog entry drafts
  */
 
-export { 
-  pushDraft, 
+export {
+  pushDraft,
   pushJournalEntry,
+  pushFieldJournal,
   type MadisonPayload,
   type JournalPayload,
+  type FieldJournalPayload,
 } from './ghostWriter';

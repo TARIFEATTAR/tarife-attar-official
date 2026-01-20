@@ -45,23 +45,44 @@ interface MadisonPayload {
  * Converts markdown/HTML to Sanity Portable Text blocks
  * Simple implementation - for production, use @portabletext/to-portabletext
  */
-function markdownToBlocks(text: string): Array<{ _type: string; children: Array<{ _type: string; text: string }> }> {
+function markdownToBlocks(text: string): any[] {
   if (!text) return [];
 
   // Split by paragraphs
   const paragraphs = text.split(/\n\n+/).filter((p) => p.trim());
 
-  return paragraphs.map((para) => ({
-    _type: 'block',
-    style: 'normal',
-    children: [
-      {
-        _type: 'span',
-        text: para.trim(),
-      },
-    ],
-    markDefs: [],
-  }));
+  return paragraphs.map((para) => {
+    let style = 'normal';
+    let content = para.trim();
+
+    // Check for headers
+    if (content.startsWith('### ')) {
+      style = 'h3';
+      content = content.replace('### ', '');
+    } else if (content.startsWith('## ')) {
+      style = 'h2';
+      content = content.replace('## ', '');
+    } else if (content.startsWith('# ')) {
+      style = 'h1';
+      content = content.replace('# ', '');
+    } else if (content.startsWith('> ')) {
+      style = 'blockquote';
+      content = content.replace('> ', '');
+    }
+
+    return {
+      _type: 'block',
+      style: style,
+      children: [
+        {
+          _type: 'span',
+          text: content,
+          marks: [],
+        },
+      ],
+      markDefs: [],
+    };
+  });
 }
 
 /**
