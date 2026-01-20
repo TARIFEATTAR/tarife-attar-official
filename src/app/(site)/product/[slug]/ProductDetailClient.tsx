@@ -23,7 +23,6 @@ interface Product {
   slug: { current: string };
   legacyName?: string;
   showLegacyName?: boolean;
-  legacyNameStyle?: 'formerly' | 'once-known' | 'previously';
   scentProfile?: string;
   inspiredBy?: string;
   collectionType: "atlas" | "relic";
@@ -47,7 +46,6 @@ interface Product {
     slug: { current: string };
     legacyName?: string;
     showLegacyName?: boolean;
-    legacyNameStyle?: 'formerly' | 'once-known' | 'previously';
     price?: number;
     mainImage?: any;
   }>;
@@ -579,7 +577,6 @@ export function ProductDetailClient({ product }: Props) {
             <LegacyName
               legacyName={product.legacyName}
               showLegacyName={product.showLegacyName}
-              style={product.legacyNameStyle}
               className="text-sm md:text-base opacity-60 mt-2"
             />
 
@@ -1064,7 +1061,6 @@ export function ProductDetailClient({ product }: Props) {
                           <LegacyName
                             legacyName={related.legacyName}
                             showLegacyName={related.showLegacyName}
-                            style={related.legacyNameStyle}
                             className="text-xs opacity-60 mb-2"
                           />
                         )}

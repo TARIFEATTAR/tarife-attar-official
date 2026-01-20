@@ -3,38 +3,18 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-export type LegacyNameStyle = 'formerly' | 'once-known' | 'previously';
-
 interface LegacyNameProps {
     legacyName: string | null | undefined;
     showLegacyName?: boolean;
-    style?: LegacyNameStyle;
     /** Display variant: 'inline' for product cards, 'block' for detail pages */
     variant?: 'inline' | 'block';
     /** Optional className override */
     className?: string;
 }
 
-/**
- * Formats the legacy name with the appropriate prefix
- */
-function formatLegacyName(name: string, style: LegacyNameStyle): string {
-    switch (style) {
-        case 'formerly':
-            return `Formerly ${name}`;
-        case 'once-known':
-            return `Once known as ${name}`;
-        case 'previously':
-            return `Previously ${name}`;
-        default:
-            return `Formerly ${name}`;
-    }
-}
-
 export const LegacyName: React.FC<LegacyNameProps> = ({
     legacyName,
     showLegacyName = true,
-    style = 'formerly',
     variant = 'inline',
     className = '',
 }) => {
@@ -42,8 +22,6 @@ export const LegacyName: React.FC<LegacyNameProps> = ({
     if (!legacyName || !showLegacyName) {
         return null;
     }
-
-    const formattedName = formatLegacyName(legacyName, style);
 
     // Base styles matching the brand's design system
     const baseStyles = `
@@ -69,9 +47,9 @@ export const LegacyName: React.FC<LegacyNameProps> = ({
         ${variantStyles[variant]}
         ${className}
       `.trim()}
-            aria-label={`This product was previously named ${legacyName}`}
+            aria-label={`Previously named ${legacyName}`}
         >
-            {formattedName}
+            {legacyName}
         </motion.span>
     );
 };
@@ -86,7 +64,6 @@ interface ProductTitleWithLegacyProps {
     title: string;
     legacyName?: string | null;
     showLegacyName?: boolean;
-    legacyNameStyle?: LegacyNameStyle;
     /** Title size variant */
     size?: 'sm' | 'md' | 'lg' | 'xl';
     className?: string;
@@ -96,7 +73,6 @@ export const ProductTitleWithLegacy: React.FC<ProductTitleWithLegacyProps> = ({
     title,
     legacyName,
     showLegacyName = true,
-    legacyNameStyle = 'formerly',
     size = 'md',
     className = '',
 }) => {
@@ -116,7 +92,6 @@ export const ProductTitleWithLegacy: React.FC<ProductTitleWithLegacyProps> = ({
                 <LegacyName
                     legacyName={legacyName}
                     showLegacyName={showLegacyName}
-                    style={legacyNameStyle}
                     variant={size === 'xl' || size === 'lg' ? 'block' : 'inline'}
                     className="mt-1"
                 />

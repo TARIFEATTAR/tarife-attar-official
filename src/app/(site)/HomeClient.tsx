@@ -146,7 +146,6 @@ export function HomeClient({ featuredProducts }: HomeClientProps) {
                                             <LegacyName
                                                 legacyName={product.legacyName}
                                                 showLegacyName={product.showLegacyName}
-                                                style={product.legacyNameStyle}
                                                 className="text-[10px] opacity-50"
                                             />
                                         </div>

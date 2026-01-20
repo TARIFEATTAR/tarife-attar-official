@@ -160,12 +160,24 @@ export const structure = (S: StructureBuilder, _context: StructureResolverContex
             ])
         ),
 
+      // Group 6: Field Journal
+      S.listItem()
+        .title('📔 Field Journal')
+        .id('field-journal')
+        .icon(() => '📔')
+        .child(
+          S.documentList()
+            .title('Field Journal')
+            .filter('_type == "fieldJournal"')
+            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+        ),
+
       // Divider
       S.divider(),
 
       // Other document types (Exhibits, etc.)
       ...S.documentTypeListItems().filter(
-        (listItem) => !['product', 'journalEntry'].includes(listItem.getId() || '')
+        (listItem) => !['product', 'journalEntry', 'fieldJournal'].includes(listItem.getId() || '')
       ),
     ]);
 };

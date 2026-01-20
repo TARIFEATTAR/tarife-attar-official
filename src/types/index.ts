@@ -99,7 +99,6 @@ export interface Product {
   // Legacy Name System (Rebrand)
   legacyName?: string;
   showLegacyName?: boolean;
-  legacyNameStyle?: 'formerly' | 'once-known' | 'previously';
 
   // Rich Content
   fieldReport?: ShoppableImage;

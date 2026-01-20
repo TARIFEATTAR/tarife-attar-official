@@ -54,7 +54,6 @@ interface Territory {
     inStock?: boolean;
     legacyName?: string;
     showLegacyName?: boolean;
-    legacyNameStyle?: 'formerly' | 'once-known' | 'previously';
     scentProfile?: string;
   }>;
 }

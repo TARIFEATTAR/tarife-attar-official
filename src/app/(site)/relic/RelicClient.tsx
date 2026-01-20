@@ -23,7 +23,6 @@ interface RelicProduct {
   inStock?: boolean;
   legacyName?: string;
   showLegacyName?: boolean;
-  legacyNameStyle?: 'formerly' | 'once-known' | 'previously';
 }
 
 interface Category {

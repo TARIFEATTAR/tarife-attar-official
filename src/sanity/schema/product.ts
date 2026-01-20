@@ -77,7 +77,7 @@ export const productSchema = {
       title: 'Legacy Name',
       type: 'string',
       group: 'general',
-      description: 'Previous product name for rebrand transition (e.g., "Honey Oud"). Displays as "Formerly [name]" during transition period.',
+      description: 'Previous product name shown below the new name during rebrand transition.',
       placeholder: 'e.g., Honey Oud',
     },
     {
@@ -85,25 +85,8 @@ export const productSchema = {
       title: 'Show Legacy Name',
       type: 'boolean',
       group: 'general',
-      description: 'Display "Formerly..." notation on product cards and detail pages. Disable once customers recognize the new name.',
+      description: 'Display the legacy name below the product title. Toggle off once customers recognize the new name.',
       initialValue: true,
-    },
-    {
-      name: 'legacyNameStyle',
-      title: 'Legacy Name Display Style',
-      type: 'string',
-      group: 'general',
-      description: 'How to phrase the legacy name reference',
-      options: {
-        list: [
-          { title: 'Formerly [Name]', value: 'formerly' },
-          { title: 'Once known as [Name]', value: 'once-known' },
-          { title: 'Previously [Name]', value: 'previously' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'formerly',
-      hidden: ({ parent }: { parent?: { legacyName?: string } }) => !parent?.legacyName,
     },
 
     // Public Title

@@ -4,4 +4,6 @@ import { journalSchema } from "./journal";
 import shoppableImage from "./objects/shoppableImage";
 import museumExhibit from "./objects/museumExhibit";
 
-export const schemaTypes = [productSchema, exhibitSchema, journalSchema, shoppableImage, museumExhibit];
+import { fieldJournalSchema } from "./fieldJournal";
+
+export const schemaTypes = [productSchema, exhibitSchema, journalSchema, shoppableImage, museumExhibit, fieldJournalSchema];
