@@ -5,7 +5,9 @@
   "description": "Tarife Attär - A curated archive of rare and vintage fragrances",
   "overrides": {
     "@portabletext/editor": "^1.1.0",
-    "@portabletext/toolkit": "^2.0.0"
+    "@portabletext/toolkit": "^2.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "scripts": {
     "dev": "next dev",
@@ -51,9 +53,9 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@types/node": "^25.0.3",
-    "@types/react": "^19.2.7",
-    "@types/react-dom": "^19.2.3",
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.35",
     "prettier": "^3.7.4",
