@@ -64,6 +64,7 @@ interface Product {
     onSkinStory?: string[];
     audioJourney?: string;
     audioOnSkin?: string;
+    displayFieldReportConcept?: boolean;
     fieldReportConcept?: {
       concept?: string;
       hotspots?: Array<{
@@ -1102,8 +1103,8 @@ export function ProductDetailClient({ product }: Props) {
               <EvocationSection title="Evocation" story={product.atlasData.evocationStory} />
             )}
 
-            {/* Field Report Concept */}
-            {isAtlas && product.atlasData?.fieldReportConcept && (
+            {/* Field Report Concept - Conditional Display */}
+            {isAtlas && product.atlasData?.displayFieldReportConcept && product.atlasData?.fieldReportConcept && (
               <FieldReportConcept
                 concept={product.atlasData.fieldReportConcept.concept}
                 hotspots={product.atlasData.fieldReportConcept.hotspots}

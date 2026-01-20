@@ -491,6 +491,13 @@ export const productSchema = {
           description: 'Intimate narration of the On Skin experience (30-45s)',
         },
         {
+          name: 'displayFieldReportConcept',
+          title: 'Display Field Report Concept',
+          type: 'boolean',
+          initialValue: false,
+          description: 'Toggle to show/hide the conceptual description and hotspots on the product page.',
+        },
+        {
           name: 'fieldReport',
           title: 'Field Report',
           type: 'shoppableImage',

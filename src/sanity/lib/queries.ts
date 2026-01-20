@@ -30,6 +30,7 @@ export const atlasProductsByTerritoryQuery = groq`
     "onSkinStory": atlasData.onSkinStory,
     "audioJourney": atlasData.audioJourney.asset->url,
     "audioOnSkin": atlasData.audioOnSkin.asset->url,
+    "displayFieldReportConcept": atlasData.displayFieldReportConcept,
     "travelLog": atlasData.travelLog,
     "fieldReport": atlasData.fieldReport {
       image,
@@ -214,6 +215,7 @@ export const productBySlugQuery = groq`
       onSkinStory,
       "audioJourney": audioJourney.asset->url,
       "audioOnSkin": audioOnSkin.asset->url,
+      displayFieldReportConcept,
       fieldReportConcept {
         concept,
         hotspots[] {
