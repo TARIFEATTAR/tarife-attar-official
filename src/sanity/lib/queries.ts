@@ -409,3 +409,131 @@ export const journalEntryBySlugQuery = groq`
     }
   }
 `;
+
+// ===== FIELD JOURNAL QUERIES (SEO-Rich Editorial Content) =====
+
+/**
+ * Get all published Field Journal entries
+ */
+export const allFieldJournalEntriesQuery = groq`
+  *[_type == "fieldJournal" && !(_id in path("drafts.**"))] | order(publishedAt desc) {
+    _id,
+    title,
+    slug,
+    subtitle,
+    excerpt,
+    coverImage,
+    author,
+    publishedAt,
+    category,
+    "territory": expeditionData.territory,
+    "locationName": expeditionData.locationName,
+    "region": expeditionData.region,
+    "season": expeditionData.season
+  }
+`;
+
+/**
+ * Get Field Journal entries by territory
+ */
+export const fieldJournalByTerritoryQuery = groq`
+  *[_type == "fieldJournal" && expeditionData.territory == $territory && !(_id in path("drafts.**"))] | order(publishedAt desc) {
+    _id,
+    title,
+    slug,
+    subtitle,
+    excerpt,
+    coverImage,
+    author,
+    publishedAt,
+    category,
+    "territory": expeditionData.territory,
+    "locationName": expeditionData.locationName
+  }
+`;
+
+/**
+ * Get Field Journal entries by category
+ */
+export const fieldJournalByCategoryQuery = groq`
+  *[_type == "fieldJournal" && category == $category && !(_id in path("drafts.**"))] | order(publishedAt desc) {
+    _id,
+    title,
+    slug,
+    subtitle,
+    excerpt,
+    coverImage,
+    author,
+    publishedAt,
+    category,
+    "territory": expeditionData.territory,
+    "locationName": expeditionData.locationName
+  }
+`;
+
+/**
+ * Get a single Field Journal entry by slug (with full content for detail page)
+ */
+export const fieldJournalBySlugQuery = groq`
+  *[_type == "fieldJournal" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
+    _id,
+    title,
+    slug,
+    subtitle,
+    excerpt,
+    body,
+    coverImage,
+    author,
+    publishedAt,
+    category,
+    expeditionData {
+      territory,
+      locationName,
+      gpsCoordinates {
+        latitude,
+        longitude,
+        display
+      },
+      region,
+      season
+    },
+    seo {
+      metaTitle,
+      metaDescription,
+      ogImage,
+      keywords,
+      canonicalUrl
+    },
+    featuredProducts[]-> {
+      _id,
+      title,
+      slug,
+      mainImage,
+      "price": coalesce(price, store.priceRange.minVariantPrice),
+      collectionType,
+      "atmosphere": atlasData.atmosphere
+    },
+    relatedEntries[]-> {
+      _id,
+      title,
+      slug,
+      excerpt,
+      coverImage,
+      "territory": expeditionData.territory
+    }
+  }
+`;
+
+/**
+ * Get recent Field Journal entries for sidebar/homepage
+ */
+export const recentFieldJournalQuery = groq`
+  *[_type == "fieldJournal" && !(_id in path("drafts.**"))] | order(publishedAt desc) [0...5] {
+    _id,
+    title,
+    slug,
+    "territory": expeditionData.territory,
+    publishedAt
+  }
+`;
+

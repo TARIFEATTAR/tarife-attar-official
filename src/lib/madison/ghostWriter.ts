@@ -333,7 +333,161 @@ export async function pushJournalEntry(data: JournalPayload): Promise<string> {
   }
 }
 
+// ===== FIELD JOURNAL SUPPORT (SEO-Rich Editorial Content) =====
+
+interface FieldJournalPayload {
+  title: string;
+  subtitle?: string;
+  content: string; // Markdown
+  excerpt?: string;
+  coverImageUrl?: string;
+  author?: 'archivist' | 'quartermaster' | 'navigator' | 'correspondent';
+  publishedAt?: string; // ISO date string
+  category?: 'dispatch' | 'distillation' | 'material' | 'territory' | 'archive';
+  expeditionData?: {
+    territory?: 'tidal' | 'ember' | 'petal' | 'terra';
+    locationName?: string;
+    gpsCoordinates?: {
+      latitude: number;
+      longitude: number;
+      display: string;
+    };
+    region?: string;
+    season?: 'spring' | 'summer' | 'autumn' | 'winter';
+  };
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    keywords?: string[];
+  };
+  featuredProductSlugs?: string[]; // Slugs of featured products
+}
+
+/**
+ * Push a Field Journal entry draft to Sanity (from Madison Studio)
+ * Creates SEO-rich editorial content with expedition data
+ */
+export async function pushFieldJournal(data: FieldJournalPayload): Promise<string> {
+  // Initialize Sanity client with write token
+  const writeToken = process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_WRITE_TOKEN;
+  if (!writeToken) {
+    throw new Error('SANITY_API_WRITE_TOKEN or SANITY_WRITE_TOKEN environment variable is required');
+  }
+
+  const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+  const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
+  const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01';
+
+  const client = createClient({
+    projectId,
+    dataset,
+    apiVersion,
+    token: writeToken,
+    useCdn: false,
+  }) as ReturnType<typeof createClient> & {
+    assets: {
+      upload: (type: 'image' | 'file', buffer: Buffer, options?: { filename?: string }) => Promise<{ _id: string }>;
+    };
+  };
+
+  // Generate draft ID
+  const draftId = `drafts.${uuidv4()}`;
+
+  // Handle cover image upload if provided
+  let coverImageAssetId: string | undefined;
+  if (data.coverImageUrl) {
+    coverImageAssetId = await uploadImageFromUrl(client, data.coverImageUrl);
+  }
+
+  // Resolve featured products by slug
+  let featuredProductRefs: Array<{ _type: string; _ref: string; _key: string }> = [];
+  if (data.featuredProductSlugs && data.featuredProductSlugs.length > 0) {
+    const productQuery = `*[_type == "product" && slug.current in $slugs && !(_id in path("drafts.**"))]{_id, "slug": slug.current}`;
+    const products = await client.fetch(productQuery, { slugs: data.featuredProductSlugs });
+    featuredProductRefs = products.map((p: { _id: string }, index: number) => ({
+      _type: 'reference',
+      _ref: p._id,
+      _key: `ref-${index}`,
+    }));
+  }
+
+  // Build the document
+  const document: Record<string, unknown> = {
+    _id: draftId,
+    _type: 'fieldJournal',
+    generationSource: 'madison-studio',
+    title: data.title,
+    slug: {
+      _type: 'slug',
+      current: data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, ''),
+    },
+    body: markdownToBlocks(data.content),
+    publishedAt: data.publishedAt || new Date().toISOString(),
+  };
+
+  // Add optional fields
+  if (data.subtitle) {
+    document.subtitle = data.subtitle;
+  }
+  if (data.excerpt) {
+    document.excerpt = data.excerpt;
+  }
+  if (data.author) {
+    document.author = data.author;
+  }
+  if (data.category) {
+    document.category = data.category;
+  }
+
+  // Add expedition data
+  if (data.expeditionData) {
+    document.expeditionData = {
+      territory: data.expeditionData.territory,
+      locationName: data.expeditionData.locationName,
+      gpsCoordinates: data.expeditionData.gpsCoordinates,
+      region: data.expeditionData.region,
+      season: data.expeditionData.season,
+    };
+  }
+
+  // Add SEO data
+  if (data.seo) {
+    document.seo = {
+      metaTitle: data.seo.metaTitle,
+      metaDescription: data.seo.metaDescription,
+      keywords: data.seo.keywords,
+    };
+  }
+
+  // Add featured products
+  if (featuredProductRefs.length > 0) {
+    document.featuredProducts = featuredProductRefs;
+  }
+
+  // Add cover image if uploaded
+  if (coverImageAssetId) {
+    document.coverImage = {
+      _type: 'image',
+      asset: {
+        _type: 'reference',
+        _ref: coverImageAssetId,
+      },
+    };
+  }
+
+  // Create the document
+  try {
+    await client.create(document as any);
+    console.log(`✅ Field Journal draft created: ${draftId}`);
+    return draftId;
+  } catch (error) {
+    console.error('Error creating Field Journal draft:', error);
+    throw new Error(`Failed to create Field Journal draft: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
 /**
  * Type exports for external use
  */
-export type { MadisonPayload, JournalPayload };
+export type { MadisonPayload, JournalPayload, FieldJournalPayload };
+

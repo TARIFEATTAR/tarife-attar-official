@@ -3,7 +3,7 @@
  * Seed Field Journal Demo Entry
  * 
  * Creates the demo "The Sillage of Intent" Field Journal entry.
- * Run with: SANITY_WRITE_TOKEN=xxx node scripts/seed-field-journal.mjs
+ * Run with: node scripts/seed-field-journal.mjs
  */
 
 import { createClient } from '@sanity/client';
