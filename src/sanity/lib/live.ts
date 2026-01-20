@@ -14,14 +14,14 @@ interface SanityFetchOptions {
  * Fetch data from Sanity with caching support
  * This is a compatibility wrapper for next-sanity@9.x
  */
-export async function sanityFetch<T = unknown>({ 
-  query, 
+export async function sanityFetch<T = unknown>({
+  query,
   params = {},
-  tags = [] 
+  tags = []
 }: SanityFetchOptions): Promise<T> {
   return client.fetch<T>(query, params, {
     // Use Next.js cache with revalidation
-    next: { 
+    next: {
       revalidate: 60, // Revalidate every 60 seconds
       tags: tags.length > 0 ? tags : ['sanity']
     }
