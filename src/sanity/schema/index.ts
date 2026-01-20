@@ -7,4 +7,6 @@ import { fieldReportSchema } from "./objects/fieldReport";
 
 import { fieldJournalSchema } from "./fieldJournal";
 
-export const schemaTypes = [productSchema, exhibitSchema, journalSchema, shoppableImage, museumExhibit, fieldReportSchema, fieldJournalSchema];
+import { territorySchema } from "./territory";
+
+export const schemaTypes = [productSchema, exhibitSchema, journalSchema, shoppableImage, museumExhibit, fieldReportSchema, fieldJournalSchema, territorySchema];

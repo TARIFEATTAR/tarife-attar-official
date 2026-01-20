@@ -158,6 +158,33 @@ export const productSchema = {
       description: 'e.g., "9ml", "3ml", "15ml"',
     },
 
+    // Sillage
+    {
+      name: 'sillage',
+      title: 'Sillage',
+      type: 'string',
+      group: 'general',
+      description: 'e.g., "Intimate", "Moderate", "Heavy"',
+    },
+
+    // Longevity
+    {
+      name: 'longevity',
+      title: 'Longevity',
+      type: 'string',
+      group: 'general',
+      description: 'e.g., "6-8 hours", "Long lasting"',
+    },
+
+    // Season
+    {
+      name: 'season',
+      title: 'Season',
+      type: 'string',
+      group: 'general',
+      description: 'e.g., "Winter", "All Season"',
+    },
+
     // Scent Profile (Short summary for Atlas Collection)
     {
       name: 'scentProfile',
@@ -373,10 +400,58 @@ export const productSchema = {
           validation: (Rule: SanityRule) => Rule.required(),
         },
         {
+          name: 'territory',
+          title: 'Territory Reference',
+          type: 'reference',
+          to: [{ type: 'territory' }],
+          description: 'Link to the Territory document',
+        },
+        {
           name: 'gpsCoordinates',
           title: 'GPS Coordinates (Inspiration Point)',
           type: 'string',
           description: 'Inspiration Point: The memory or atmosphere this scent captures (e.g., "A market in Tangier"). Coordinates like "45.5017° N, 73.5673° W".',
+        },
+        {
+          name: 'evocationLocation',
+          title: 'Evocation Location',
+          type: 'string',
+          description: 'Name of the location (e.g., "Aden, Yemen")',
+        },
+        {
+          name: 'evocationStory',
+          title: 'Evocation Story',
+          type: 'array',
+          of: [{ type: 'string' }],
+          description: 'Paragraphs of the evocation story',
+        },
+        {
+          name: 'onSkinStory',
+          title: 'On Skin Story',
+          type: 'array',
+          of: [{ type: 'string' }],
+          description: 'Paragraphs describing how it wears on skin',
+        },
+        {
+          name: 'fieldReportConcept',
+          title: 'Field Report Concept',
+          type: 'object',
+          fields: [
+            { name: 'concept', type: 'text', title: 'Concept' },
+            {
+              name: 'hotspots',
+              type: 'array',
+              of: [
+                {
+                  type: 'object',
+                  fields: [
+                    { name: 'item', type: 'string' },
+                    { name: 'meaning', type: 'string' },
+                  ],
+                },
+              ],
+            },
+          ],
         },
         {
           name: 'travelLog',
