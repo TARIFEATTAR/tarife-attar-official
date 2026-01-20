@@ -477,6 +477,20 @@ export const productSchema = {
           },
         },
         {
+          name: 'audioJourney',
+          title: 'Audio: The Journey',
+          type: 'file',
+          options: { accept: 'audio/*' },
+          description: 'Narration of the Evocation story (60-90s)',
+        },
+        {
+          name: 'audioOnSkin',
+          title: 'Audio: On Skin',
+          type: 'file',
+          options: { accept: 'audio/*' },
+          description: 'Intimate narration of the On Skin experience (30-45s)',
+        },
+        {
           name: 'fieldReport',
           title: 'Field Report',
           type: 'shoppableImage',

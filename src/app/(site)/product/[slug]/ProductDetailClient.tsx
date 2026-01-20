@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { ArrowLeft, Plus, Minus, Gift, MapPin, Calendar, Droplets, Check, AlertCircle, Map as MapIcon, Info, Flame, Flower2, Waves, TreePine } from "lucide-react";
+import { ArrowLeft, Plus, Minus, Gift, MapPin, Calendar, Droplets, Check, AlertCircle, Map as MapIcon, Info, Flame, Flower2, Waves, TreePine, Volume2, Play, Pause, Compass } from "lucide-react";
 import { urlForImage } from "@/sanity/lib/image";
 import { useShopifyCart } from "@/context";
 import { GlobalFooter } from "@/components/navigation";
@@ -59,6 +59,18 @@ interface Product {
   atlasData?: {
     atmosphere?: string;
     gpsCoordinates?: string;
+    evocationLocation?: string;
+    evocationStory?: string[];
+    onSkinStory?: string[];
+    audioJourney?: string;
+    audioOnSkin?: string;
+    fieldReportConcept?: {
+      concept?: string;
+      hotspots?: Array<{
+        item: string;
+        meaning: string;
+      }>;
+    };
     travelLog?: PortableTextBlock[];
     badges?: string[];
     fieldReport?: {
@@ -98,6 +110,170 @@ interface Props {
   product: Product;
 }
 
+const EvocationSection = ({ title, story }: { title: string; story: string[] }) => {
+  if (!story || story.length === 0) return null;
+  return (
+    <div className="pt-8 border-t border-theme-charcoal/10">
+      <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-theme-gold block mb-4">
+        {title}
+      </span>
+      <div className="space-y-4 font-serif italic text-base md:text-lg leading-relaxed opacity-90">
+        {story.map((paragraph, idx) => (
+          <p key={idx}>{paragraph}</p>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const FieldReportConcept = ({ concept, hotspots }: { concept?: string; hotspots?: Array<{ item: string; meaning: string }> }) => {
+  if (!concept && (!hotspots || hotspots.length === 0)) return null;
+
+  return (
+    <div className="pt-8 border-t border-theme-charcoal/10">
+      <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-theme-gold block mb-4">
+        Field Report Concept
+      </span>
+      {concept && (
+        <p className="font-serif italic text-base md:text-lg leading-relaxed opacity-90 mb-6">
+          {concept}
+        </p>
+      )}
+      {hotspots && hotspots.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {hotspots.map((h, i) => (
+            <div key={i} className="flex gap-3 items-start">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-theme-gold mt-1">0{i + 1}</span>
+              <div>
+                <span className="font-mono text-[10px] uppercase tracking-widest opacity-60 block">{h.item}</span>
+                <span className="font-serif italic text-sm opacity-80">{h.meaning}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Audio Player Component
+const AudioNarrative = ({
+  audioJourney,
+  audioOnSkin
+}: {
+  audioJourney?: string;
+  audioOnSkin?: string;
+}) => {
+  const [activeTrack, setActiveTrack] = useState<'journey' | 'skin'>('journey');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const journeySrc = audioJourney;
+  const skinSrc = audioOnSkin;
+
+  // Auto-switch track if the selected one is missing
+  useEffect(() => {
+    if (activeTrack === 'journey' && !journeySrc && skinSrc) setActiveTrack('skin');
+    if (activeTrack === 'skin' && !skinSrc && journeySrc) setActiveTrack('journey');
+  }, [activeTrack, journeySrc, skinSrc]);
+
+  if (!audioJourney && !audioOnSkin) return null;
+
+  const currentSrc = activeTrack === 'journey' ? journeySrc : skinSrc;
+
+  const handlePlayPause = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleTrackChange = (track: 'journey' | 'skin') => {
+    if (track === activeTrack) return;
+    setActiveTrack(track);
+    // Don't auto-play immediately to allow user to orient, unless they hit play
+    setIsPlaying(false);
+  };
+
+  // When src changes, if we were playing, we might want to continue or pause.
+  // Let's pause on track switch for safety/clarity unless we want gapless feel.
+
+  return (
+    <div className="py-6 border-y border-theme-charcoal/10 my-6">
+      <div className="flex items-center justify-between mb-4">
+        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-theme-gold">
+          Archive Audio
+        </span>
+        <div className="flex gap-4">
+          {audioJourney && (
+            <button
+              onClick={() => handleTrackChange('journey')}
+              className={`flex items-center gap-2 transition-opacity ${activeTrack === 'journey' ? 'opacity-100' : 'opacity-40 hover:opacity-100'}`}
+            >
+              <Compass className="w-3 h-3" />
+              <span className="font-mono text-[9px] uppercase tracking-widest">The Journey</span>
+            </button>
+          )}
+          {audioOnSkin && (
+            <button
+              onClick={() => handleTrackChange('skin')}
+              className={`flex items-center gap-2 transition-opacity ${activeTrack === 'skin' ? 'opacity-100' : 'opacity-40 hover:opacity-100'}`}
+            >
+              <Droplets className="w-3 h-3" />
+              <span className="font-mono text-[9px] uppercase tracking-widest">On Skin</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="bg-theme-charcoal/5 p-4 flex items-center gap-4 rounded-sm">
+        <button
+          onClick={handlePlayPause}
+          className="w-10 h-10 flex items-center justify-center bg-theme-charcoal text-theme-alabaster rounded-full hover:scale-105 transition-transform flex-shrink-0"
+        >
+          {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+        </button>
+
+        <div className="flex-1 min-w-0">
+          {/* Visualizer / Waveform placeholder */}
+          <div className="h-8 flex items-center gap-0.5 opacity-30">
+            {Array.from({ length: 40 }).map((_, i) => (
+              <motion.div
+                key={i}
+                className="w-1 bg-theme-charcoal rounded-full"
+                animate={{
+                  height: isPlaying ? [4, 16 + Math.random() * 16, 4] : 4
+                }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 1,
+                  delay: i * 0.05,
+                  ease: "easeInOut"
+                }}
+                style={{ height: 4 }}
+              />
+            ))}
+          </div>
+        </div>
+
+        <Volume2 className="w-4 h-4 opacity-40 flex-shrink-0" />
+
+        <audio
+          ref={audioRef}
+          src={currentSrc}
+          onEnded={() => setIsPlaying(false)}
+          onPause={() => setIsPlaying(false)}
+          onPlay={() => setIsPlaying(true)}
+        />
+      </div>
+    </div>
+  );
+};
+
 const TERRITORY_NAMES: Record<string, string> = {
   tidal: "Tidal",
   ember: "Ember",
@@ -124,42 +300,42 @@ type VariantSize = '6ml' | '12ml';
 
 // Territory Badge Component with elegant icons
 const TerritoryBadge = ({ territory }: { territory: string }) => {
-  const territories: Record<string, { 
-    bg: string; 
-    border: string; 
+  const territories: Record<string, {
+    bg: string;
+    border: string;
     iconColor: string;
     Icon: React.ComponentType<{ className?: string }>;
   }> = {
-    ember: { 
-      bg: 'bg-amber-50/80', 
-      border: 'border-amber-200/60', 
+    ember: {
+      bg: 'bg-amber-50/80',
+      border: 'border-amber-200/60',
       iconColor: 'text-amber-600',
-      Icon: Flame 
+      Icon: Flame
     },
-    petal: { 
-      bg: 'bg-rose-50/80', 
-      border: 'border-rose-200/60', 
+    petal: {
+      bg: 'bg-rose-50/80',
+      border: 'border-rose-200/60',
       iconColor: 'text-rose-500',
-      Icon: Flower2 
+      Icon: Flower2
     },
-    tidal: { 
-      bg: 'bg-cyan-50/80', 
-      border: 'border-cyan-200/60', 
+    tidal: {
+      bg: 'bg-cyan-50/80',
+      border: 'border-cyan-200/60',
       iconColor: 'text-cyan-600',
-      Icon: Waves 
+      Icon: Waves
     },
-    terra: { 
-      bg: 'bg-emerald-50/80', 
-      border: 'border-emerald-200/60', 
+    terra: {
+      bg: 'bg-emerald-50/80',
+      border: 'border-emerald-200/60',
       iconColor: 'text-emerald-600',
-      Icon: TreePine 
+      Icon: TreePine
     },
   };
-  
+
   const style = territories[territory] || territories.ember;
   const name = TERRITORY_NAMES[territory] || territory;
   const IconComponent = style.Icon;
-  
+
   return (
     <div className={`inline-flex items-center gap-2.5 px-4 py-2 ${style.bg} ${style.border} border backdrop-blur-sm`}>
       <IconComponent className={`w-4 h-4 ${style.iconColor}`} />
@@ -287,13 +463,13 @@ export function ProductDetailClient({ product }: Props) {
 
   // Get Shopify image URL as fallback
   const shopifyImageUrl = product.shopifyPreviewImageUrl || product.shopifyImage;
-  
+
   const allImages = product.mainImage
     ? [product.mainImage, ...(product.gallery || [])]
     : product.gallery || [];
 
   // Use Sanity image if available, otherwise fall back to Shopify image
-  const mainImageUrl = allImages.length > 0 
+  const mainImageUrl = allImages.length > 0
     ? urlForImage(allImages[selectedImage] || product.mainImage)
     : null;
   const isAtlas = product.collectionType === "atlas";
@@ -330,7 +506,7 @@ export function ProductDetailClient({ product }: Props) {
     // For Atlas products with variant selection, use the specific variant ID
     // For Relic or single-variant products, use the default shopifyVariantId
     let variantIdToAdd = product.shopifyVariantId;
-    
+
     if (isAtlas && selectedVariant) {
       if (selectedVariant === '6ml' && product.shopifyVariant6mlId) {
         variantIdToAdd = product.shopifyVariant6mlId;
@@ -612,19 +788,17 @@ export function ProductDetailClient({ product }: Props) {
                       onClick={() => setSelectedVariant(size)}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`flex-1 py-4 px-6 border-2 transition-all ${
-                        selectedVariant === size
-                          ? isRelic ? 'border-theme-alabaster bg-theme-alabaster text-theme-obsidian' : 'border-theme-charcoal bg-theme-charcoal text-theme-alabaster'
-                          : isRelic ? 'border-white/20 hover:border-white/40' : 'border-theme-charcoal/20 hover:border-theme-charcoal/40'
-                      }`}
+                      className={`flex-1 py-4 px-6 border-2 transition-all ${selectedVariant === size
+                        ? isRelic ? 'border-theme-alabaster bg-theme-alabaster text-theme-obsidian' : 'border-theme-charcoal bg-theme-charcoal text-theme-alabaster'
+                        : isRelic ? 'border-white/20 hover:border-white/40' : 'border-theme-charcoal/20 hover:border-theme-charcoal/40'
+                        }`}
                     >
                       <div className="text-center">
                         <div className="font-mono text-sm uppercase tracking-widest mb-1">
                           {size}
                         </div>
-                        <div className={`text-2xl font-serif tracking-tighter ${
-                          selectedVariant === size ? 'text-theme-alabaster' : ''
-                        }`}>
+                        <div className={`text-2xl font-serif tracking-tighter ${selectedVariant === size ? 'text-theme-alabaster' : ''
+                          }`}>
                           ${territoryPricing[size]}
                         </div>
                       </div>
@@ -686,11 +860,10 @@ export function ProductDetailClient({ product }: Props) {
                     className="flex items-center gap-4 text-left hover:opacity-80 transition-opacity"
                   >
                     {/* Elegant circular indicator */}
-                    <div className={`w-10 h-10 border flex items-center justify-center transition-all ${
-                      showMap 
-                        ? 'border-theme-gold bg-theme-gold/5' 
-                        : 'border-theme-charcoal/20 bg-theme-charcoal/[0.02]'
-                    }`}>
+                    <div className={`w-10 h-10 border flex items-center justify-center transition-all ${showMap
+                      ? 'border-theme-gold bg-theme-gold/5'
+                      : 'border-theme-charcoal/20 bg-theme-charcoal/[0.02]'
+                      }`}>
                       <MapPin className={`w-4 h-4 transition-colors ${showMap ? 'text-theme-gold' : 'text-theme-charcoal/50'}`} />
                     </div>
                     <div className="flex-1">
@@ -916,6 +1089,32 @@ export function ProductDetailClient({ product }: Props) {
               Make it a gift
             </motion.button>
 
+            {/* Audio Narrative */}
+            {isAtlas && (product.atlasData?.audioJourney || product.atlasData?.audioOnSkin) && (
+              <AudioNarrative
+                audioJourney={product.atlasData.audioJourney}
+                audioOnSkin={product.atlasData.audioOnSkin}
+              />
+            )}
+
+            {/* Evocation Story - The "Story" */}
+            {isAtlas && product.atlasData?.evocationStory && (
+              <EvocationSection title="Evocation" story={product.atlasData.evocationStory} />
+            )}
+
+            {/* Field Report Concept */}
+            {isAtlas && product.atlasData?.fieldReportConcept && (
+              <FieldReportConcept
+                concept={product.atlasData.fieldReportConcept.concept}
+                hotspots={product.atlasData.fieldReportConcept.hotspots}
+              />
+            )}
+
+            {/* On Skin Story */}
+            {isAtlas && product.atlasData?.onSkinStory && (
+              <EvocationSection title="On Skin" story={product.atlasData.onSkinStory} />
+            )}
+
             {/* The Journey / Travel Log - VISIBLE BY DEFAULT */}
             {(isAtlas && product.atlasData?.travelLog) || (isRelic && product.relicData?.museumDescription) ? (
               <div className="pt-8 border-t border-theme-charcoal/10">
@@ -1095,11 +1294,10 @@ export function ProductDetailClient({ product }: Props) {
                     <button
                       key={size}
                       onClick={() => setSelectedVariant(size)}
-                      className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border transition-all ${
-                        selectedVariant === size
-                          ? isRelic ? 'border-theme-alabaster bg-theme-alabaster text-theme-obsidian' : 'border-theme-charcoal bg-theme-charcoal text-theme-alabaster'
-                          : isRelic ? 'border-white/20' : 'border-theme-charcoal/20'
-                      }`}
+                      className={`font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 border transition-all ${selectedVariant === size
+                        ? isRelic ? 'border-theme-alabaster bg-theme-alabaster text-theme-obsidian' : 'border-theme-charcoal bg-theme-charcoal text-theme-alabaster'
+                        : isRelic ? 'border-white/20' : 'border-theme-charcoal/20'
+                        }`}
                     >
                       {size}
                     </button>

@@ -25,6 +25,11 @@ export const atlasProductsByTerritoryQuery = groq`
     inStock,
     "atmosphere": atlasData.atmosphere,
     "gpsCoordinates": atlasData.gpsCoordinates,
+    "evocationLocation": atlasData.evocationLocation,
+    "evocationStory": atlasData.evocationStory,
+    "onSkinStory": atlasData.onSkinStory,
+    "audioJourney": atlasData.audioJourney.asset->url,
+    "audioOnSkin": atlasData.audioOnSkin.asset->url,
     "travelLog": atlasData.travelLog,
     "fieldReport": atlasData.fieldReport {
       image,
@@ -204,6 +209,18 @@ export const productBySlugQuery = groq`
     atlasData {
       atmosphere,
       gpsCoordinates,
+      evocationLocation,
+      evocationStory,
+      onSkinStory,
+      "audioJourney": audioJourney.asset->url,
+      "audioOnSkin": audioOnSkin.asset->url,
+      fieldReportConcept {
+        concept,
+        hotspots[] {
+          item,
+          meaning
+        }
+      },
       travelLog,
       badges,
       fieldReport {
