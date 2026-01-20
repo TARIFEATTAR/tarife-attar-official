@@ -3,28 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "description": "Tarife Attär - A curated archive of rare and vintage fragrances",
-  "overrides": {
-    "@portabletext/editor": "^1.1.0",
-    "@portabletext/toolkit": "^2.0.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "@types/react": "^18.2.48",
-    "@types/react-dom": "^18.2.18"
-  },
-  "pnpm": {
-    "overrides": {
-      "react": "^18.3.1",
-      "react-dom": "^18.3.1",
-      "@types/react": "^18.2.48",
-      "@types/react-dom": "^18.2.18"
-    }
-  },
-  "resolutions": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "@types/react": "^18.2.48",
-    "@types/react-dom": "^18.2.18"
-  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -50,7 +28,7 @@
     "@portabletext/react": "^3.1.0",
     "@sanity/client": "^7.13.2",
     "@sanity/image-url": "^1.2.0",
-    "@sanity/vision": "^4.22.0",
+    "@sanity/vision": "^3.57.0",
     "@types/uuid": "^10.0.0",
     "ai": "^6.0.14",
     "autoprefixer": "^10.4.23",
@@ -58,11 +36,11 @@
     "framer-motion": "^12.23.26",
     "lucide-react": "^0.562.0",
     "next": "^14.2.35",
-    "next-sanity": "^11.6.12",
+    "next-sanity": "^9.4.7",
     "postcss": "^8.5.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "sanity": "^5.5.0",
+    "sanity": "^3.57.0",
     "styled-components": "^6.1.19",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^3.4.19",
