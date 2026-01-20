@@ -23,7 +23,7 @@ async function enableLegacyNames() {
   `);
 
   console.log(`Found ${products.length} products to update:\n`);
-  
+
   for (const product of products) {
     console.log(`  • ${product.title} → "${product.legacyName}"`);
   }
@@ -44,7 +44,7 @@ async function enableLegacyNames() {
         .patch(product._id)
         .set({ showLegacyName: true })
         .commit();
-      
+
       console.log(`  ✅ ${product.title}`);
       successCount++;
     } catch (error) {
