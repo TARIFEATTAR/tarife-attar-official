@@ -111,7 +111,8 @@ export function HeroPanel({
             />
 
             {/* Layer 3: Content */}
-            <div className="relative z-10">
+            {/* Must fill the panel so children using `h-full` / flex centering behave correctly */}
+            <div className="relative z-10 h-full w-full">
                 {children}
             </div>
         </div>
