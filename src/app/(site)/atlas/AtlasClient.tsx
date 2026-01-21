@@ -45,11 +45,11 @@ interface Territory {
     price?: number;
     volume?: string;
     productFormat?: string;
-    mainImage?: any;
+    mainImage?: unknown;
     shopifyPreviewImageUrl?: string;
     shopifyImage?: string;
     fieldReport?: {
-      image?: any;
+      image?: unknown;
     };
     inStock?: boolean;
     legacyName?: string;
@@ -89,11 +89,6 @@ export function AtlasClient({ territories, totalCount }: Props) {
     }
   }, [searchParams, territories]);
 
-  const handleNavigate = (path: string) => {
-    if (path === "home") router.push("/");
-    else router.push(`/${path}`);
-  };
-  
   // Handle territory selection with URL update
   const handleTerritorySelect = (territoryId: string | null) => {
     setActiveTerritory(territoryId);

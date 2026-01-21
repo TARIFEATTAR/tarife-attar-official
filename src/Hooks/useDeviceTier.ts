@@ -84,7 +84,7 @@ export function useDeviceTier(): DeviceTierResult {
             }
           }
         }
-      } catch (_e) {
+      } catch {
         // WebGL not available
         score -= 2;
       }
@@ -112,7 +112,7 @@ export function useDeviceTier(): DeviceTierResult {
             setIsLowPower(true);
           }
         }
-      } catch (_e) {
+      } catch {
         // Battery API not available
       }
 

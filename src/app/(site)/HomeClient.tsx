@@ -14,8 +14,8 @@ import { HeroBackgroundsQueryResult } from "@/sanity/lib/queries";
 
 interface HomeClientProps {
     featuredProducts: (Product & { 
-      atlasImage?: any; 
-      relicImage?: any;
+      atlasImage?: unknown; 
+      relicImage?: unknown;
       shopifyPreviewImageUrl?: string;
       shopifyImage?: string;
     })[];
@@ -25,11 +25,6 @@ interface HomeClientProps {
 export function HomeClient({ featuredProducts, heroBackgrounds }: HomeClientProps) {
     const router = useRouter();
     const [showLoader, setShowLoader] = useState(true); // Enable intro loader with animations
-
-    // Debug hero backgrounds in development
-    if (process.env.NODE_ENV === 'development') {
-        console.log('[HomeClient] Hero Backgrounds Data:', heroBackgrounds);
-    }
 
     const handleNavigate = (path: string) => {
         if (path === 'home') {
