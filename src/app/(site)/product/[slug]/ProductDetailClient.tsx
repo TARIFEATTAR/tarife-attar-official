@@ -13,6 +13,7 @@ import { PortableText } from "@portabletext/react";
 import { getClassLabel, getCoordinateLabel, COLLECTION_LABELS } from "@/lib/brandSystem";
 import { LegacyName } from "@/components/product/LegacyName";
 import { triggerEssenceDrop } from "@/components/cart/Satchel";
+import { CompactAudioButton } from "@/components/ui/CompactAudioButton";
 
 // Portable Text type
 type PortableTextBlock = any;
@@ -157,14 +158,8 @@ const FieldReportConcept = ({ concept, hotspots }: { concept?: string; hotspots?
   );
 };
 
-// Audio Player Component
-const AudioNarrative = ({
-  audioJourney,
-  audioOnSkin
-}: {
-  audioJourney?: string;
-  audioOnSkin?: string;
-}) => {
+// Audio Narrative Hook - shared state for both mobile and desktop players
+const useAudioNarrative = (audioJourney?: string, audioOnSkin?: string) => {
   const [activeTrack, setActiveTrack] = useState<'journey' | 'skin'>('journey');
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -178,9 +173,8 @@ const AudioNarrative = ({
     if (activeTrack === 'skin' && !skinSrc && journeySrc) setActiveTrack('journey');
   }, [activeTrack, journeySrc, skinSrc]);
 
-  if (!audioJourney && !audioOnSkin) return null;
-
   const currentSrc = activeTrack === 'journey' ? journeySrc : skinSrc;
+  const hasAudio = !!(audioJourney || audioOnSkin);
 
   const handlePlayPause = () => {
     if (audioRef.current) {
@@ -196,15 +190,39 @@ const AudioNarrative = ({
   const handleTrackChange = (track: 'journey' | 'skin') => {
     if (track === activeTrack) return;
     setActiveTrack(track);
-    // Don't auto-play immediately to allow user to orient, unless they hit play
     setIsPlaying(false);
   };
 
-  // When src changes, if we were playing, we might want to continue or pause.
-  // Let's pause on track switch for safety/clarity unless we want gapless feel.
+  return {
+    activeTrack,
+    isPlaying,
+    audioRef,
+    currentSrc,
+    hasAudio,
+    handlePlayPause,
+    handleTrackChange,
+    setIsPlaying,
+    journeySrc,
+    skinSrc,
+  };
+};
+
+// Desktop Audio Player - Full version
+const AudioNarrativeDesktop = ({
+  audioJourney,
+  audioOnSkin,
+  audioState,
+}: {
+  audioJourney?: string;
+  audioOnSkin?: string;
+  audioState: ReturnType<typeof useAudioNarrative>;
+}) => {
+  const { activeTrack, isPlaying, audioRef, currentSrc, handlePlayPause, handleTrackChange, setIsPlaying } = audioState;
+
+  if (!audioJourney && !audioOnSkin) return null;
 
   return (
-    <div className="py-6 border-y border-theme-charcoal/10 my-6">
+    <div className="hidden md:block py-6 border-y border-theme-charcoal/10 my-6">
       <div className="flex items-center justify-between mb-4">
         <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-theme-gold">
           Archive Audio
@@ -271,6 +289,44 @@ const AudioNarrative = ({
           onPlay={() => setIsPlaying(true)}
         />
       </div>
+    </div>
+  );
+};
+
+// Mobile Compact Audio Button
+const AudioNarrativeMobile = ({
+  audioState,
+  isRelic,
+}: {
+  audioState: ReturnType<typeof useAudioNarrative>;
+  isRelic?: boolean;
+}) => {
+  const { isPlaying, hasAudio, handlePlayPause, audioRef, currentSrc, setIsPlaying } = audioState;
+
+  if (!hasAudio) return null;
+
+  return (
+    <div className="md:hidden absolute right-0 top-1/2 -translate-y-1/2">
+      <button
+        onClick={handlePlayPause}
+        className={`w-10 h-10 flex items-center justify-center rounded-full transition-all hover:scale-105 ${isPlaying
+          ? 'bg-theme-gold text-theme-obsidian'
+          : isRelic
+            ? 'bg-white/10 text-theme-alabaster border border-white/20'
+            : 'bg-theme-charcoal/10 text-theme-charcoal border border-theme-charcoal/20'
+          }`}
+      >
+        {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+      </button>
+      {/* Hidden audio element for mobile - shares ref with desktop */}
+      <audio
+        ref={audioRef}
+        src={currentSrc}
+        onEnded={() => setIsPlaying(false)}
+        onPause={() => setIsPlaying(false)}
+        onPlay={() => setIsPlaying(true)}
+        className="hidden"
+      />
     </div>
   );
 };
@@ -546,6 +602,12 @@ export function ProductDetailClient({ product }: Props) {
     footerTheme: isRelic ? 'dark' : 'light' as 'dark' | 'light',
   };
 
+  // Audio narrative state - shared between mobile compact button and desktop full player
+  const audioState = useAudioNarrative(
+    product.atlasData?.audioJourney,
+    product.atlasData?.audioOnSkin
+  );
+
   const handleAddToSatchel = async (source: 'desktop' | 'mobile' = 'desktop') => {
     // Check if product is purchasable
     if (!product.inStock) {
@@ -802,10 +864,31 @@ export function ProductDetailClient({ product }: Props) {
               )}
             </div>
 
-            {/* Product Title */}
-            <h1 className="text-4xl md:text-6xl font-serif italic tracking-tighter leading-[0.9]">
-              {product.title}
-            </h1>
+            {/* Product Title with Mobile Audio Button */}
+            <div className="relative">
+              <h1 className="text-4xl md:text-6xl font-serif italic tracking-tighter leading-[0.9] pr-14 md:pr-0">
+                {product.title}
+              </h1>
+
+              {/* Mobile-only compact audio button */}
+              {isAtlas && audioState.hasAudio && (
+                <div className="md:hidden absolute right-0 top-1/2 -translate-y-1/2">
+                  <CompactAudioButton
+                    isPlaying={audioState.isPlaying}
+                    onToggle={audioState.handlePlayPause}
+                  />
+                  {/* Hidden audio element for mobile */}
+                  <audio
+                    ref={audioState.audioRef}
+                    src={audioState.currentSrc}
+                    onEnded={() => audioState.setIsPlaying(false)}
+                    onPause={() => audioState.setIsPlaying(false)}
+                    onPlay={() => audioState.setIsPlaying(true)}
+                    className="hidden"
+                  />
+                </div>
+              )}
+            </div>
             <LegacyName
               legacyName={product.legacyName}
               showLegacyName={product.showLegacyName}
@@ -1145,11 +1228,12 @@ export function ProductDetailClient({ product }: Props) {
               Make it a gift
             </motion.button>
 
-            {/* Audio Narrative */}
-            {isAtlas && (product.atlasData?.audioJourney || product.atlasData?.audioOnSkin) && (
-              <AudioNarrative
-                audioJourney={product.atlasData.audioJourney}
-                audioOnSkin={product.atlasData.audioOnSkin}
+            {/* Audio Narrative - Desktop Only */}
+            {isAtlas && audioState.hasAudio && (
+              <AudioNarrativeDesktop
+                audioJourney={product.atlasData?.audioJourney}
+                audioOnSkin={product.atlasData?.audioOnSkin}
+                audioState={audioState}
               />
             )}
 
