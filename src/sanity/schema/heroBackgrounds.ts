@@ -13,7 +13,7 @@ export const heroBackgroundsSchema = defineType({
     type: 'document',
     
     // Singleton pattern - only one instance
-    // @ts-ignore - __experimental_actions is valid in Sanity v3 but not in TypeScript types yet
+    // @ts-expect-error - __experimental_actions is valid in Sanity v3 but not in TypeScript types yet
     __experimental_actions: ['update', 'publish'],
     
     groups: [
