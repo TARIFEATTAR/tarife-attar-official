@@ -11,6 +11,7 @@ export const fieldJournalSchema = {
         { name: 'expedition', title: 'Expedition Data' },
         { name: 'seo', title: 'SEO & Meta' },
         { name: 'relations', title: 'Relations' },
+        { name: 'system', title: 'System' },
     ],
     fields: [
         // ═══════════════════════════════════════════════════════
@@ -237,6 +238,47 @@ export const fieldJournalSchema = {
                     { title: 'Archive Note', value: 'archive' },
                 ],
             },
+        },
+
+        // ═══════════════════════════════════════════════════════
+        // SYSTEM (NOTION SYNC)
+        // ═══════════════════════════════════════════════════════
+        {
+            name: 'generationSource',
+            title: 'Generation Source',
+            type: 'string',
+            group: 'system',
+            options: {
+                list: [
+                    { title: 'Sanity Studio', value: 'sanity-studio' },
+                    { title: 'Madison Studio', value: 'madison-studio' },
+                    { title: 'Notion', value: 'notion' },
+                ],
+            },
+            initialValue: 'sanity-studio',
+            readOnly: true,
+        },
+        {
+            name: 'notionPageId',
+            title: 'Notion Page ID',
+            type: 'string',
+            group: 'system',
+            description: 'Stable identifier used to sync updates from Notion',
+            readOnly: true,
+        },
+        {
+            name: 'notionUrl',
+            title: 'Notion URL',
+            type: 'url',
+            group: 'system',
+            readOnly: true,
+        },
+        {
+            name: 'notionLastEditedAt',
+            title: 'Notion Last Edited At',
+            type: 'datetime',
+            group: 'system',
+            readOnly: true,
         },
     ],
     preview: {

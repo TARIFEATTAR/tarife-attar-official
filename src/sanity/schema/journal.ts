@@ -180,6 +180,7 @@ export const journalSchema = defineType({
         list: [
           { title: 'Sanity Studio', value: 'sanity-studio' },
           { title: 'Madison Studio', value: 'madison-studio' },
+          { title: 'Notion', value: 'notion' },
         ],
       },
       initialValue: 'sanity-studio',
@@ -199,6 +200,27 @@ export const journalSchema = defineType({
       rows: 2,
       description: 'Meta description for search engines (max 160 characters)',
       validation: (Rule) => Rule.max(160),
+    }),
+
+    // === NOTION SYNC (SYSTEM) ===
+    defineField({
+      name: 'notionPageId',
+      title: 'Notion Page ID',
+      type: 'string',
+      description: 'Stable identifier used to sync updates from Notion',
+      readOnly: true,
+    }),
+    defineField({
+      name: 'notionUrl',
+      title: 'Notion URL',
+      type: 'url',
+      readOnly: true,
+    }),
+    defineField({
+      name: 'notionLastEditedAt',
+      title: 'Notion Last Edited At',
+      type: 'datetime',
+      readOnly: true,
     }),
   ],
 
