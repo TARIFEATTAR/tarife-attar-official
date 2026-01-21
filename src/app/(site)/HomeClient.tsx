@@ -10,6 +10,7 @@ import { EntryLoader } from "@/components/intro";
 import { Product } from "@/types";
 import { urlForImage } from "@/sanity/lib/image";
 import { LegacyName } from "@/components/product/LegacyName";
+import { HeroBackgroundsQueryResult } from "@/sanity/lib/queries";
 
 interface HomeClientProps {
     featuredProducts: (Product & { 
@@ -18,11 +19,17 @@ interface HomeClientProps {
       shopifyPreviewImageUrl?: string;
       shopifyImage?: string;
     })[];
+    heroBackgrounds?: HeroBackgroundsQueryResult;
 }
 
-export function HomeClient({ featuredProducts }: HomeClientProps) {
+export function HomeClient({ featuredProducts, heroBackgrounds }: HomeClientProps) {
     const router = useRouter();
     const [showLoader, setShowLoader] = useState(true); // Enable intro loader with animations
+
+    // Debug hero backgrounds in development
+    if (process.env.NODE_ENV === 'development') {
+        console.log('[HomeClient] Hero Backgrounds Data:', heroBackgrounds);
+    }
 
     const handleNavigate = (path: string) => {
         if (path === 'home') {
@@ -64,7 +71,7 @@ export function HomeClient({ featuredProducts }: HomeClientProps) {
             >
                 {/* Hero Entry Section */}
                 <div className="h-screen w-full relative">
-                    <SplitEntry onNavigate={handleNavigate} />
+                    <SplitEntry onNavigate={handleNavigate} heroBackgrounds={heroBackgrounds} />
                 </div>
 
                 {/* Featured Grid Section */}

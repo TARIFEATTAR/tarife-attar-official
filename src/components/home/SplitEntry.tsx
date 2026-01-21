@@ -4,12 +4,15 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { RealisticCompass } from '@/components/navigation/RealisticCompass';
 import { EntryState } from '@/types';
+import { HeroPanel } from '@/components/HeroPanel';
+import { HeroBackgroundsQueryResult } from '@/sanity/lib/queries';
 
 interface Props {
   onNavigate?: (path: string) => void;
+  heroBackgrounds?: HeroBackgroundsQueryResult;
 }
 
-export const SplitEntry: React.FC<Props> = ({ onNavigate }) => {
+export const SplitEntry: React.FC<Props> = ({ onNavigate, heroBackgrounds }) => {
   const [hovered, setHovered] = useState<EntryState>('idle');
 
   // Convert hover state to compass direction
@@ -27,15 +30,22 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate }) => {
   return (
     <div className="relative w-full h-screen flex flex-col md:flex-row overflow-hidden">
       {/* Atlas Side (Left/West) - Fixed 50% */}
-      <motion.section
-        onMouseEnter={() => setHovered('atlas')}
-        onMouseLeave={() => setHovered('idle')}
-        onClick={() => onNavigate?.('atlas')}
-        className="relative flex flex-col items-center justify-center overflow-hidden cursor-pointer
-          w-full h-1/2 md:w-1/2 md:h-full
-          bg-theme-alabaster text-theme-charcoal
-          group"
+      <HeroPanel
+        variant="atlas"
+        backgroundUrl={heroBackgrounds?.atlasBackground}
+        overlayOpacity={heroBackgrounds?.atlasOverlayOpacity}
+        hotspot={heroBackgrounds?.atlasHotspot}
+        className="w-full h-1/2 md:w-1/2 md:h-full"
       >
+        <motion.section
+          onMouseEnter={() => setHovered('atlas')}
+          onMouseLeave={() => setHovered('idle')}
+          onClick={() => onNavigate?.('atlas')}
+          className="relative flex flex-col items-center justify-center overflow-hidden cursor-pointer
+            w-full h-full
+            text-theme-charcoal
+            group"
+        >
         {/* Subtle hover overlay */}
         <motion.div
           className="absolute inset-0 bg-theme-gold/5 pointer-events-none"
@@ -90,17 +100,25 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate }) => {
           </motion.div>
         </motion.div>
       </motion.section>
+      </HeroPanel>
 
       {/* Relic Side (Right/East) - Fixed 50% */}
-      <motion.section
-        onMouseEnter={() => setHovered('relic')}
-        onMouseLeave={() => setHovered('idle')}
-        onClick={() => onNavigate?.('relic')}
-        className="relative flex flex-col items-center justify-center overflow-hidden cursor-pointer
-          w-full h-1/2 md:w-1/2 md:h-full
-          bg-theme-obsidian text-theme-alabaster
-          group"
+      <HeroPanel
+        variant="relic"
+        backgroundUrl={heroBackgrounds?.relicBackground}
+        overlayOpacity={heroBackgrounds?.relicOverlayOpacity}
+        hotspot={heroBackgrounds?.relicHotspot}
+        className="w-full h-1/2 md:w-1/2 md:h-full"
       >
+        <motion.section
+          onMouseEnter={() => setHovered('relic')}
+          onMouseLeave={() => setHovered('idle')}
+          onClick={() => onNavigate?.('relic')}
+          className="relative flex flex-col items-center justify-center overflow-hidden cursor-pointer
+            w-full h-full
+            text-theme-alabaster
+            group"
+        >
         {/* Subtle hover overlay */}
         <motion.div
           className="absolute inset-0 bg-theme-gold/5 pointer-events-none"
@@ -155,6 +173,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate }) => {
           </motion.div>
         </motion.div>
       </motion.section>
+      </HeroPanel>
 
       {/* Centered Compass - Teaching Mode */}
       <RealisticCompass

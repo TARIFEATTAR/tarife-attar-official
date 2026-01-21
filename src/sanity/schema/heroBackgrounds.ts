@@ -11,7 +11,11 @@ export const heroBackgroundsSchema = defineType({
     name: 'heroBackgrounds',
     title: 'Hero Backgrounds',
     type: 'document',
-
+    
+    // Singleton pattern - only one instance
+    // @ts-ignore - __experimental_actions is valid in Sanity v3 but not in TypeScript types yet
+    __experimental_actions: ['update', 'publish'],
+    
     groups: [
         { name: 'atlas', title: 'Atlas (Light Side)' },
         { name: 'relic', title: 'Relic (Dark Side)' },

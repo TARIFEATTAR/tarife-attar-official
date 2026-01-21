@@ -563,7 +563,7 @@ export const recentFieldJournalQuery = groq`
  * This is a singleton document - only one instance exists
  */
 export const heroBackgroundsQuery = groq`
-  *[_type == "heroBackgrounds"][0] {
+  *[_type == "heroBackgrounds" && !(_id in path("drafts.**"))][0] {
     "atlasBackground": atlasBackground.asset->url,
     "atlasHotspot": atlasBackground.hotspot,
     atlasOverlayOpacity,
@@ -576,9 +576,9 @@ export const heroBackgroundsQuery = groq`
 // Type for hero backgrounds query result
 export interface HeroBackgroundsQueryResult {
   atlasBackground?: string;
-  atlasHotspot?: { x: number; y: number };
+  atlasHotspot?: { _type?: string; x: number; y: number; width?: number; height?: number };
   atlasOverlayOpacity?: number;
   relicBackground?: string;
-  relicHotspot?: { x: number; y: number };
+  relicHotspot?: { _type?: string; x: number; y: number; width?: number; height?: number };
   relicOverlayOpacity?: number;
 }
