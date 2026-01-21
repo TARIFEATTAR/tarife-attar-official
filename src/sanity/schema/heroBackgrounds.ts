@@ -5,15 +5,16 @@
  * Allows editorial control over background images without code changes.
  */
 
-import { defineType, defineField } from 'sanity'
+import { defineField } from 'sanity'
 
-export const heroBackgroundsSchema = defineType({
+// NOTE: Defined as a plain object (not `defineType`) to allow `__experimental_actions`
+// without fighting Sanity's TS types / eslint ban-ts-comment rules.
+export const heroBackgroundsSchema = {
     name: 'heroBackgrounds',
     title: 'Hero Backgrounds',
     type: 'document',
     
     // Singleton pattern - only one instance
-    // @ts-expect-error - __experimental_actions is valid in Sanity v3 but not in TypeScript types yet
     __experimental_actions: ['update', 'publish'],
     
     groups: [
@@ -101,4 +102,4 @@ export const heroBackgroundsSchema = defineType({
             }
         },
     },
-})
+}
