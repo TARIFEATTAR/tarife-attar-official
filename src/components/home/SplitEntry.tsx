@@ -35,7 +35,8 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, heroBackgrounds }) => 
         backgroundUrl={heroBackgrounds?.atlasBackground}
         overlayOpacity={heroBackgrounds?.atlasOverlayOpacity}
         hotspot={heroBackgrounds?.atlasHotspot}
-        className="w-full h-1/2 md:w-1/2 md:h-full"
+        // Slight overlap on desktop to avoid a 1px seam at the center due to subpixel rounding
+        className="w-full h-1/2 md:w-1/2 md:h-full md:-mr-px"
       >
         <motion.section
           onMouseEnter={() => setHovered('atlas')}
@@ -108,7 +109,8 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, heroBackgrounds }) => 
         backgroundUrl={heroBackgrounds?.relicBackground}
         overlayOpacity={heroBackgrounds?.relicOverlayOpacity}
         hotspot={heroBackgrounds?.relicHotspot}
-        className="w-full h-1/2 md:w-1/2 md:h-full"
+        // Slight overlap on desktop to avoid a 1px seam at the center due to subpixel rounding
+        className="w-full h-1/2 md:w-1/2 md:h-full md:-ml-px"
       >
         <motion.section
           onMouseEnter={() => setHovered('relic')}
