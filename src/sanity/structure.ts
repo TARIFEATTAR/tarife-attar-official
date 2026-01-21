@@ -1,6 +1,6 @@
 /**
  * Bifurcated Desk Structure Builder
- * 
+ *
  * Configures the Sanity Studio desk to show curated groups instead of
  * the default "Product" list. Creates three distinct workspaces:
  * 1. The Inbox (Madison Studio submissions)
@@ -177,7 +177,33 @@ export const structure = (S: StructureBuilder, _context: StructureResolverContex
 
       // Other document types (Exhibits, etc.)
       ...S.documentTypeListItems().filter(
-        (listItem) => !['product', 'journalEntry', 'fieldJournal'].includes(listItem.getId() || '')
+        (listItem) => !['product', 'journalEntry', 'fieldJournal', 'heroBackgrounds'].includes(listItem.getId() || '')
       ),
+
+      // Divider
+      S.divider(),
+
+      // ═══════════════════════════════════════════
+      // SETTINGS / SINGLETONS
+      // ═══════════════════════════════════════════
+      S.listItem()
+        .title('⚙️ Settings')
+        .id('settings')
+        .child(
+          S.list()
+            .title('Settings')
+            .items([
+              // Hero Backgrounds Singleton
+              S.listItem()
+                .title('🎨 Hero Backgrounds')
+                .id('hero-backgrounds')
+                .child(
+                  S.document()
+                    .schemaType('heroBackgrounds')
+                    .documentId('heroBackgrounds')
+                    .title('Hero Backgrounds')
+                ),
+            ])
+        ),
     ]);
 };

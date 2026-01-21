@@ -20,6 +20,13 @@ SANITY_WRITE_TOKEN=<your_token_here>
 # Webhook Secret (generate with: openssl rand -base64 32)
 SANITY_REVALIDATE_SECRET=<random_string_here>
 
+# NOTION (Optional - publish posts from Notion into Sanity)
+# Create a Notion integration, copy its token, and share your Notion DB(s) with the integration.
+NOTION_TOKEN=<your_notion_integration_token>
+# Notion database id(s) used for publishing
+NOTION_JOURNAL_DB_ID=<your_journal_db_id>
+NOTION_FIELD_JOURNAL_DB_ID=<your_field_journal_db_id_optional>
+
 # SHOPIFY
 NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN=vasana-perfumes.myshopify.com
 

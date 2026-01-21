@@ -556,3 +556,29 @@ export const recentFieldJournalQuery = groq`
   }
 `;
 
+// ===== HERO BACKGROUNDS QUERY (Two Roads Landing Page) =====
+
+/**
+ * Get hero background textures for the Two Roads entry page
+ * This is a singleton document - only one instance exists
+ */
+export const heroBackgroundsQuery = groq`
+  *[_type == "heroBackgrounds"][0] {
+    "atlasBackground": atlasBackground.asset->url,
+    "atlasHotspot": atlasBackground.hotspot,
+    atlasOverlayOpacity,
+    "relicBackground": relicBackground.asset->url,
+    "relicHotspot": relicBackground.hotspot,
+    relicOverlayOpacity
+  }
+`;
+
+// Type for hero backgrounds query result
+export interface HeroBackgroundsQueryResult {
+  atlasBackground?: string;
+  atlasHotspot?: { x: number; y: number };
+  atlasOverlayOpacity?: number;
+  relicBackground?: string;
+  relicHotspot?: { x: number; y: number };
+  relicOverlayOpacity?: number;
+}
