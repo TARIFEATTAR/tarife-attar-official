@@ -59,7 +59,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, heroBackgrounds }) => 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-center px-6 md:px-10 py-4 md:py-6 relative z-10 bg-white/60 backdrop-blur-[1px] rounded-md shadow-sm"
+          className="text-center px-6 md:px-10 relative z-10"
         >
           <div className="flex flex-col items-center">
             {/* A insignia */}
@@ -67,17 +67,17 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, heroBackgrounds }) => 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-5xl sm:text-6xl md:text-[10rem] font-serif font-bold mb-2 leading-none text-theme-gold drop-shadow-[0_2px_4px_rgba(0,0,0,0.18)]"
+              className="text-5xl sm:text-6xl md:text-[10rem] font-serif font-bold mb-2 leading-none text-theme-gold"
             >
               A
             </motion.span>
-            <motion.h2 className="text-2xl sm:text-3xl md:text-5xl italic font-light mb-4 md:mb-6 tracking-tighter drop-shadow-[0_2px_4px_rgba(0,0,0,0.22)]">
+            <motion.h2 className="text-2xl sm:text-3xl md:text-5xl italic font-light mb-4 md:mb-6 tracking-tighter">
               Atlas
             </motion.h2>
           </div>
 
           {/* Always visible description */}
-          <motion.p className="max-w-[200px] sm:max-w-[240px] md:max-w-sm mx-auto text-xs sm:text-sm md:text-base opacity-80 leading-relaxed font-serif italic mb-6 md:mb-8 drop-shadow-[0_1px_3px_rgba(0,0,0,0.25)]">
+          <motion.p className="max-w-[200px] sm:max-w-[240px] md:max-w-sm mx-auto text-xs sm:text-sm md:text-base opacity-80 leading-relaxed font-serif italic mb-6 md:mb-8">
             Clean perfume oils organized across four sensory territories. Twenty-four destinations for the modern explorer.
           </motion.p>
 
@@ -133,7 +133,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, heroBackgrounds }) => 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-center px-6 md:px-10 py-4 md:py-6 relative z-10 bg-black/35 backdrop-blur-[1px] rounded-md shadow-md"
+          className="text-center px-6 md:px-10 relative z-10"
         >
           <div className="flex flex-col items-center">
             {/* R insignia */}
@@ -141,17 +141,17 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, heroBackgrounds }) => 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-5xl sm:text-6xl md:text-[10rem] font-serif font-bold mb-2 leading-none text-theme-gold drop-shadow-[0_3px_6px_rgba(0,0,0,0.35)]"
+              className="text-5xl sm:text-6xl md:text-[10rem] font-serif font-bold mb-2 leading-none text-theme-gold"
             >
               R
             </motion.span>
-            <motion.h2 className="text-2xl sm:text-3xl md:text-5xl font-light mb-4 md:mb-6 tracking-tighter drop-shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
+            <motion.h2 className="text-2xl sm:text-3xl md:text-5xl font-light mb-4 md:mb-6 tracking-tighter">
               Relic
             </motion.h2>
           </div>
 
           {/* Always visible description */}
-          <motion.p className="max-w-[200px] sm:max-w-[240px] md:max-w-sm mx-auto text-xs sm:text-sm md:text-base opacity-90 leading-relaxed font-serif italic mb-6 md:mb-8 drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)]">
+          <motion.p className="max-w-[200px] sm:max-w-[240px] md:max-w-sm mx-auto text-xs sm:text-sm md:text-base opacity-90 leading-relaxed font-serif italic mb-6 md:mb-8">
             Pure resins, rare ouds, and aged materials for the devoted collector. Each specimen arrives with provenance documentation.
           </motion.p>
 
