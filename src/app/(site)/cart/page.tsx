@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ShoppingBag, Trash2, ExternalLink, Bookmark, Check } from "lucide-react";
@@ -14,22 +16,22 @@ export default function CartPage() {
   const [saveCartEmail, setSaveCartEmail] = useState('');
   const [saveCartSubmitted, setSaveCartSubmitted] = useState(false);
   const [isSavingCart, setIsSavingCart] = useState(false);
-  const { 
-    items, 
-    itemCount, 
-    cartTotal, 
-    checkoutUrl, 
-    isLoading, 
+  const {
+    items,
+    itemCount,
+    cartTotal,
+    checkoutUrl,
+    isLoading,
     error,
-    updateItemQuantity, 
-    removeItem, 
-    clearCart 
+    updateItemQuantity,
+    removeItem,
+    clearCart
   } = useShopifyCart();
 
   // Show "Save your satchel" prompt after 15 seconds on cart page with items
   useEffect(() => {
     if (items.length === 0) return;
-    
+
     const hasSaved = localStorage.getItem('satchel-saved');
     if (hasSaved) return;
 
@@ -56,9 +58,9 @@ export default function CartPage() {
         body: JSON.stringify({
           email: saveCartEmail,
           source: 'satchel',
-          cartItems: items.map(item => ({ 
-            title: item.title, 
-            price: item.price 
+          cartItems: items.map(item => ({
+            title: item.title,
+            price: item.price
           })),
         }),
       });
@@ -118,7 +120,7 @@ export default function CartPage() {
     // Final check: ensure checkout URL uses Shopify domain, not custom domain
     const shopifyDomain = 'vasana-perfumes.myshopify.com';
     let finalCheckoutUrl = checkoutUrl;
-    
+
     if (checkoutUrl.includes('tarifeattar.com')) {
       console.warn('⚠️ Checkout URL still contains tarifeattar.com, transforming...');
       try {
@@ -185,7 +187,7 @@ export default function CartPage() {
                   Error: {error || checkoutError}
                 </p>
                 <p className="font-mono text-[10px] uppercase tracking-widest text-red-600 mt-2 opacity-80">
-                  {error 
+                  {error
                     ? 'Please check your Shopify configuration or try refreshing the page.'
                     : 'Please try refreshing the page or adding items to your cart again.'}
                 </p>
@@ -219,10 +221,20 @@ export default function CartPage() {
                         exit={{ opacity: 0, x: 20 }}
                         className="flex gap-3 md:gap-6 p-4 md:p-6 border border-theme-charcoal/10 bg-white/50 backdrop-blur-sm"
                       >
-                        <div className="w-16 h-20 md:w-24 md:h-32 bg-theme-charcoal/5 flex items-center justify-center border border-theme-charcoal/5 flex-shrink-0">
-                          <span className="font-mono text-[8px] opacity-30 text-center px-2">
-                            {item.title}
-                          </span>
+                        <div className="relative w-16 h-20 md:w-24 md:h-32 bg-theme-charcoal/5 flex items-center justify-center border border-theme-charcoal/5 flex-shrink-0 overflow-hidden">
+                          {item.image ? (
+                            <Image
+                              src={item.image}
+                              alt={item.title}
+                              fill
+                              sizes="(max-width: 768px) 64px, 96px"
+                              className="object-cover"
+                            />
+                          ) : (
+                            <span className="font-mono text-[8px] opacity-30 text-center px-2">
+                              {item.title}
+                            </span>
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2 mb-1">
@@ -305,7 +317,7 @@ export default function CartPage() {
                           <span className="font-mono text-[9px] uppercase opacity-40 tracking-widest">USD</span>
                         </div>
                       </div>
-                      <button 
+                      <button
                         onClick={handleCheckout}
                         disabled={isLoading || !checkoutUrl || items.length === 0}
                         className="w-full py-4 md:py-5 bg-theme-charcoal text-theme-alabaster font-mono text-[10px] uppercase tracking-[0.4em] hover:bg-theme-obsidian transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group"
@@ -318,7 +330,7 @@ export default function CartPage() {
                           </>
                         )}
                       </button>
-                      
+
                       <div className="mt-6 flex flex-wrap justify-center gap-4 opacity-30 grayscale contrast-200">
                         {/* Simple placeholder icons for payment methods */}
                         <div className="font-mono text-[8px] uppercase border border-theme-charcoal px-2 py-1">Visa</div>

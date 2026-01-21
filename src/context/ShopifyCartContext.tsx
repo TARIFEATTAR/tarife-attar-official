@@ -20,6 +20,7 @@ interface CartItem {
   quantity: number;
   price: string;
   currencyCode: string;
+  image?: string;
 }
 
 interface ShopifyCartContextType {
@@ -217,17 +218,18 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
     handle: node.merchandise.product.handle,
     quantity: node.quantity,
     price: String(node.merchandise.price?.amount || '0.00'),
-    currencyCode: node.merchandise.price?.currencyCode || 'USD'
+    currencyCode: node.merchandise.price?.currencyCode || 'USD',
+    image: node.merchandise.image?.url || node.merchandise.product.featuredImage?.url
   })) || [];
 
   const itemCount = cart?.totalQuantity || 0;
   const cartTotal = String(cart?.cost?.totalAmount?.amount || '0.00');
-  
+
   // Transform checkout URL to use Shopify domain if it's pointing to custom domain
   const rawCheckoutUrl = cart?.checkoutUrl || '';
-  
+
   let checkoutUrl = rawCheckoutUrl;
-  
+
   if (rawCheckoutUrl && SHOPIFY_STORE_DOMAIN) {
     try {
       // If checkout URL is pointing to tarifeattar.com, replace with Shopify domain
@@ -238,10 +240,10 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
         const pathAndQuery = url.pathname + url.search;
         // Replace with Shopify store domain
         checkoutUrl = `https://${SHOPIFY_STORE_DOMAIN}${pathAndQuery}`;
-        console.log('✅ Transformed checkout URL:', { 
-          from: rawCheckoutUrl, 
+        console.log('✅ Transformed checkout URL:', {
+          from: rawCheckoutUrl,
           to: checkoutUrl,
-          shopifyDomain: SHOPIFY_STORE_DOMAIN 
+          shopifyDomain: SHOPIFY_STORE_DOMAIN
         });
       } else {
         console.log('✓ Checkout URL already uses correct domain:', rawCheckoutUrl);

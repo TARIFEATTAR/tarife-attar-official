@@ -64,9 +64,21 @@ export const CREATE_CART_MUTATION = `
                     amount
                     currencyCode
                   }
+                  image {
+                    url
+                    altText
+                    width
+                    height
+                  }
                   product {
                     title
                     handle
+                    featuredImage {
+                      url
+                      altText
+                      width
+                      height
+                    }
                   }
                 }
               }
