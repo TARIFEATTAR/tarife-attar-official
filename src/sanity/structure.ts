@@ -25,7 +25,7 @@ export const structure = (S: StructureBuilder, _context: StructureResolverContex
         .child(
           S.documentList()
             .title('The Inbox')
-            .filter('_type == "product" && generationSource == "madison-studio"')
+            .filter('(_type == "product" || _type == "journalEntry" || _type == "fieldJournal") && generationSource == "madison-studio"')
             .defaultOrdering([{ field: '_createdAt', direction: 'desc' }])
         ),
 
