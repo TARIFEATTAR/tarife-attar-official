@@ -84,7 +84,7 @@ export function HeroPanel({
                         console.error(`[HeroPanel ${variant}] Failed to load image:`, backgroundUrl);
                         console.error('Error:', e);
                     }}
-                    onLoad={() => {
+                    onLoad={(e) => {
                         if (process.env.NODE_ENV === 'development') {
                             console.log(`[HeroPanel ${variant}] Image loaded successfully`);
                             console.log(`[HeroPanel ${variant}] Image dimensions:`, {
