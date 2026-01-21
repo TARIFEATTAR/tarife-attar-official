@@ -209,18 +209,26 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
     }
   };
 
-  // Map Shopify response to clean state
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const items: CartItem[] = cart?.lines?.edges?.map(({ node }: any) => ({
-    id: node.id,
-    variantId: node.merchandise.id,
-    title: node.merchandise.product.title,
-    handle: node.merchandise.product.handle,
-    quantity: node.quantity,
-    price: String(node.merchandise.price?.amount || '0.00'),
-    currencyCode: node.merchandise.price?.currencyCode || 'USD',
-    image: node.merchandise.image?.url || node.merchandise.product.featuredImage?.url
-  })) || [];
+  const items: CartItem[] = cart?.lines?.edges?.map(({ node }: any) => {
+    // Debug log for each item being mapped
+    console.log('Cart Item Node:', {
+      title: node.merchandise.product.title,
+      variantImage: node.merchandise.image,
+      productImage: node.merchandise.product.featuredImage
+    });
+
+    return {
+      id: node.id,
+      variantId: node.merchandise.id,
+      title: node.merchandise.product.title,
+      handle: node.merchandise.product.handle,
+      quantity: node.quantity,
+      price: String(node.merchandise.price?.amount || '0.00'),
+      currencyCode: node.merchandise.price?.currencyCode || 'USD',
+      image: node.merchandise.image?.url || node.merchandise.product.featuredImage?.url
+    };
+  }) || [];
 
   const itemCount = cart?.totalQuantity || 0;
   const cartTotal = String(cart?.cost?.totalAmount?.amount || '0.00');
