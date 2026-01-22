@@ -41,6 +41,25 @@ export default function CartPage() {
     return () => clearTimeout(timer);
   }, [items.length]);
 
+  // #region agent log
+  useEffect(() => {
+    // Log cart state for debug session (H1: ensure render without unused vars)
+    fetch('http://127.0.0.1:7243/ingest/6c3a1000-6649-4e7a-a50a-9f4301ecbd6a', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: 'debug-session',
+        runId: 'lint-verify',
+        hypothesisId: 'H1',
+        location: 'cart/page.tsx:log-state',
+        message: 'Cart render',
+        data: { items: items.length, checkoutUrl: !!checkoutUrl },
+        timestamp: Date.now()
+      })
+    }).catch(() => { });
+  }, [items.length, checkoutUrl]);
+  // #endregion
+
   const handleSaveCart = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!saveCartEmail) return;

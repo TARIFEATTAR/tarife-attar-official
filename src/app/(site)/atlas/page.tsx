@@ -84,6 +84,22 @@ export default async function AtlasPage() {
 
   const totalCount = products.length;
 
+  // #region agent log
+  await fetch('http://127.0.0.1:7243/ingest/6c3a1000-6649-4e7a-a50a-9f4301ecbd6a', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sessionId: 'debug-session',
+      runId: 'lint-verify',
+      hypothesisId: 'H1',
+      location: 'atlas/page.tsx:log-data',
+      message: 'AtlasPage fetched data',
+      data: { products: totalCount, territories: TERRITORIES.length },
+      timestamp: Date.now()
+    })
+  }).catch(() => { });
+  // #endregion
+
   return (
     <Suspense fallback={<div className="min-h-screen bg-theme-alabaster" />}>
       <AtlasClient territories={productsByTerritory} totalCount={totalCount} />

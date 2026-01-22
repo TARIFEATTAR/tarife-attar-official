@@ -25,6 +25,25 @@ interface HomeClientProps {
 export function HomeClient({ featuredProducts, heroBackgrounds }: HomeClientProps) {
     const router = useRouter();
     const [showLoader, setShowLoader] = useState(true); // Enable intro loader with animations
+    
+    // #region agent log
+    useEffect(() => {
+        // Log render entry for debug session (H1: verify HomeClient runs without unused vars)
+        fetch('http://127.0.0.1:7243/ingest/6c3a1000-6649-4e7a-a50a-9f4301ecbd6a', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sessionId: 'debug-session',
+                runId: 'lint-verify',
+                hypothesisId: 'H1',
+                location: 'HomeClient.tsx:log-render',
+                message: 'HomeClient rendered',
+                data: { featuredCount: featuredProducts?.length ?? 0 },
+                timestamp: Date.now()
+            })
+        }).catch(() => { });
+    }, [featuredProducts]);
+    // #endregion
 
     const handleNavigate = (path: string) => {
         if (path === 'home') {
