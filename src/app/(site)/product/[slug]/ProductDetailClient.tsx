@@ -1,22 +1,21 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { ArrowLeft, Plus, Minus, Gift, MapPin, Calendar, Droplets, Check, AlertCircle, Map as MapIcon, Info, Flame, Flower2, Waves, TreePine, Volume2, Play, Pause, Compass } from "lucide-react";
+import { ArrowLeft, Plus, Minus, Gift, MapPin, Calendar, Droplets, Check, AlertCircle, Map as MapIcon, Flame, Flower2, Waves, TreePine, Volume2, Play, Pause, Compass } from "lucide-react";
 import { urlForImage } from "@/sanity/lib/image";
 import { useShopifyCart } from "@/context";
 import { GlobalFooter } from "@/components/navigation";
 import { PortableText } from "@portabletext/react";
-import { getClassLabel, getCoordinateLabel, COLLECTION_LABELS } from "@/lib/brandSystem";
+import { getClassLabel, getCoordinateLabel } from "@/lib/brandSystem";
 import { LegacyName } from "@/components/product/LegacyName";
 import { triggerEssenceDrop } from "@/components/cart/Satchel";
 import { CompactAudioButton } from "@/components/ui/CompactAudioButton";
 
 // Portable Text type
-type PortableTextBlock = any;
+type PortableTextBlock = unknown;
 
 interface Product {
   _id: string;
@@ -30,10 +29,10 @@ interface Product {
   price?: number;
   volume?: string;
   productFormat?: string;
-  mainImage?: any;
+  mainImage?: unknown;
   shopifyPreviewImageUrl?: string;
   shopifyImage?: string;
-  gallery?: Array<{ _key: string; asset: any }>;
+  gallery?: Array<{ _key: string; asset: unknown }>;
   inStock?: boolean;
   shopifyHandle?: string;
   shopifyVariantId?: string;
@@ -48,7 +47,7 @@ interface Product {
     legacyName?: string;
     showLegacyName?: boolean;
     price?: number;
-    mainImage?: any;
+    mainImage?: unknown;
   }>;
   notes?: {
     top?: string[];
@@ -76,7 +75,7 @@ interface Product {
     travelLog?: PortableTextBlock[];
     badges?: string[];
     fieldReport?: {
-      image?: any;
+      image?: unknown;
       hotspots?: Array<{
         product?: {
           _id: string;
@@ -97,7 +96,7 @@ interface Product {
     museumDescription?: PortableTextBlock[];
     badges?: string[];
     museumExhibit?: {
-      exhibitImage?: any;
+      exhibitImage?: unknown;
       artifacts?: Array<{
         label?: string;
         specimenData?: string;
@@ -293,43 +292,6 @@ const AudioNarrativeDesktop = ({
   );
 };
 
-// Mobile Compact Audio Button
-const AudioNarrativeMobile = ({
-  audioState,
-  isRelic,
-}: {
-  audioState: ReturnType<typeof useAudioNarrative>;
-  isRelic?: boolean;
-}) => {
-  const { isPlaying, hasAudio, handlePlayPause, audioRef, currentSrc, setIsPlaying } = audioState;
-
-  if (!hasAudio) return null;
-
-  return (
-    <div className="md:hidden absolute right-0 top-1/2 -translate-y-1/2">
-      <button
-        onClick={handlePlayPause}
-        className={`w-10 h-10 flex items-center justify-center rounded-full transition-all hover:scale-105 ${isPlaying
-          ? 'bg-theme-gold text-theme-obsidian'
-          : isRelic
-            ? 'bg-white/10 text-theme-alabaster border border-white/20'
-            : 'bg-theme-charcoal/10 text-theme-charcoal border border-theme-charcoal/20'
-          }`}
-      >
-        {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
-      </button>
-      {/* Hidden audio element for mobile - shares ref with desktop */}
-      <audio
-        ref={audioRef}
-        src={currentSrc}
-        onEnded={() => setIsPlaying(false)}
-        onPause={() => setIsPlaying(false)}
-        onPlay={() => setIsPlaying(true)}
-        className="hidden"
-      />
-    </div>
-  );
-};
 
 const FieldReportImage = ({
   fieldReport
@@ -517,7 +479,7 @@ const ScentPyramid = ({ notes }: { notes: Product["notes"] }) => {
 };
 
 // Trust Badges Component - Conditionally rendered based on collection type
-const TrustBadges = ({ isAtlas, isRelic, product }: { isAtlas: boolean; isRelic: boolean; product: Product }) => {
+const TrustBadges = ({ isAtlas, product }: { isAtlas: boolean; product: Product }) => {
   // Use custom badges from Sanity if available, otherwise fall back to defaults
   const customBadges = isAtlas ? product.atlasData?.badges : product.relicData?.badges;
 
@@ -549,8 +511,7 @@ const TrustBadges = ({ isAtlas, isRelic, product }: { isAtlas: boolean; isRelic:
 };
 
 export function ProductDetailClient({ product }: Props) {
-  const router = useRouter();
-  const { addItem, isLoading: isCartLoading } = useShopifyCart();
+  const { addItem } = useShopifyCart();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
@@ -567,7 +528,6 @@ export function ProductDetailClient({ product }: Props) {
   const territoryTagline = territory ? TERRITORY_TAGLINES[territory] : null;
   const currentPrice = territoryPricing ? territoryPricing[selectedVariant] : product.price;
 
-  const scrollRef = useRef(null);
   const addButtonRef = useRef<HTMLButtonElement>(null);
   const mobileAddButtonRef = useRef<HTMLButtonElement>(null);
   const { scrollY } = useScroll();
@@ -697,10 +657,6 @@ export function ProductDetailClient({ product }: Props) {
     }));
   };
 
-  const handleNavigate = (path: string) => {
-    if (path === "home") router.push("/");
-    else router.push(`/${path}`);
-  };
 
   return (
     <div className={`min-h-screen ${theme.bg} ${theme.text}`}>
@@ -1217,7 +1173,7 @@ export function ProductDetailClient({ product }: Props) {
             )}
 
             {/* Trust Badges */}
-            <TrustBadges isAtlas={isAtlas} isRelic={isRelic} product={product} />
+            <TrustBadges isAtlas={isAtlas} product={product} />
 
             {/* Gift Option */}
             <motion.button

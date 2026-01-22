@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
         let body;
         try {
             body = await req.json();
-        } catch (e) {
+        } catch {
             console.error('[Madison] Failed to parse JSON body');
             return NextResponse.json({
                 success: false,

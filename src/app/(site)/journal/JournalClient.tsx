@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Calendar, MapPin } from 'lucide-react';
+import { ArrowLeft, Calendar } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { urlForImage } from '@/sanity/lib/image';
@@ -14,7 +14,7 @@ interface JournalEntry {
   title: string;
   slug: { current: string };
   excerpt?: string;
-  coverImage?: any;
+  coverImage?: unknown;
   author?: string;
   publishedAt?: string;
   category?: string;

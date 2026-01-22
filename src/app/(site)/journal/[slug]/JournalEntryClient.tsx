@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Calendar, MapPin, User } from 'lucide-react';
+import { ArrowLeft, Calendar, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PortableText } from '@portabletext/react';
@@ -14,13 +14,13 @@ interface JournalEntry {
   title: string;
   slug: { current: string };
   excerpt?: string;
-  content?: any[];
-  coverImage?: any;
+  content?: unknown[];
+  coverImage?: unknown;
   author?: string;
   publishedAt?: string;
   category?: string;
   territory?: string;
-  relatedProducts?: any[];
+  relatedProducts?: unknown[];
 }
 
 interface Props {
@@ -44,7 +44,7 @@ const TERRITORY_COLORS: Record<string, { bg: string; text: string }> = {
 // Custom Portable Text components
 const portableTextComponents = {
   types: {
-    image: ({ value }: any) => {
+    image: ({ value }: { value?: { asset?: { _ref?: string }; alt?: string; caption?: string } }) => {
       if (!value?.asset?._ref) {
         return null;
       }
@@ -68,23 +68,23 @@ const portableTextComponents = {
     },
   },
   block: {
-    h2: ({ children }: any) => (
+    h2: ({ children }: { children?: React.ReactNode }) => (
       <h2 className="text-3xl font-serif italic tracking-tight mt-12 mb-6">{children}</h2>
     ),
-    h3: ({ children }: any) => (
+    h3: ({ children }: { children?: React.ReactNode }) => (
       <h3 className="text-2xl font-serif italic tracking-tight mt-10 mb-4">{children}</h3>
     ),
-    blockquote: ({ children }: any) => (
+    blockquote: ({ children }: { children?: React.ReactNode }) => (
       <blockquote className="my-8 pl-6 border-l-2 border-theme-gold/40 font-serif italic text-xl text-theme-charcoal/70">
         {children}
       </blockquote>
     ),
-    normal: ({ children }: any) => (
+    normal: ({ children }: { children?: React.ReactNode }) => (
       <p className="mb-6 font-serif text-lg leading-relaxed text-theme-charcoal/80">{children}</p>
     ),
   },
   marks: {
-    link: ({ children, value }: any) => (
+    link: ({ children, value }: { children?: React.ReactNode; value?: { href?: string } }) => (
       <a
         href={value?.href}
         target="_blank"
@@ -217,7 +217,7 @@ export function JournalEntryClient({ entry }: Props) {
                 Featured in This Story
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                {entry.relatedProducts.map((product: any) => (
+                {entry.relatedProducts.map((product: { _id: string; slug?: { current?: string }; title?: string; mainImage?: unknown; collectionType?: string; price?: number }) => (
                   <Link
                     key={product._id}
                     href={`/product/${product.slug?.current}`}

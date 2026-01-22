@@ -15,7 +15,7 @@ interface FieldJournalEntry {
     slug: { current: string };
     subtitle?: string;
     excerpt?: string;
-    coverImage?: any;
+    coverImage?: unknown;
     author?: string;
     publishedAt?: string;
     category?: string;
@@ -59,12 +59,6 @@ const AUTHOR_LABELS: Record<string, string> = {
     correspondent: 'Field Correspondent',
 };
 
-const SEASON_LABELS: Record<string, string> = {
-    spring: 'Spring Equinox',
-    summer: 'Summer Solstice',
-    autumn: 'Autumn Equinox',
-    winter: 'Winter Solstice',
-};
 
 export function FieldJournalClient({ entries }: Props) {
     const router = useRouter();

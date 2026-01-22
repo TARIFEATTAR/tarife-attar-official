@@ -19,7 +19,7 @@ interface ExpeditionData {
 interface SEOData {
     metaTitle?: string;
     metaDescription?: string;
-    ogImage?: any;
+    ogImage?: unknown;
     keywords?: string[];
     canonicalUrl?: string;
 }
@@ -30,15 +30,15 @@ interface FieldJournalEntry {
     slug: { current: string };
     subtitle?: string;
     excerpt?: string;
-    body?: any[];
-    coverImage?: any;
+    body?: unknown[];
+    coverImage?: unknown;
     author?: string;
     publishedAt?: string;
     category?: string;
     expeditionData?: ExpeditionData;
     seo?: SEOData;
-    featuredProducts?: any[];
-    relatedEntries?: any[];
+    featuredProducts?: unknown[];
+    relatedEntries?: unknown[];
 }
 
 interface PageProps {

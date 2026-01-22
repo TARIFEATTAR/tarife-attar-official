@@ -13,7 +13,7 @@ interface JournalEntry {
   title: string;
   slug: { current: string };
   excerpt?: string;
-  coverImage?: any;
+  coverImage?: unknown;
   author?: string;
   publishedAt?: string;
   category?: string;

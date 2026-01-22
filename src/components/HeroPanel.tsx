@@ -80,9 +80,8 @@ export function HeroPanel({
                         zIndex: 0,
                     }}
                     loading="eager"
-                    onError={(e) => {
+                    onError={() => {
                         console.error(`[HeroPanel ${variant}] Failed to load image:`, backgroundUrl);
-                        console.error('Error:', e);
                     }}
                     onLoad={(e) => {
                         if (process.env.NODE_ENV === 'development') {

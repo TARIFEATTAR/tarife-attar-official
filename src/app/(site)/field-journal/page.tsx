@@ -19,7 +19,7 @@ interface FieldJournalEntry {
     slug: { current: string };
     subtitle?: string;
     excerpt?: string;
-    coverImage?: any;
+    coverImage?: unknown;
     author?: string;
     publishedAt?: string;
     category?: string;

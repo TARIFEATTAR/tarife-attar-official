@@ -9,14 +9,14 @@ interface JournalEntry {
   title: string;
   slug: { current: string };
   excerpt?: string;
-  content?: any[];
-  coverImage?: any;
+  content?: unknown[];
+  coverImage?: unknown;
   author?: string;
   publishedAt?: string;
   category?: string;
   territory?: string;
   seoDescription?: string;
-  relatedProducts?: any[];
+  relatedProducts?: unknown[];
 }
 
 interface PageProps {

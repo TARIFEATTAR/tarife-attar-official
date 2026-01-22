@@ -16,9 +16,9 @@ interface RelicProduct {
   price?: number;
   volume?: string;
   productFormat?: string;
-  mainImage?: any;
+  mainImage?: unknown;
   museumExhibit?: {
-    exhibitImage?: any;
+    exhibitImage?: unknown;
   };
   inStock?: boolean;
   legacyName?: string;
@@ -42,10 +42,6 @@ interface Props {
 export function RelicClient({ categories, totalCount }: Props) {
   const router = useRouter();
 
-  const handleNavigate = (path: string) => {
-    if (path === "home") router.push("/");
-    else router.push(`/${path}`);
-  };
 
   return (
     <div className="min-h-screen bg-theme-obsidian text-theme-alabaster overflow-x-hidden">
