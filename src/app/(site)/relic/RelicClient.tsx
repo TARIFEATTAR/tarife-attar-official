@@ -162,10 +162,10 @@ export function RelicClient({ categories, totalCount }: Props) {
                             );
                           } catch (error) {
                             console.warn('Failed to generate image URL:', product.title, error);
-                            // Use placeholder image if Sanity image fails
+                            // Use Relic-specific placeholder image if Sanity image fails
                             return (
                               <Image
-                                src={getPlaceholderImageUrl()}
+                                src={getPlaceholderImageUrl('relic')}
                                 alt={`${product.title} - Coming soon`}
                                 fill
                                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -182,9 +182,9 @@ export function RelicClient({ categories, totalCount }: Props) {
                             );
                           }
                         })() : (
-                          // Use placeholder image for products without images
+                          // Use Relic-specific placeholder image for products without images
                           <Image
-                            src={getPlaceholderImageUrl()}
+                            src={getPlaceholderImageUrl('relic')}
                             alt={`${product.title} - Coming soon`}
                             fill
                             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
