@@ -136,7 +136,7 @@ export function RelicClient({ categories, totalCount, placeholderImages }: Props
                       <div className="relative aspect-square">
                         {product.museumExhibit?.exhibitImage || product.mainImage ? (() => {
                           const displayImage = product.museumExhibit?.exhibitImage || product.mainImage;
-                          const imageUrl = urlForImage(displayImage);
+                          const imageUrl = urlForImage(displayImage as any);
                           if (!imageUrl) {
                             return (
                               <div className="absolute inset-0 flex items-center justify-center">

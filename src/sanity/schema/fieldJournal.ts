@@ -1,6 +1,13 @@
 import { BookOpenIcon } from 'lucide-react';
 import { sensoryLexiconValidation } from '../validation/sensoryLexicon';
 
+type SanityRule = {
+  required: () => SanityRule;
+  min: (n: number) => SanityRule;
+  max: (n: number) => SanityRule;
+  custom: (validator: (value: unknown) => true | string | { message: string; level?: 'error' | 'warning' }) => SanityRule;
+};
+
 export const fieldJournalSchema = {
     name: 'fieldJournal',
     title: 'Field Journal',
