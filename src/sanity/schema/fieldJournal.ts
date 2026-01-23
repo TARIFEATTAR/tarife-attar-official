@@ -23,7 +23,7 @@ export const fieldJournalSchema = {
             type: 'string',
             group: 'content',
             description: 'The headline (aim for 50-60 characters for SEO)',
-            validation: (Rule: any) => Rule.required().max(70),
+            validation: (Rule: SanityRule) => Rule.required().max(70),
         },
         {
             name: 'slug',
@@ -31,7 +31,7 @@ export const fieldJournalSchema = {
             type: 'slug',
             group: 'content',
             options: { source: 'title', maxLength: 96 },
-            validation: (Rule: any) => Rule.required(),
+            validation: (Rule: SanityRule) => Rule.required(),
         },
         {
             name: 'subtitle',
@@ -47,7 +47,7 @@ export const fieldJournalSchema = {
             group: 'content',
             rows: 3,
             description: 'Brief summary for cards and previews (150-160 characters ideal for meta description)',
-            validation: (Rule: any) => Rule.max(200),
+            validation: (Rule: SanityRule) => Rule.max(200),
         },
         {
             name: 'coverImage',
@@ -70,7 +70,7 @@ export const fieldJournalSchema = {
                 { type: 'image', options: { hotspot: true } },
                 { type: 'fieldReport' }, // Reuse shoppable image component
             ],
-            validation: (Rule: any) => sensoryLexiconValidation(Rule, 'Body'),
+                    validation: (Rule: SanityRule) => sensoryLexiconValidation(Rule, 'Body'),
         },
         {
             name: 'publishedAt',
@@ -180,7 +180,7 @@ export const fieldJournalSchema = {
                     type: 'text',
                     rows: 2,
                     description: 'Search engine description (150-160 characters)',
-                    validation: (Rule: any) => Rule.max(160),
+                    validation: (Rule: SanityRule) => Rule.max(160),
                 },
                 {
                     name: 'ogImage',

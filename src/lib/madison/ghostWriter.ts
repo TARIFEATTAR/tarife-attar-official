@@ -89,7 +89,7 @@ function markdownToBlocks(text: string): any[] {
  * Fetches an image from a URL and uploads it to Sanity
  */
 async function uploadImageFromUrl(
-  client: any,
+  client: ReturnType<typeof createClient>,
   imageUrl: string
 ): Promise<string | undefined> {
   if (!imageUrl || !imageUrl.startsWith('http')) return undefined;
@@ -153,7 +153,7 @@ export async function pushDraft(data: MadisonPayload): Promise<string> {
     apiVersion,
     token: writeToken,
     useCdn: false, // Always use the API for writes
-  }) as any; // Simplified cast
+  });
 
   // Generate draft ID
   const draftId = `drafts.${uuidv4()}`;
@@ -291,7 +291,7 @@ export async function pushJournalEntry(data: JournalPayload): Promise<string> {
     apiVersion,
     token: writeToken,
     useCdn: false,
-  }) as any;
+  });
 
   // Generate draft ID
   const draftId = `drafts.${uuidv4()}`;
