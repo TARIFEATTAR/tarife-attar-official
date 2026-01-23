@@ -105,5 +105,5 @@ export default async function FieldJournalEntryPage({ params }: PageProps) {
         notFound();
     }
 
-    return <FieldJournalEntryClient entry={entry} />;
+    return <FieldJournalEntryClient entry={entry as any} />;
 }

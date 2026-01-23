@@ -545,7 +545,7 @@ export function ProductDetailClient({ product, placeholderImages }: Props) {
 
   // Use Sanity image if available, otherwise fall back to Shopify image
   const mainImageUrl = allImages.length > 0
-    ? urlForImage(allImages[selectedImage] || product.mainImage)
+    ? urlForImage((allImages[selectedImage] || product.mainImage) as any)
     : null;
   const isAtlas = product.collectionType === "atlas";
   const isRelic = product.collectionType === "relic";
@@ -1249,9 +1249,9 @@ export function ProductDetailClient({ product, placeholderImages }: Props) {
                   </span>
                   <div className="font-serif italic text-base md:text-lg leading-relaxed opacity-90">
                     {isAtlas && product.atlasData?.travelLog ? (
-                      <PortableText value={product.atlasData.travelLog} />
+                      <PortableText value={product.atlasData.travelLog as any} />
                     ) : isRelic && product.relicData?.museumDescription ? (
-                      <PortableText value={product.relicData.museumDescription} />
+                      <PortableText value={product.relicData.museumDescription as any} />
                     ) : null}
                   </div>
                 </motion.div>
@@ -1354,7 +1354,7 @@ export function ProductDetailClient({ product, placeholderImages }: Props) {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                 {product.relatedProducts.map((related) => {
-                  const relatedImageUrl = urlForImage(related.mainImage);
+                  const relatedImageUrl = urlForImage(related.mainImage as any);
                   return (
                     <Link
                       key={related._id}

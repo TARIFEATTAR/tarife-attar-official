@@ -172,16 +172,21 @@ export function FieldJournalClient({ entries }: Props) {
                                         <Link href={`/field-journal/${entry.slug.current}`} className="group block">
                                             <article className={`p-6 rounded-2xl border transition-all duration-300 ${territoryStyle.border || 'border-theme-charcoal/10'} ${territoryStyle.bg || 'bg-theme-charcoal/[0.02]'} hover:shadow-lg`}>
                                                 {/* Cover Image */}
-                                                {entry.coverImage && (
-                                                    <div className="relative aspect-[16/9] rounded-xl overflow-hidden mb-6">
-                                                        <Image
-                                                            src={urlForImage(entry.coverImage)?.width(800)?.height(450)?.url() || ''}
-                                                            alt={entry.title}
-                                                            fill
-                                                            className="object-cover group-hover:scale-105 transition-transform duration-700"
-                                                        />
-                                                    </div>
-                                                )}
+                                                {(() => {
+                                                    if (!entry.coverImage) return null;
+                                                    const coverImageUrl = urlForImage(entry.coverImage);
+                                                    if (!coverImageUrl) return null;
+                                                    return (
+                                                        <div className="relative aspect-[16/9] rounded-xl overflow-hidden mb-6">
+                                                            <Image
+                                                                src={coverImageUrl.width(800).height(450).url()}
+                                                                alt={entry.title}
+                                                                fill
+                                                                className="object-cover group-hover:scale-105 transition-transform duration-700"
+                                                            />
+                                                        </div>
+                                                    );
+                                                })()}
 
                                                 {/* Meta Row */}
                                                 <div className="flex flex-wrap items-center gap-3 mb-4">

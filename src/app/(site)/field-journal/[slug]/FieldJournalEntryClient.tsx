@@ -196,18 +196,23 @@ export function FieldJournalEntryClient({ entry }: Props) {
 
             <article className="pt-24 md:pt-32">
                 {/* Cover Image */}
-                {entry.coverImage && (
-                    <div className="relative h-[40vh] md:h-[50vh] mb-12">
-                        <Image
-                            src={urlForImage(entry.coverImage)?.width(1600)?.height(900)?.url() || ''}
-                            alt={entry.coverImage.alt || entry.title}
-                            fill
-                            className="object-cover"
-                            priority
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-theme-alabaster via-transparent to-transparent" />
-                    </div>
-                )}
+                {(() => {
+                    if (!entry.coverImage) return null;
+                    const coverImageUrl = urlForImage(entry.coverImage);
+                    if (!coverImageUrl) return null;
+                    return (
+                        <div className="relative h-[40vh] md:h-[50vh] mb-12">
+                            <Image
+                                src={coverImageUrl.width(1600).height(900).url()}
+                                alt={entry.title}
+                                fill
+                                className="object-cover"
+                                priority
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-theme-alabaster via-transparent to-transparent" />
+                        </div>
+                    );
+                })()}
 
                 {/* Content Container */}
                 <div className="max-w-3xl mx-auto px-4 md:px-8">
@@ -296,7 +301,7 @@ export function FieldJournalEntryClient({ entry }: Props) {
                         className="py-12"
                     >
                         {entry.body && entry.body.length > 0 ? (
-                            <PortableText value={entry.body} components={portableTextComponents} />
+                            <PortableText value={entry.body as any} components={portableTextComponents} />
                         ) : (
                             <p className="font-serif italic text-xl text-theme-charcoal/40 text-center py-12">
                                 Content coming soon...
@@ -398,16 +403,21 @@ export function FieldJournalEntryClient({ entry }: Props) {
                                             href={`/field-journal/${related.slug?.current}`}
                                             className="group flex gap-4 p-4 rounded-xl border border-theme-charcoal/10 hover:border-theme-gold/30 transition-colors"
                                         >
-                                            {related.coverImage && (
-                                                <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
-                                                    <Image
-                                                        src={urlForImage(related.coverImage)?.width(200)?.height(200)?.url() || ''}
-                                                        alt={related.title}
-                                                        fill
-                                                        className="object-cover"
-                                                    />
-                                                </div>
-                                            )}
+                                            {(() => {
+                                                if (!related.coverImage) return null;
+                                                const relatedImageUrl = urlForImage(related.coverImage);
+                                                if (!relatedImageUrl) return null;
+                                                return (
+                                                    <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+                                                        <Image
+                                                            src={relatedImageUrl.width(200).height(200).url()}
+                                                            alt={related.title}
+                                                            fill
+                                                            className="object-cover"
+                                                        />
+                                                    </div>
+                                                );
+                                            })()}
                                             <div className="flex-1 min-w-0">
                                                 {relatedTerritoryStyle && (
                                                     <span className={`inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-widest mb-2 ${relatedTerritoryStyle.color}`}>

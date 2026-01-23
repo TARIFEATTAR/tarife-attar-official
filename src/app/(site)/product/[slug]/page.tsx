@@ -11,7 +11,7 @@ interface ProductPageProps {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const [product, placeholderImages] = await Promise.all([
-    sanityFetch<unknown>({
+    sanityFetch<any>({
       query: productBySlugQuery,
       params: { slug: params.slug },
       tags: [`product-${params.slug}`],
@@ -28,5 +28,5 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  return <ProductDetailClient product={product} placeholderImages={placeholderImages} />;
+  return <ProductDetailClient product={product as any} placeholderImages={placeholderImages} />;
 }

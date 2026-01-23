@@ -130,18 +130,23 @@ export function JournalEntryClient({ entry }: Props) {
       {/* Hero */}
       <article className="pt-24 md:pt-32">
         {/* Cover Image */}
-        {entry.coverImage && (
-          <div className="relative h-[40vh] md:h-[50vh] mb-12">
-            <Image
-              src={urlForImage(entry.coverImage)?.width(1600)?.height(900)?.url() || ''}
-              alt={entry.title}
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-theme-alabaster via-transparent to-transparent" />
-          </div>
-        )}
+        {(() => {
+          if (!entry.coverImage) return null;
+          const coverImageUrl = urlForImage(entry.coverImage);
+          if (!coverImageUrl) return null;
+          return (
+            <div className="relative h-[40vh] md:h-[50vh] mb-12">
+              <Image
+                src={coverImageUrl.width(1600).height(900).url()}
+                alt={entry.title}
+                fill
+                className="object-cover"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-theme-alabaster via-transparent to-transparent" />
+            </div>
+          );
+        })()}
 
         {/* Meta & Title */}
         <div className="max-w-3xl mx-auto px-4 md:px-8">
@@ -197,7 +202,7 @@ export function JournalEntryClient({ entry }: Props) {
             className="py-12"
           >
             {entry.content && entry.content.length > 0 ? (
-              <PortableText value={entry.content} components={portableTextComponents} />
+              <PortableText value={entry.content as any} components={portableTextComponents} />
             ) : (
               <p className="font-serif italic text-xl text-theme-charcoal/40 text-center py-12">
                 Content coming soon...
@@ -217,7 +222,7 @@ export function JournalEntryClient({ entry }: Props) {
                 Featured in This Story
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                {entry.relatedProducts.map((product: { _id: string; slug?: { current?: string }; title?: string; mainImage?: unknown; collectionType?: string; price?: number }) => (
+                {(entry.relatedProducts as Array<{ _id: string; slug?: { current?: string }; title?: string; mainImage?: unknown; collectionType?: string; price?: number }>).map((product) => (
                   <Link
                     key={product._id}
                     href={`/product/${product.slug?.current}`}
@@ -227,7 +232,7 @@ export function JournalEntryClient({ entry }: Props) {
                       {product.mainImage ? (
                         <Image
                           src={urlForImage(product.mainImage)?.width(400)?.height(400)?.url() || ''}
-                          alt={product.title}
+                          alt={product.title || 'Product image'}
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
