@@ -10,6 +10,7 @@ import Link from "next/link";
 import { urlForImage } from "@/sanity/lib/image";
 import { getItemLabel } from "@/lib/brandSystem";
 import { getPlaceholderImageUrl } from "@/lib/placeholder-image";
+import { PlaceholderImagesQueryResult } from "@/sanity/lib/queries";
 
 // Territory-based pricing for Atlas Collection (same as ProductDetailClient)
 const TERRITORY_PRICING: Record<string, { '6ml': number; '12ml': number }> = {
@@ -62,9 +63,10 @@ interface Territory {
 interface Props {
   territories: Territory[];
   totalCount: number;
+  placeholderImages?: PlaceholderImagesQueryResult | null;
 }
 
-export function AtlasClient({ territories, totalCount }: Props) {
+export function AtlasClient({ territories, totalCount, placeholderImages }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeTerritory, setActiveTerritory] = useState<string | null>(null);
@@ -306,7 +308,7 @@ export function AtlasClient({ territories, totalCount }: Props) {
                             // Use placeholder image for products without images
                             return (
                               <Image
-                                src={getPlaceholderImageUrl()}
+                                src={getPlaceholderImageUrl('atlas', placeholderImages)}
                                 alt={`${product.title} - Coming soon`}
                                 fill
                                 sizes="(max-width: 768px) 50vw, 25vw"

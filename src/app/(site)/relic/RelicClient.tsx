@@ -9,6 +9,7 @@ import Link from "next/link";
 import { urlForImage } from "@/sanity/lib/image";
 import { getPlaceholderImageUrl } from "@/lib/placeholder-image";
 import { getItemLabel } from "@/lib/brandSystem";
+import { PlaceholderImagesQueryResult } from "@/sanity/lib/queries";
 
 interface RelicProduct {
   _id: string;
@@ -38,9 +39,10 @@ interface Category {
 interface Props {
   categories: Category[];
   totalCount: number;
+  placeholderImages?: PlaceholderImagesQueryResult | null;
 }
 
-export function RelicClient({ categories, totalCount }: Props) {
+export function RelicClient({ categories, totalCount, placeholderImages }: Props) {
   const router = useRouter();
 
 
@@ -165,7 +167,7 @@ export function RelicClient({ categories, totalCount }: Props) {
                             // Use Relic-specific placeholder image if Sanity image fails
                             return (
                               <Image
-                                src={getPlaceholderImageUrl('relic')}
+                                src={getPlaceholderImageUrl('relic', placeholderImages)}
                                 alt={`${product.title} - Coming soon`}
                                 fill
                                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -184,7 +186,7 @@ export function RelicClient({ categories, totalCount }: Props) {
                         })() : (
                           // Use Relic-specific placeholder image for products without images
                           <Image
-                            src={getPlaceholderImageUrl('relic')}
+                            src={getPlaceholderImageUrl('relic', placeholderImages)}
                             alt={`${product.title} - Coming soon`}
                             fill
                             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"

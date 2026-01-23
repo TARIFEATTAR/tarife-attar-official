@@ -11,7 +11,7 @@ import { Product } from "@/types";
 import { urlForImage } from "@/sanity/lib/image";
 import { getPlaceholderImageUrl } from "@/lib/placeholder-image";
 import { LegacyName } from "@/components/product/LegacyName";
-import { HeroBackgroundsQueryResult } from "@/sanity/lib/queries";
+import { HeroBackgroundsQueryResult, PlaceholderImagesQueryResult } from "@/sanity/lib/queries";
 
 interface HomeClientProps {
     featuredProducts: (Product & { 
@@ -21,9 +21,10 @@ interface HomeClientProps {
       shopifyImage?: string;
     })[];
     heroBackgrounds?: HeroBackgroundsQueryResult;
+    placeholderImages?: PlaceholderImagesQueryResult | null;
 }
 
-export function HomeClient({ featuredProducts, heroBackgrounds }: HomeClientProps) {
+export function HomeClient({ featuredProducts, heroBackgrounds, placeholderImages }: HomeClientProps) {
     const router = useRouter();
     const [showLoader, setShowLoader] = useState(true); // Enable intro loader with animations
     
@@ -149,7 +150,7 @@ export function HomeClient({ featuredProducts, heroBackgrounds }: HomeClientProp
                                             // Use placeholder image for products without images
                                             return (
                                                 <Image
-                                                    src={getPlaceholderImageUrl()}
+                                                    src={getPlaceholderImageUrl(product.collectionType as 'relic' | 'atlas' | undefined, placeholderImages)}
                                                     alt={`${product.title} - Coming soon`}
                                                     fill
                                                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"

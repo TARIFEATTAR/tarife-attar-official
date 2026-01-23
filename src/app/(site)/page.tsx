@@ -1,16 +1,19 @@
 
 import { sanityFetch } from "@/sanity/lib/client";
-import { featuredProductsQuery, heroBackgroundsQuery, HeroBackgroundsQueryResult } from "@/sanity/lib/queries";
+import { featuredProductsQuery, heroBackgroundsQuery, HeroBackgroundsQueryResult, placeholderImagesQuery, PlaceholderImagesQueryResult } from "@/sanity/lib/queries";
 import { Product } from "@/types";
 import { HomeClient } from "./HomeClient";
 
 export default async function Home() {
-  const [featuredProducts, heroBackgrounds] = await Promise.all([
+  const [featuredProducts, heroBackgrounds, placeholderImages] = await Promise.all([
     sanityFetch<Product[]>({
       query: featuredProductsQuery
     }),
     sanityFetch<HeroBackgroundsQueryResult>({
       query: heroBackgroundsQuery
+    }),
+    sanityFetch<PlaceholderImagesQueryResult>({
+      query: placeholderImagesQuery
     })
   ]);
 
@@ -19,5 +22,5 @@ export default async function Home() {
     console.log('[Home Page] Hero Backgrounds fetched:', heroBackgrounds);
   }
 
-  return <HomeClient featuredProducts={featuredProducts} heroBackgrounds={heroBackgrounds} />;
+  return <HomeClient featuredProducts={featuredProducts} heroBackgrounds={heroBackgrounds} placeholderImages={placeholderImages} />;
 }

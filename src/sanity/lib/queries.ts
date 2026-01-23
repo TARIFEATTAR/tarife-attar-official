@@ -582,3 +582,89 @@ export interface HeroBackgroundsQueryResult {
   relicHotspot?: { _type?: string; x: number; y: number; width?: number; height?: number };
   relicOverlayOpacity?: number;
 }
+
+/**
+ * Get placeholder images for products without images
+ * This is a singleton document - only one instance exists
+ * If no image is set in Sanity, falls back to hardcoded placeholder
+ */
+export const placeholderImagesQuery = groq`
+  *[_type == "placeholderImages" && !(_id in path("drafts.**"))][0] {
+    "relicPlaceholder": relicPlaceholder.asset->{
+      _id,
+      _type,
+      asset->{
+        _id,
+        _type,
+        url,
+        metadata {
+          dimensions
+        }
+      }
+    },
+    "atlasPlaceholder": atlasPlaceholder.asset->{
+      _id,
+      _type,
+      asset->{
+        _id,
+        _type,
+        url,
+        metadata {
+          dimensions
+        }
+      }
+    },
+    "generalPlaceholder": generalPlaceholder.asset->{
+      _id,
+      _type,
+      asset->{
+        _id,
+        _type,
+        url,
+        metadata {
+          dimensions
+        }
+      }
+    }
+  }
+`;
+
+// Type for placeholder images query result
+export interface PlaceholderImagesQueryResult {
+  relicPlaceholder?: {
+    _id?: string;
+    _type?: string;
+    asset?: {
+      _id?: string;
+      _type?: string;
+      url?: string;
+      metadata?: {
+        dimensions?: { width?: number; height?: number };
+      };
+    };
+  };
+  atlasPlaceholder?: {
+    _id?: string;
+    _type?: string;
+    asset?: {
+      _id?: string;
+      _type?: string;
+      url?: string;
+      metadata?: {
+        dimensions?: { width?: number; height?: number };
+      };
+    };
+  };
+  generalPlaceholder?: {
+    _id?: string;
+    _type?: string;
+    asset?: {
+      _id?: string;
+      _type?: string;
+      url?: string;
+      metadata?: {
+        dimensions?: { width?: number; height?: number };
+      };
+    };
+  };
+}

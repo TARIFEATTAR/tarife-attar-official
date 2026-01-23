@@ -10,6 +10,7 @@ import { fieldJournalSchema } from "./fieldJournal";
 import { territorySchema } from "./territory";
 
 import { heroBackgroundsSchema } from "./heroBackgrounds";
+import { placeholderImagesSchema } from "./placeholderImages";
 
-export const schemaTypes = [productSchema, exhibitSchema, journalSchema, shoppableImage, museumExhibit, fieldReportSchema, fieldJournalSchema, territorySchema, heroBackgroundsSchema];
+export const schemaTypes = [productSchema, exhibitSchema, journalSchema, shoppableImage, museumExhibit, fieldReportSchema, fieldJournalSchema, territorySchema, heroBackgroundsSchema, placeholderImagesSchema];
 

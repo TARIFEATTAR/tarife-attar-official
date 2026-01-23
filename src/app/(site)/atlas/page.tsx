@@ -3,6 +3,8 @@ import { sanityFetch } from "@/sanity/lib/client";
 import {
   atlasProductsByTerritoryQuery,
   atlasTerritoryCountsQuery,
+  placeholderImagesQuery,
+  PlaceholderImagesQueryResult,
 } from "@/sanity/lib/queries";
 import { AtlasClient } from "./AtlasClient";
 
@@ -58,19 +60,24 @@ interface TerritoryCounts {
 }
 
 export default async function AtlasPage() {
-  // Fetch all Atlas products (only published, not drafts)
-  const products = (await sanityFetch<AtlasProduct[]>({
-    query: atlasProductsByTerritoryQuery,
-    tags: ["atlas-products"],
-    revalidate: 0, // Always fetch fresh data, rely on webhook for revalidation
-  })) || [];
-
-  // Fetch territory counts
-  const counts = (await sanityFetch<TerritoryCounts>({
-    query: atlasTerritoryCountsQuery,
-    tags: ["atlas-counts"],
-    revalidate: 0, // Always fetch fresh data
-  })) || { tidal: 0, ember: 0, petal: 0, terra: 0 };
+  // Fetch all Atlas products, territory counts, and placeholder images
+  const [products, counts, placeholderImages] = await Promise.all([
+    sanityFetch<AtlasProduct[]>({
+      query: atlasProductsByTerritoryQuery,
+      tags: ["atlas-products"],
+      revalidate: 0, // Always fetch fresh data, rely on webhook for revalidation
+    }),
+    sanityFetch<TerritoryCounts>({
+      query: atlasTerritoryCountsQuery,
+      tags: ["atlas-counts"],
+      revalidate: 0, // Always fetch fresh data
+    }),
+    sanityFetch<PlaceholderImagesQueryResult>({
+      query: placeholderImagesQuery,
+      tags: ["placeholder-images"],
+      revalidate: 0,
+    })
+  ]);
 
   // Group products by territory
   const productsByTerritory = TERRITORIES.map((territory) => ({
@@ -102,7 +109,7 @@ export default async function AtlasPage() {
 
   return (
     <Suspense fallback={<div className="min-h-screen bg-theme-alabaster" />}>
-      <AtlasClient territories={productsByTerritory} totalCount={totalCount} />
+      <AtlasClient territories={productsByTerritory} totalCount={totalCount} placeholderImages={placeholderImages} />
     </Suspense>
   );
 }

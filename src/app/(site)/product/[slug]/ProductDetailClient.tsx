@@ -8,6 +8,7 @@ import { ArrowLeft, Plus, Minus, Gift, MapPin, Calendar, Droplets, Check, AlertC
 import { urlForImage } from "@/sanity/lib/image";
 import { getPlaceholderImageUrl } from "@/lib/placeholder-image";
 import { useShopifyCart } from "@/context";
+import { PlaceholderImagesQueryResult } from "@/sanity/lib/queries";
 import { GlobalFooter } from "@/components/navigation";
 import { PortableText } from "@portabletext/react";
 import { getClassLabel, getCoordinateLabel } from "@/lib/brandSystem";
@@ -110,6 +111,7 @@ interface Product {
 
 interface Props {
   product: Product;
+  placeholderImages?: PlaceholderImagesQueryResult | null;
 }
 
 const EvocationSection = ({ title, story }: { title: string; story: string[] }) => {
@@ -511,7 +513,7 @@ const TrustBadges = ({ isAtlas, product }: { isAtlas: boolean; product: Product 
   );
 };
 
-export function ProductDetailClient({ product }: Props) {
+export function ProductDetailClient({ product, placeholderImages }: Props) {
   const { addItem } = useShopifyCart();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -729,7 +731,7 @@ export function ProductDetailClient({ product }: Props) {
                   // Use placeholder image for products without images
                   return (
                     <Image
-                      src={getPlaceholderImageUrl()}
+                      src={getPlaceholderImageUrl(product.collectionType, placeholderImages)}
                       alt={`${product.title} - Coming soon`}
                       fill
                       sizes="(max-width: 1024px) 100vw, 50vw"

@@ -41,11 +41,16 @@ export function HeroPanel({
     }
 
     // Default opacities if not set in Sanity
-    const defaultOpacity = variant === 'atlas' ? 88 : 85
+    // Note: These values represent overlay opacity (how much the color covers the image)
+    // Lower values = more visible image, Higher values = more subtle texture
+    // Adjusted to allow more image visibility (was 88/85, now 75/70)
+    const defaultOpacity = variant === 'atlas' ? 75 : 70
     // TEMPORARY: Set overlayOpacity to 0 to test if images are loading
     // Remove this after confirming images work
     const testMode = process.env.NEXT_PUBLIC_HERO_TEST_MODE === 'true'
     const effectiveOpacity = testMode ? 0 : (overlayOpacity ?? defaultOpacity)
+    // Convert percentage to 0-1 range for CSS opacity
+    // 88% overlay = 0.88 opacity = image shows through at 12% visibility
     const opacity = effectiveOpacity / 100
 
     // Hotspot → object-position conversion for image focus
@@ -60,7 +65,8 @@ export function HeroPanel({
         console.log(`[HeroPanel ${variant}] Background URL:`, backgroundUrl);
         console.log(`[HeroPanel ${variant}] Overlay Opacity:`, effectiveOpacity, '%', testMode ? '(TEST MODE - overlay disabled)' : '');
         console.log(`[HeroPanel ${variant}] Hotspot:`, hotspot);
-        console.log(`[HeroPanel ${variant}] Image should be visible at:`, (100 - effectiveOpacity), '% opacity');
+        console.log(`[HeroPanel ${variant}] Image visibility:`, (100 - effectiveOpacity), '% (overlay covers', effectiveOpacity, '%)');
+        console.log(`[HeroPanel ${variant}] Image should be visible through the overlay`);
     }
 
     return (
@@ -100,12 +106,14 @@ export function HeroPanel({
             ) : null}
 
             {/* Layer 2: Color Overlay */}
+            {/* Using mix-blend-mode to allow image to show through more naturally */}
             <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
                     backgroundColor: colors[variant],
                     opacity: opacity,
                     zIndex: 1,
+                    mixBlendMode: 'normal',
                 }}
             />
 

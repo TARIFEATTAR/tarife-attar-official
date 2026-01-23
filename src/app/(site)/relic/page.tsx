@@ -1,5 +1,5 @@
 import { sanityFetch } from "@/sanity/lib/client";
-import { relicProductsQuery } from "@/sanity/lib/queries";
+import { relicProductsQuery, placeholderImagesQuery, PlaceholderImagesQueryResult } from "@/sanity/lib/queries";
 import { RelicClient } from "./RelicClient";
 
 // Relic categories mapping
@@ -37,12 +37,19 @@ interface RelicProduct {
 }
 
 export default async function RelicPage() {
-  // Fetch all Relic products (only published, not drafts)
-  const products = (await sanityFetch<RelicProduct[]>({
-    query: relicProductsQuery,
-    tags: ["relic-products"],
-    revalidate: 0, // Always fetch fresh data, rely on webhook for revalidation
-  })) || [];
+  // Fetch all Relic products and placeholder images
+  const [products, placeholderImages] = await Promise.all([
+    sanityFetch<RelicProduct[]>({
+      query: relicProductsQuery,
+      tags: ["relic-products"],
+      revalidate: 0, // Always fetch fresh data, rely on webhook for revalidation
+    }),
+    sanityFetch<PlaceholderImagesQueryResult>({
+      query: placeholderImagesQuery,
+      tags: ["placeholder-images"],
+      revalidate: 0,
+    })
+  ]);
 
   // Debug: Log products to help troubleshoot
   if (process.env.NODE_ENV === 'development') {
@@ -77,7 +84,7 @@ export default async function RelicPage() {
     });
   }
 
-  const totalCount = products.length;
+  const totalCount = (products || []).length;
 
-  return <RelicClient categories={categories} totalCount={totalCount} />;
+  return <RelicClient categories={categories} totalCount={totalCount} placeholderImages={placeholderImages} />;
 }

@@ -177,7 +177,7 @@ export const structure = (S: StructureBuilder, _context: StructureResolverContex
 
       // Other document types (Exhibits, etc.)
       ...S.documentTypeListItems().filter(
-        (listItem) => !['product', 'journalEntry', 'fieldJournal', 'heroBackgrounds'].includes(listItem.getId() || '')
+        (listItem) => !['product', 'journalEntry', 'fieldJournal', 'heroBackgrounds', 'placeholderImages'].includes(listItem.getId() || '')
       ),
 
       // Divider
@@ -202,6 +202,17 @@ export const structure = (S: StructureBuilder, _context: StructureResolverContex
                     .schemaType('heroBackgrounds')
                     .documentId('heroBackgrounds')
                     .title('Hero Backgrounds')
+                ),
+              
+              // Placeholder Images Singleton
+              S.listItem()
+                .title('🖼️ Placeholder Images')
+                .id('placeholder-images')
+                .child(
+                  S.document()
+                    .schemaType('placeholderImages')
+                    .documentId('placeholderImages')
+                    .title('Placeholder Images')
                 ),
             ])
         ),
