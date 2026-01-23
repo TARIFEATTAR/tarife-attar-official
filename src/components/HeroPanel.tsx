@@ -43,8 +43,8 @@ export function HeroPanel({
     // Default opacities if not set in Sanity
     // Note: These values represent overlay opacity (how much the color covers the image)
     // Lower values = more visible image, Higher values = more subtle texture
-    // Adjusted to allow much more image visibility (was 88/85, now 65/60)
-    const defaultOpacity = variant === 'atlas' ? 65 : 60
+    // Adjusted to allow much more image visibility (was 88/85, now 55/50)
+    const defaultOpacity = variant === 'atlas' ? 55 : 50
     // TEMPORARY: Set overlayOpacity to 0 to test if images are loading
     // Remove this after confirming images work
     const testMode = process.env.NEXT_PUBLIC_HERO_TEST_MODE === 'true'
