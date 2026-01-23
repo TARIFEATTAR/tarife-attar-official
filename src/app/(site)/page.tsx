@@ -7,13 +7,19 @@ import { HomeClient } from "./HomeClient";
 export default async function Home() {
   const [featuredProducts, heroBackgrounds, placeholderImages] = await Promise.all([
     sanityFetch<Product[]>({
-      query: featuredProductsQuery
+      query: featuredProductsQuery,
+      tags: ['featured-products'],
+      revalidate: 0, // Always fetch fresh, rely on webhook for revalidation
     }),
     sanityFetch<HeroBackgroundsQueryResult>({
-      query: heroBackgroundsQuery
+      query: heroBackgroundsQuery,
+      tags: ['hero-backgrounds'],
+      revalidate: 0, // Always fetch fresh, rely on webhook for revalidation
     }),
     sanityFetch<PlaceholderImagesQueryResult>({
-      query: placeholderImagesQuery
+      query: placeholderImagesQuery,
+      tags: ['placeholder-images'],
+      revalidate: 0,
     })
   ]);
 
