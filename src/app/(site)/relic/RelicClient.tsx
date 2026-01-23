@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { urlForImage } from "@/sanity/lib/image";
+import { getPlaceholderImageUrl } from "@/lib/placeholder-image";
 import { getItemLabel } from "@/lib/brandSystem";
 
 interface RelicProduct {
@@ -161,20 +162,42 @@ export function RelicClient({ categories, totalCount }: Props) {
                             );
                           } catch (error) {
                             console.warn('Failed to generate image URL:', product.title, error);
+                            // Use placeholder image if Sanity image fails
                             return (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="font-mono text-[10px] uppercase tracking-widest opacity-20">
-                                  No Image
-                                </span>
-                              </div>
+                              <Image
+                                src={getPlaceholderImageUrl()}
+                                alt={`${product.title} - Coming soon`}
+                                fill
+                                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                                className="object-cover opacity-60 grayscale group-hover:opacity-80 group-hover:grayscale-0 transition-all duration-500"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  const parent = target.parentElement;
+                                  if (parent) {
+                                    parent.innerHTML = '<div class="absolute inset-0 flex items-center justify-center"><span class="font-mono text-[10px] uppercase tracking-widest opacity-20">Coming Soon</span></div>';
+                                  }
+                                }}
+                              />
                             );
                           }
                         })() : (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="font-mono text-[10px] uppercase tracking-widest opacity-20">
-                              No Image
-                            </span>
-                          </div>
+                          // Use placeholder image for products without images
+                          <Image
+                            src={getPlaceholderImageUrl()}
+                            alt={`${product.title} - Coming soon`}
+                            fill
+                            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                            className="object-cover opacity-60 grayscale group-hover:opacity-80 group-hover:grayscale-0 transition-all duration-500"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = '<div class="absolute inset-0 flex items-center justify-center"><span class="font-mono text-[10px] uppercase tracking-widest opacity-20">Coming Soon</span></div>';
+                              }
+                            }}
+                          />
                         )}
                       </div>
                       

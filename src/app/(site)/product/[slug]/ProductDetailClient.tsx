@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { ArrowLeft, Plus, Minus, Gift, MapPin, Calendar, Droplets, Check, AlertCircle, Map as MapIcon, Flame, Flower2, Waves, TreePine, Volume2, Play, Pause, Compass } from "lucide-react";
 import { urlForImage } from "@/sanity/lib/image";
+import { getPlaceholderImageUrl } from "@/lib/placeholder-image";
 import { useShopifyCart } from "@/context";
 import { GlobalFooter } from "@/components/navigation";
 import { PortableText } from "@portabletext/react";
@@ -725,12 +726,24 @@ export function ProductDetailClient({ product }: Props) {
                       </motion.div>
                     );
                   }
+                  // Use placeholder image for products without images
                   return (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="font-mono text-xs uppercase tracking-widest opacity-20">
-                        No Image
-                      </span>
-                    </div>
+                    <Image
+                      src={getPlaceholderImageUrl()}
+                      alt={`${product.title} - Coming soon`}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      className="object-cover opacity-60 grayscale"
+                      priority
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const parent = target.parentElement;
+                        if (parent) {
+                          parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><span class="font-mono text-xs uppercase tracking-widest opacity-20">Coming Soon</span></div>';
+                        }
+                      }}
+                    />
                   );
                 }
               })() : shopifyImageUrl ? (

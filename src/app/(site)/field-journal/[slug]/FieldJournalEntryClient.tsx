@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { PortableText } from '@portabletext/react';
 import { urlForImage } from '@/sanity/lib/image';
+import { getPlaceholderImageUrl } from '@/lib/placeholder-image';
 import { GlobalFooter } from '@/components/navigation';
 
 interface ExpeditionData {
@@ -346,11 +347,21 @@ export function FieldJournalEntryClient({ entry }: Props) {
                                                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                                                 />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <span className="font-mono text-[8px] uppercase tracking-widest opacity-20">
-                                                        {product.collectionType}
-                                                    </span>
-                                                </div>
+                                                <Image
+                                                    src={getPlaceholderImageUrl()}
+                                                    alt={`${product.title} - Coming soon`}
+                                                    fill
+                                                    sizes="(max-width: 768px) 50vw, 400px"
+                                                    className="object-cover opacity-60 grayscale group-hover:opacity-80 group-hover:grayscale-0 transition-all duration-500"
+                                                    onError={(e) => {
+                                                        const target = e.target as HTMLImageElement;
+                                                        target.style.display = 'none';
+                                                        const parent = target.parentElement;
+                                                        if (parent) {
+                                                            parent.innerHTML = `<div class="w-full h-full flex items-center justify-center"><span class="font-mono text-[8px] uppercase tracking-widest opacity-20">${product.collectionType}</span></div>`;
+                                                        }
+                                                    }}
+                                                />
                                             )}
                                         </div>
                                         <h4 className="font-serif italic text-sm group-hover:text-theme-gold transition-colors">

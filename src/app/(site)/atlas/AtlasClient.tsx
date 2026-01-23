@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { urlForImage } from "@/sanity/lib/image";
 import { getItemLabel } from "@/lib/brandSystem";
+import { getPlaceholderImageUrl } from "@/lib/placeholder-image";
 
 // Territory-based pricing for Atlas Collection (same as ProductDetailClient)
 const TERRITORY_PRICING: Record<string, { '6ml': number; '12ml': number }> = {
@@ -302,12 +303,24 @@ export function AtlasClient({ territories, totalCount }: Props) {
                               );
                             }
                             
+                            // Use placeholder image for products without images
                             return (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="font-mono text-[10px] uppercase tracking-widest opacity-20">
-                                  No Image
-                                </span>
-                              </div>
+                              <Image
+                                src={getPlaceholderImageUrl()}
+                                alt={`${product.title} - Coming soon`}
+                                fill
+                                sizes="(max-width: 768px) 50vw, 25vw"
+                                className="object-cover opacity-60 grayscale group-hover:opacity-80 group-hover:grayscale-0 transition-all duration-500"
+                                onError={(e) => {
+                                  // Fallback to text if placeholder image fails to load
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  const parent = target.parentElement;
+                                  if (parent) {
+                                    parent.innerHTML = '<div class="absolute inset-0 flex items-center justify-center"><span class="font-mono text-[10px] uppercase tracking-widest opacity-20">Coming Soon</span></div>';
+                                  }
+                                }}
+                              />
                             );
                           })()}
                         </div>

@@ -9,6 +9,7 @@ import { GlobalFooter } from "@/components/navigation";
 import { EntryLoader } from "@/components/intro";
 import { Product } from "@/types";
 import { urlForImage } from "@/sanity/lib/image";
+import { getPlaceholderImageUrl } from "@/lib/placeholder-image";
 import { LegacyName } from "@/components/product/LegacyName";
 import { HeroBackgroundsQueryResult } from "@/sanity/lib/queries";
 
@@ -145,10 +146,23 @@ export function HomeClient({ featuredProducts, heroBackgrounds }: HomeClientProp
                                                 );
                                             }
                                             
+                                            // Use placeholder image for products without images
                                             return (
-                                                <div className="w-full h-full flex items-center justify-center bg-theme-charcoal/5">
-                                                    <span className="font-mono text-xs uppercase tracking-widest opacity-20">No Image</span>
-                                                </div>
+                                                <Image
+                                                    src={getPlaceholderImageUrl()}
+                                                    alt={`${product.title} - Coming soon`}
+                                                    fill
+                                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                                    className="object-cover opacity-60 grayscale group-hover:opacity-80 group-hover:grayscale-0 transition-all duration-1000"
+                                                    onError={(e) => {
+                                                        const target = e.target as HTMLImageElement;
+                                                        target.style.display = 'none';
+                                                        const parent = target.parentElement;
+                                                        if (parent) {
+                                                            parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-theme-charcoal/5"><span class="font-mono text-xs uppercase tracking-widest opacity-20">Coming Soon</span></div>';
+                                                        }
+                                                    }}
+                                                />
                                             );
                                         })()}
                                     </div>
