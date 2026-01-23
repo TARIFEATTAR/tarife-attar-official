@@ -32,6 +32,10 @@ NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN=vasana-perfumes.myshopify.com
 
 # Storefront API Token (see instructions below)
 NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN=<your_token_here>
+
+# Admin API Token (for SKU sync scripts - see instructions below)
+# Get from: Shopify Admin → Settings → Apps → Develop apps → Create app → Admin API scopes
+SHOPIFY_ADMIN_ACCESS_TOKEN=<your_admin_token_here>
 ```
 
 ## How to Get Shopify Storefront API Token
@@ -48,6 +52,23 @@ NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN=<your_token_here>
 7. Click **Save**
 8. Click **Install app**
 9. Click **Reveal token once** and copy it
+
+## How to Get Shopify Admin API Token (for SKU Sync)
+
+**Note:** This is different from the Storefront API token. You need this for scripts that sync SKUs.
+
+1. Go to **Shopify Admin** → **Settings** → **Apps and sales channels**
+2. Click **Develop apps**
+3. Click **Create an app** (or use existing app)
+4. Name it: `SKU Sync Scripts`
+5. Click **Configure Admin API scopes**
+6. Enable these permissions:
+   - ✅ `read_products` (to read product data)
+   - ✅ `write_products` (to update SKUs)
+7. Click **Save**
+8. Click **Install app**
+9. Click **Reveal token once** and copy the token (starts with `shpat_`)
+10. Add it to `.env.local` as `SHOPIFY_ADMIN_ACCESS_TOKEN`
 
 ## How to Get Sanity Write Token
 

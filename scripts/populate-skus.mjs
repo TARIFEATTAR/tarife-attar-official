@@ -14,6 +14,31 @@
  *   node scripts/populate-skus.mjs              # Apply changes
  */
 
+// Load environment variables from .env.local
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const envPath = join(__dirname, '..', '.env.local');
+
+try {
+  const envFile = readFileSync(envPath, 'utf-8');
+  envFile.split('\n').forEach(line => {
+    const match = line.match(/^([^=:#]+)=(.*)$/);
+    if (match && !match[1].startsWith('#')) {
+      const key = match[1].trim();
+      const value = match[2].trim().replace(/^["']|["']$/g, '');
+      if (!process.env[key]) {
+        process.env[key] = value;
+      }
+    }
+  });
+} catch (error) {
+  // .env.local might not exist, that's okay
+}
+
 import { createClient } from '@sanity/client';
 
 const client = createClient({
