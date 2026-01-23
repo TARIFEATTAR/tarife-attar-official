@@ -10,10 +10,37 @@
  */
 
 import { createClient } from '@sanity/client';
-import dotenv from 'dotenv';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-dotenv.config({ path: '.env.local' });
-dotenv.config({ path: '.env' });
+// Load environment variables from .env.local
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const projectRoot = join(__dirname, '..');
+
+function loadEnvFile(filePath) {
+    try {
+        const content = readFileSync(filePath, 'utf-8');
+        const lines = content.split('\n');
+        for (const line of lines) {
+            const trimmed = line.trim();
+            if (trimmed && !trimmed.startsWith('#')) {
+                const [key, ...valueParts] = trimmed.split('=');
+                if (key && valueParts.length > 0) {
+                    const value = valueParts.join('=').replace(/^["']|["']$/g, '');
+                    process.env[key.trim()] = value.trim();
+                }
+            }
+        }
+    } catch (e) {
+        // File doesn't exist, that's okay
+    }
+}
+
+// Load .env.local first, then .env (local overrides)
+loadEnvFile(join(projectRoot, '.env'));
+loadEnvFile(join(projectRoot, '.env.local'));
 
 const client = createClient({
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
