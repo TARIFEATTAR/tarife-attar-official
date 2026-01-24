@@ -10,7 +10,6 @@
  */
 
 import type { PlaceholderImagesQueryResult } from '@/sanity/lib/queries';
-import { urlForImage } from '@/sanity/lib/image';
 
 // General placeholder image URL - for Atlas and other collections
 // Fallback if not set in Sanity

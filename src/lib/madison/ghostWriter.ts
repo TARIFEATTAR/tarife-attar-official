@@ -41,11 +41,22 @@ interface MadisonPayload {
   };
 }
 
+interface PortableTextBlock {
+  _type: 'block';
+  style: string;
+  children: Array<{
+    _type: 'span';
+    text: string;
+    marks: unknown[];
+  }>;
+  markDefs: unknown[];
+}
+
 /**
  * Converts markdown/HTML to Sanity Portable Text blocks
  * Simple implementation - for production, use @portabletext/to-portabletext
  */
-function markdownToBlocks(text: string): any[] {
+function markdownToBlocks(text: string): PortableTextBlock[] {
   if (!text) return [];
 
   // Split by paragraphs
@@ -85,11 +96,17 @@ function markdownToBlocks(text: string): any[] {
   });
 }
 
+interface SanityClientWithAssets extends ReturnType<typeof createClient> {
+  assets: {
+    upload: (type: 'image' | 'file', buffer: Buffer, options?: { filename?: string }) => Promise<{ _id: string }>;
+  };
+}
+
 /**
  * Fetches an image from a URL and uploads it to Sanity
  */
 async function uploadImageFromUrl(
-  client: ReturnType<typeof createClient>,
+  client: SanityClientWithAssets,
   imageUrl: string
 ): Promise<string | undefined> {
   if (!imageUrl || !imageUrl.startsWith('http')) return undefined;
@@ -153,7 +170,7 @@ export async function pushDraft(data: MadisonPayload): Promise<string> {
     apiVersion,
     token: writeToken,
     useCdn: false, // Always use the API for writes
-  });
+  }) as SanityClientWithAssets;
 
   // Generate draft ID
   const draftId = `drafts.${uuidv4()}`;
@@ -240,13 +257,14 @@ export async function pushDraft(data: MadisonPayload): Promise<string> {
   // Create the document
   try {
     console.log(`[Madison] Creating product draft in Sanity...`);
-    const result = await client.create(document as any);
+    const result = await client.create(document);
     console.log(`✅ [Madison] Draft created: ${result._id}`);
     return result._id;
   } catch (error) {
     console.error('[Madison] Sanity creation failed:', error);
     if (typeof error === 'object' && error !== null && 'details' in error) {
-      console.error('[Madison] Failure details:', JSON.stringify((error as any).details, null, 2));
+      const errorWithDetails = error as { details?: unknown };
+      console.error('[Madison] Failure details:', JSON.stringify(errorWithDetails.details, null, 2));
     }
     throw new Error(`Sanity creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
@@ -291,7 +309,7 @@ export async function pushJournalEntry(data: JournalPayload): Promise<string> {
     apiVersion,
     token: writeToken,
     useCdn: false,
-  });
+  }) as SanityClientWithAssets;
 
   // Generate draft ID
   const draftId = `drafts.${uuidv4()}`;
@@ -306,8 +324,12 @@ export async function pushJournalEntry(data: JournalPayload): Promise<string> {
   let relatedProductRefs: Array<{ _type: string; _ref: string; _key: string }> = [];
   if (data.relatedProductSlugs && data.relatedProductSlugs.length > 0) {
     const productQuery = `*[_type == "product" && slug.current in $slugs && !(_id in path("drafts.**"))]{_id, "slug": slug.current}`;
-    const products = await client.fetch(productQuery, { slugs: data.relatedProductSlugs });
-    relatedProductRefs = products.map((p: { _id: string }, index: number) => ({
+    interface ProductResult {
+      _id: string;
+      slug: string;
+    }
+    const products = await client.fetch<ProductResult[]>(productQuery, { slugs: data.relatedProductSlugs });
+    relatedProductRefs = products.map((p, index: number) => ({
       _type: 'reference',
       _ref: p._id,
       _key: `ref-${index}`,
@@ -363,13 +385,14 @@ export async function pushJournalEntry(data: JournalPayload): Promise<string> {
   // Create the document
   try {
     console.log(`[Madison] Creating journal draft in Sanity...`);
-    const result = await client.create(document as any);
+    const result = await client.create(document);
     console.log(`✅ [Madison] Journal draft created: ${result._id}`);
     return result._id;
   } catch (error) {
     console.error('[Madison] Sanity journal creation failed:', error);
     if (typeof error === 'object' && error !== null && 'details' in error) {
-      console.error('[Madison] Failure details:', JSON.stringify((error as any).details, null, 2));
+      const errorWithDetails = error as { details?: unknown };
+      console.error('[Madison] Failure details:', JSON.stringify(errorWithDetails.details, null, 2));
     }
     throw new Error(`Sanity journal creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
@@ -427,11 +450,7 @@ export async function pushFieldJournal(data: FieldJournalPayload): Promise<strin
     apiVersion,
     token: writeToken,
     useCdn: false,
-  }) as ReturnType<typeof createClient> & {
-    assets: {
-      upload: (type: 'image' | 'file', buffer: Buffer, options?: { filename?: string }) => Promise<{ _id: string }>;
-    };
-  };
+  }) as SanityClientWithAssets;
 
   // Generate draft ID
   const draftId = `drafts.${uuidv4()}`;
@@ -446,8 +465,12 @@ export async function pushFieldJournal(data: FieldJournalPayload): Promise<strin
   let featuredProductRefs: Array<{ _type: string; _ref: string; _key: string }> = [];
   if (data.featuredProductSlugs && data.featuredProductSlugs.length > 0) {
     const productQuery = `*[_type == "product" && slug.current in $slugs && !(_id in path("drafts.**"))]{_id, "slug": slug.current}`;
-    const products = await client.fetch(productQuery, { slugs: data.featuredProductSlugs });
-    featuredProductRefs = products.map((p: { _id: string }, index: number) => ({
+    interface ProductResult {
+      _id: string;
+      slug: string;
+    }
+    const products = await client.fetch<ProductResult[]>(productQuery, { slugs: data.featuredProductSlugs });
+    featuredProductRefs = products.map((p, index: number) => ({
       _type: 'reference',
       _ref: p._id,
       _key: `ref-${index}`,
@@ -521,13 +544,14 @@ export async function pushFieldJournal(data: FieldJournalPayload): Promise<strin
   // Create the document
   try {
     console.log(`[Madison] Creating Field Journal draft in Sanity...`);
-    const result = await client.create(document as any);
+    const result = await client.create(document);
     console.log(`✅ [Madison] Field Journal draft created: ${result._id}`);
     return result._id;
   } catch (error) {
     console.error('[Madison] Sanity Field Journal creation failed:', error);
     if (typeof error === 'object' && error !== null && 'details' in error) {
-      console.error('[Madison] Failure details:', JSON.stringify((error as any).details, null, 2));
+      const errorWithDetails = error as { details?: unknown };
+      console.error('[Madison] Failure details:', JSON.stringify(errorWithDetails.details, null, 2));
     }
     throw new Error(`Sanity Field Journal creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }

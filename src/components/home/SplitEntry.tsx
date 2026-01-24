@@ -77,8 +77,8 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, heroBackgrounds }) => 
           </div>
 
           {/* Always visible description */}
-          <motion.p className="max-w-[200px] sm:max-w-[240px] md:max-w-sm mx-auto text-xs sm:text-sm md:text-base opacity-80 leading-relaxed font-serif italic mb-6 md:mb-8">
-            Clean perfume oils organized across four sensory territories. Twenty-four destinations for the modern explorer.
+          <motion.p className="max-w-[200px] sm:max-w-[240px] md:max-w-sm mx-auto text-sm sm:text-base md:text-lg opacity-80 leading-relaxed font-serif italic mb-6 md:mb-8">
+            Clean perfume oils organized across four sensory territories. Twenty-six destinations for the modern explorer.
           </motion.p>
 
           {/* Territory preview */}
@@ -151,7 +151,7 @@ export const SplitEntry: React.FC<Props> = ({ onNavigate, heroBackgrounds }) => 
           </div>
 
           {/* Always visible description */}
-          <motion.p className="max-w-[200px] sm:max-w-[240px] md:max-w-sm mx-auto text-xs sm:text-sm md:text-base opacity-90 leading-relaxed font-serif italic mb-6 md:mb-8">
+          <motion.p className="max-w-[200px] sm:max-w-[240px] md:max-w-sm mx-auto text-sm sm:text-base md:text-lg opacity-90 leading-relaxed font-serif italic mb-6 md:mb-8">
             Pure resins, rare ouds, and aged materials for the devoted collector. Each specimen arrives with provenance documentation.
           </motion.p>
 

@@ -10,12 +10,16 @@ if (!domain || !accessToken) {
   console.warn('Shopify configuration missing. Cart functionality will be disabled.');
 }
 
+interface ShopifyFetchVariables {
+  [key: string]: unknown;
+}
+
 async function shopifyFetch({
   query,
   variables = {},
 }: {
   query: string;
-  variables?: any;
+  variables?: ShopifyFetchVariables;
 }) {
   if (!domain || !accessToken) {
     throw new Error('Shopify configuration missing. Please set NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN and NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN');

@@ -23,6 +23,46 @@ interface CartItem {
   image?: string;
 }
 
+interface ShopifyCartLineNode {
+  id: string;
+  quantity: number;
+  merchandise: {
+    id: string;
+    title?: string;
+    price?: {
+      amount: string;
+      currencyCode: string;
+    };
+    image?: {
+      url: string;
+    };
+    product: {
+      title: string;
+      handle: string;
+      featuredImage?: {
+        url: string;
+      };
+    };
+  };
+}
+
+interface ShopifyCart {
+  id: string;
+  checkoutUrl: string;
+  totalQuantity: number;
+  lines: {
+    edges: Array<{
+      node: ShopifyCartLineNode;
+    }>;
+  };
+  cost: {
+    totalAmount: {
+      amount: string;
+      currencyCode: string;
+    };
+  };
+}
+
 interface ShopifyCartContextType {
   items: CartItem[];
   itemCount: number;
@@ -39,7 +79,7 @@ interface ShopifyCartContextType {
 const ShopifyCartContext = createContext<ShopifyCartContextType | undefined>(undefined);
 
 export function ShopifyCartProvider({ children }: { children: React.ReactNode }) {
-  const [cart, setCart] = useState<any>(null);
+  const [cart, setCart] = useState<ShopifyCart | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -171,7 +211,7 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
       if (response.data?.cartLinesUpdate?.cart) {
         setCart(response.data.cartLinesUpdate.cart);
       }
-    } catch (_err) {
+    } catch {
       setError('Failed to update quantity');
     } finally {
       setIsLoading(false);
@@ -192,7 +232,7 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
       if (response.data?.cartLinesRemove?.cart) {
         setCart(response.data.cartLinesRemove.cart);
       }
-    } catch (_err) {
+    } catch {
       setError('Failed to remove item');
     } finally {
       setIsLoading(false);
@@ -209,8 +249,7 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const items: CartItem[] = cart?.lines?.edges?.map(({ node }: any) => {
+  const items: CartItem[] = cart?.lines?.edges?.map(({ node }: { node: ShopifyCartLineNode }) => {
     // Debug log for each item being mapped
     console.log('Cart Item Node:', {
       title: node.merchandise.product.title,
