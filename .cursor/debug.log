@@ -1,6 +1,0 @@
-{"sessionId":"debug-session","runId":"lint-verify","hypothesisId":"H1","location":"cart/page.tsx:log-state","message":"Cart render","data":{"items":0,"checkoutUrl":true},"timestamp":1769272283292}
-{"sessionId":"debug-session","runId":"lint-verify","hypothesisId":"H1","location":"cart/page.tsx:log-state","message":"Cart render","data":{"items":0,"checkoutUrl":true},"timestamp":1769272283293}
-{"sessionId":"debug-session","runId":"lint-verify","hypothesisId":"H1","location":"cart/page.tsx:log-state","message":"Cart render","data":{"items":0,"checkoutUrl":true},"timestamp":1769272284851}
-{"sessionId":"debug-session","runId":"lint-verify","hypothesisId":"H1","location":"cart/page.tsx:log-state","message":"Cart render","data":{"items":0,"checkoutUrl":true},"timestamp":1769272284851}
-{"sessionId":"debug-session","runId":"lint-verify","hypothesisId":"H1","location":"atlas/page.tsx:log-data","message":"AtlasPage fetched data","data":{"products":26,"territories":4},"timestamp":1769272333768}
-{"sessionId":"debug-session","runId":"lint-verify","hypothesisId":"H1","location":"atlas/page.tsx:log-data","message":"AtlasPage fetched data","data":{"products":26,"territories":4},"timestamp":1769272334294}
