@@ -35,12 +35,18 @@ interface ShopifyCartLineNode {
     };
     image?: {
       url: string;
+      altText?: string;
+      width?: number;
+      height?: number;
     };
     product: {
       title: string;
       handle: string;
       featuredImage?: {
         url: string;
+        altText?: string;
+        width?: number;
+        height?: number;
       };
     };
   };

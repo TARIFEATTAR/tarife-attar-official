@@ -119,9 +119,21 @@ export const GET_CART_QUERY = `
                   amount
                   currencyCode
                 }
+                image {
+                  url
+                  altText
+                  width
+                  height
+                }
                 product {
                   title
                   handle
+                  featuredImage {
+                    url
+                    altText
+                    width
+                    height
+                  }
                 }
               }
             }
@@ -158,9 +170,21 @@ export const ADD_LINES_MUTATION = `
                     amount
                     currencyCode
                   }
+                  image {
+                    url
+                    altText
+                    width
+                    height
+                  }
                   product {
                     title
                     handle
+                    featuredImage {
+                      url
+                      altText
+                      width
+                      height
+                    }
                   }
                 }
               }
@@ -198,9 +222,21 @@ export const UPDATE_LINES_MUTATION = `
                     amount
                     currencyCode
                   }
+                  image {
+                    url
+                    altText
+                    width
+                    height
+                  }
                   product {
                     title
                     handle
+                    featuredImage {
+                      url
+                      altText
+                      width
+                      height
+                    }
                   }
                 }
               }
@@ -238,9 +274,21 @@ export const REMOVE_LINES_MUTATION = `
                     amount
                     currencyCode
                   }
+                  image {
+                    url
+                    altText
+                    width
+                    height
+                  }
                   product {
                     title
                     handle
+                    featuredImage {
+                      url
+                      altText
+                      width
+                      height
+                    }
                   }
                 }
               }
