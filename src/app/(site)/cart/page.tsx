@@ -261,9 +261,11 @@ export default function CartPage() {
                               ${parseFloat(item.price || '0').toFixed(2)}
                             </p>
                           </div>
-                          <p className="font-mono text-[10px] uppercase tracking-widest opacity-40 mb-3 md:mb-4">
-                            Shopify Variant: {item.handle}
-                          </p>
+                          {item.variantTitle && (
+                            <p className="font-mono text-[10px] uppercase tracking-widest opacity-40 mb-3 md:mb-4">
+                              {item.variantTitle}
+                            </p>
+                          )}
                           <div className="flex items-center gap-3 md:gap-6 flex-wrap">
                             <div className="flex items-center border border-theme-charcoal/20">
                               <button

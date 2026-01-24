@@ -15,7 +15,8 @@ import {
 interface CartItem {
   id: string; // Line item ID
   variantId: string;
-  title: string;
+  title: string; // Product title
+  variantTitle?: string; // Variant title (e.g., "6 mL Cairo")
   handle: string;
   quantity: number;
   price: string;
@@ -267,6 +268,7 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
       id: node.id,
       variantId: node.merchandise.id,
       title: node.merchandise.product.title,
+      variantTitle: node.merchandise.title, // Variant title (e.g., "6 mL Cairo")
       handle: node.merchandise.product.handle,
       quantity: node.quantity,
       price: String(node.merchandise.price?.amount || '0.00'),
