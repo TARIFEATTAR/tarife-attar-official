@@ -205,6 +205,11 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
       return;
     }
 
+    if (!cart) {
+      setError('No cart available');
+      return;
+    }
+
     setIsLoading(true);
     try {
       const response = await shopifyFetch({
@@ -226,6 +231,11 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
   };
 
   const removeItem = async (lineId: string) => {
+    if (!cart) {
+      setError('No cart available');
+      return;
+    }
+
     setIsLoading(true);
     try {
       const response = await shopifyFetch({

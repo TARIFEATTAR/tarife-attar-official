@@ -96,7 +96,7 @@ function markdownToBlocks(text: string): PortableTextBlock[] {
   });
 }
 
-interface SanityClientWithAssets extends ReturnType<typeof createClient> {
+type SanityClientWithAssets = ReturnType<typeof createClient> & {
   assets: {
     upload: (type: 'image' | 'file', buffer: Buffer, options?: { filename?: string }) => Promise<{ _id: string }>;
   };
@@ -257,7 +257,7 @@ export async function pushDraft(data: MadisonPayload): Promise<string> {
   // Create the document
   try {
     console.log(`[Madison] Creating product draft in Sanity...`);
-    const result = await client.create(document);
+    const result = await client.create(document as { _type: string; _id: string; [key: string]: unknown });
     console.log(`✅ [Madison] Draft created: ${result._id}`);
     return result._id;
   } catch (error) {
@@ -385,7 +385,7 @@ export async function pushJournalEntry(data: JournalPayload): Promise<string> {
   // Create the document
   try {
     console.log(`[Madison] Creating journal draft in Sanity...`);
-    const result = await client.create(document);
+    const result = await client.create(document as { _type: string; _id: string; [key: string]: unknown });
     console.log(`✅ [Madison] Journal draft created: ${result._id}`);
     return result._id;
   } catch (error) {
@@ -544,7 +544,7 @@ export async function pushFieldJournal(data: FieldJournalPayload): Promise<strin
   // Create the document
   try {
     console.log(`[Madison] Creating Field Journal draft in Sanity...`);
-    const result = await client.create(document);
+    const result = await client.create(document as { _type: string; _id: string; [key: string]: unknown });
     console.log(`✅ [Madison] Field Journal draft created: ${result._id}`);
     return result._id;
   } catch (error) {
