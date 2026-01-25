@@ -30,6 +30,18 @@ const nextConfig = {
   // =========================================================================
   async redirects() {
     return [
+      // =========================================================================
+      // OMNISEND / EMAIL CAMPAIGN REDIRECTS
+      // Handle common "shop" URLs from abandoned cart/checkout emails
+      // =========================================================================
+      { source: '/shop', destination: '/atlas', permanent: false },
+      { source: '/shopify', destination: '/atlas', permanent: false },
+      { source: '/shopify/shop', destination: '/atlas', permanent: false },
+      { source: '/collections', destination: '/atlas', permanent: false },
+      { source: '/collections/all', destination: '/atlas', permanent: false },
+      { source: '/store', destination: '/atlas', permanent: false },
+      { source: '/browse', destination: '/atlas', permanent: false },
+      
       // EMBER TERRITORY
       { source: '/product/granada-amber', destination: '/product/granada', permanent: true },
       { source: '/product/beloved', destination: '/product/granada', permanent: true },
