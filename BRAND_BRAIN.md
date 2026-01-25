@@ -101,7 +101,7 @@ The brand operates on a bifurcated philosophy — two distinct paths serving dif
 **Overview:**
 - Total Products: 24 perfume oils (6 per territory)
 - Format: Perfume Oil
-- Volume: 9ml (standard)
+- Volume: 6ml and 12ml
 - Price Range: $28-$55
 
 **The Four Territories:**
@@ -135,7 +135,7 @@ The brand operates on a bifurcated philosophy — two distinct paths serving dif
 
 **Overview:**
 - Format: Pure Oud, Rare Attar, Aged Resin, Pure Distillate, Traditional Attar
-- Volume: 3ml (typical for rare materials)
+- Volume: 6ml and 12ml
 - Price Range: $45-$450
 
 **Relic Product Attributes:**
