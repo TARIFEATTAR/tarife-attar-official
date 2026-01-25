@@ -90,12 +90,24 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize cart from localStorage on mount
+  // Initialize cart from localStorage or URL parameters (for abandoned cart recovery)
   useEffect(() => {
     const initCart = async () => {
       setIsLoading(true);
       try {
-        const cartId = localStorage.getItem('shopify_cart_id');
+        // Check for cart ID in URL parameters first (for abandoned cart emails)
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCartId = urlParams.get('cart_id') || urlParams.get('cart');
+        
+        // Also check for checkout URL - if provided, log it (cart restoration happens via cart_id)
+        const checkoutUrl = urlParams.get('checkout_url');
+        if (checkoutUrl) {
+          console.log('Checkout URL detected in params:', checkoutUrl);
+          // Note: For direct checkout, the cart page will handle redirect
+        }
+
+        // Priority: URL param > localStorage
+        const cartId = urlCartId || localStorage.getItem('shopify_cart_id');
 
         if (cartId) {
           const response = await shopifyFetch({
@@ -105,9 +117,17 @@ export function ShopifyCartProvider({ children }: { children: React.ReactNode })
 
           if (response.data?.cart) {
             setCart(response.data.cart);
+            // Save to localStorage for future use
+            localStorage.setItem('shopify_cart_id', cartId);
+            console.log('✅ Cart restored from:', urlCartId ? 'URL parameter' : 'localStorage');
           } else {
             // Cart might be expired, clear it
-            localStorage.removeItem('shopify_cart_id');
+            if (urlCartId) {
+              // If from URL, don't clear localStorage (might have a different valid cart)
+              console.warn('Cart ID from URL is expired or invalid');
+            } else {
+              localStorage.removeItem('shopify_cart_id');
+            }
             await createNewCart();
           }
         } else {

@@ -27,6 +27,19 @@ export default function CartPage() {
     clearCart
   } = useShopifyCart();
 
+  // Handle direct checkout URL from abandoned cart emails
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const directCheckoutUrl = urlParams.get('checkout_url');
+    
+    if (directCheckoutUrl && directCheckoutUrl.startsWith('http')) {
+      // If a checkout URL is provided directly, redirect to checkout immediately
+      console.log('Direct checkout URL detected, redirecting to checkout...');
+      window.location.href = directCheckoutUrl;
+      return;
+    }
+  }, []);
+
   // Show "Save your satchel" prompt after 15 seconds on cart page with items
   useEffect(() => {
     if (items.length === 0) return;

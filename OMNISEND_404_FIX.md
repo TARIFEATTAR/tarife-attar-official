@@ -16,19 +16,19 @@ OmniAscent is likely generating URLs that don't exist on your Next.js site:
 
 ### 1. Added Redirects in `next.config.js`
 
-I've added redirects for common "shop" URLs that OmniAscent might generate:
+I've added redirects for common "shop" URLs that OmniAscent might generate. **For abandoned cart emails, these redirect to `/cart`** (not the collection page), so users can see their cart and complete checkout:
 
 ```javascript
-{ source: '/shop', destination: '/atlas', permanent: false },
-{ source: '/shopify', destination: '/atlas', permanent: false },
-{ source: '/shopify/shop', destination: '/atlas', permanent: false },
-{ source: '/collections', destination: '/atlas', permanent: false },
-{ source: '/collections/all', destination: '/atlas', permanent: false },
-{ source: '/store', destination: '/atlas', permanent: false },
-{ source: '/browse', destination: '/atlas', permanent: false },
+{ source: '/shop', destination: '/cart', permanent: false },
+{ source: '/shopify', destination: '/cart', permanent: false },
+{ source: '/shopify/shop', destination: '/cart', permanent: false },
+{ source: '/collections', destination: '/cart', permanent: false },
+{ source: '/collections/all', destination: '/cart', permanent: false },
+{ source: '/store', destination: '/cart', permanent: false },
+{ source: '/browse', destination: '/cart', permanent: false },
 ```
 
-These redirect to `/atlas` (your main collection page).
+**Why `/cart`?** For abandoned cart emails, users should go directly to their cart to complete the purchase, not browse more products.
 
 ### 2. Next Steps: Check OmniAscent Configuration
 
@@ -49,16 +49,22 @@ You need to verify what URL OmniAscent is actually generating:
 
 ### 3. Update OmniAscent Email Templates
 
-Once you know what URL OmniAscent is generating, you have two options:
+**For abandoned cart/checkout emails, you should configure OmniAscent to use:**
 
-#### Option A: Update OmniAscent to Use Correct URLs
-In your OmniAscent email templates, change the shop button URL to:
-- **Main collection**: `https://www.tarifeattar.com/atlas`
-- **Cart page**: `https://www.tarifeattar.com/cart`
-- **Home page**: `https://www.tarifeattar.com`
+#### Primary Button (Complete Checkout)
+- **URL**: Use OmniAscent's `{{checkout_url}}` variable - this goes directly to Shopify checkout
+- **Text**: "Complete Checkout" or "Continue to Checkout"
 
-#### Option B: Keep Redirects (Current Solution)
-The redirects I've added will automatically handle common patterns, so even if OmniAscent generates `/shop`, it will redirect to `/atlas`.
+#### Secondary Button (View Cart)
+- **URL**: `https://www.tarifeattar.com/cart`
+- **Text**: "View Cart" or "Return to Cart"
+
+#### Alternative: Direct Cart Recovery
+If OmniAscent supports cart recovery tokens, you can:
+- Use `{{cart_url}}` or `{{recovery_url}}` if available
+- Or manually set: `https://www.tarifeattar.com/cart?cart_id={{cart_id}}` (if OmniAscent provides cart ID)
+
+**Note:** The redirects I've added will handle common patterns automatically, so even if OmniAscent generates `/shop`, it will redirect to `/cart`.
 
 ### 4. Common OmniAscent URL Patterns
 
@@ -71,9 +77,21 @@ OmniAscent might be generating:
 ### 5. Verify Redirects Work
 
 After deploying, test these URLs:
-- `https://www.tarifeattar.com/shop` → Should redirect to `/atlas`
-- `https://www.tarifeattar.com/collections` → Should redirect to `/atlas`
-- `https://www.tarifeattar.com/shopify` → Should redirect to `/atlas`
+- `https://www.tarifeattar.com/shop` → Should redirect to `/cart`
+- `https://www.tarifeattar.com/collections` → Should redirect to `/cart`
+- `https://www.tarifeattar.com/shopify` → Should redirect to `/cart`
+
+### 6. How Cart Restoration Works
+
+Your cart system:
+1. **Stores cart ID in localStorage** (`shopify_cart_id`)
+2. **On `/cart` page load**, it tries to restore the cart from localStorage
+3. **If cart ID exists**, it fetches the cart from Shopify
+4. **If cart is expired/missing**, it creates a new cart
+
+**For abandoned cart emails:**
+- If the user clicks the link on the same device/browser, their cart should restore automatically
+- If on a different device, they'll see an empty cart (this is expected - they need to add items again or use the checkout URL directly)
 
 ## Additional Considerations
 
