@@ -135,7 +135,7 @@ The brand operates on a bifurcated philosophy — two distinct paths serving dif
 
 **Overview:**
 - Format: Pure Oud, Rare Attar, Aged Resin, Pure Distillate, Traditional Attar
-- Volume: 6ml and 12ml
+- Volume: 3ml (Attars & Ouds), 5ml and 10ml (Essential Oils)
 - Price Range: $45-$450
 
 **Relic Product Attributes:**
