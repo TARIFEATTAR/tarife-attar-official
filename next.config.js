@@ -105,6 +105,14 @@ const nextConfig = {
       { source: '/products/china-rain', destination: '/product/kyoto', permanent: true },
       { source: '/products/coconut-jasmine', destination: '/product/bahia', permanent: true },
       { source: '/products/regatta', destination: '/product/regatta', permanent: true },
+      
+      // Catch-all for /products/* → /product/* (handles any Shopify-style product URLs)
+      // This must be LAST so specific redirects above take precedence
+      { 
+        source: '/products/:slug*', 
+        destination: '/product/:slug*', 
+        permanent: false 
+      },
     ];
   },
 };
