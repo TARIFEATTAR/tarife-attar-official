@@ -79,6 +79,17 @@ const nextConfig = {
       { source: '/product/china-rain', destination: '/product/kyoto', permanent: true },
       { source: '/product/coconut-jasmine', destination: '/product/bahia', permanent: true },
       
+      // =========================================================================
+      // LEGACY PRODUCTS - Redirect to cart (products that exist in Shopify but not on headless site)
+      // These must come BEFORE the catch-all redirect below
+      // =========================================================================
+      { source: '/product/tarife-attar-gift-card', destination: '/cart', permanent: false },
+      { source: '/products/tarife-attar-gift-card', destination: '/cart', permanent: false },
+      { source: '/product/gift-card', destination: '/cart', permanent: false },
+      { source: '/products/gift-card', destination: '/cart', permanent: false },
+      // Add more legacy products here as needed:
+      // { source: '/products/legacy-product-name', destination: '/cart', permanent: false },
+      
       // Also handle /products/ path (Shopify-style URLs)
       { source: '/products/granada-amber', destination: '/product/granada', permanent: true },
       { source: '/products/honey-oudh', destination: '/product/caravan', permanent: true },
